@@ -1722,7 +1722,7 @@ function fxRender(s){
 /* ================= Браузер ================= */
 const PAGES = {
   start:{ title:'Нова вкладка', url:'', start:true },
-  school:{ title:'Школа №5', url:'school5.ua', h:'Школа №5 · Новини',
+  school:{ title:'Гімназія №131', url:'school131.kyiv.ua', h:'Гімназія №131 · Новини',
     ps:['Вітаємо на сайті нашої школи! Тут новини, розклад уроків і оголошення.', 'Цього тижня — конкурс малюнків «Моя улюблена книжка». Роботи несіть до бібліотеки.',
         'У п\'ятницю — екскурсія до планетарію для 4 класів.', 'Шкільна їдальня оновила меню: тепер щодня є фрукти.', 'Розклад перших уроків:'],
     table:[['День','Перший урок'],['Понеділок','Математика'],['Вівторок','Українська мова'],['Середа','Інформатика'],['Четвер','Природознавство'],['П\'ятниця','Фізкультура']],
@@ -1793,7 +1793,7 @@ function webApply(s, combo){
 function webPageHTML(s, tab){
   const p = PAGES[tab.page];
   if(tab.err) return `<div class="bw-center"><div class="big">🦖</div><p>Немає з'єднання. Сторінку не вдалося завантажити.</p><p style="opacity:.6">Спробуй оновити сторінку</p></div>`;
-  if(p.start) return `<div class="bw-center"><div class="big">🔎</div><p>Нова вкладка</p><div class="bw-tiles"><span>🏫 school5.ua</span><span>📚 wiki.ua</span><span>☀️ pogoda.ua</span><span>▶ video.ua</span></div></div>`;
+  if(p.start) return `<div class="bw-center"><div class="big">🔎</div><p>Нова вкладка</p><div class="bw-tiles"><span>🏫 school131.kyiv.ua</span><span>📚 wiki.ua</span><span>☀️ pogoda.ua</span><span>▶ video.ua</span></div></div>`;
   const q = s.find && s.find.q;
   const re = q ? new RegExp(escRe(esc(q)), 'gi') : null;
   const hl = t => re ? esc(t).replace(re, m=>`<mark>${m}</mark>`) : esc(t);
@@ -1884,7 +1884,7 @@ function osRender(s){
   const body = id => ({
     doc:'Моє літо<br><span class="sub">Влітку я їздив до моря. Там були чайки.</span>',
     files:'📁 Документи<br>📁 Зображення<br>📁 Музика<br>📁 Відео',
-    web:'<span class="sub">🔗 school5.ua</span><br>Школа №5 · Новини<br><span class="sub">Розклад, гуртки, оголошення</span>',
+    web:'<span class="sub">🔗 school131.kyiv.ua</span><br>Гімназія №131 · Новини<br><span class="sub">Розклад, гуртки, оголошення</span>',
     task:`<div class="row"><span>🌐 Браузер</span><span>перезапущено</span></div><div class="row"><span>📄 Документ</span><span>1%</span></div><div class="row"><span>📁 Провідник</span><span>0%</span></div>`
   }[id]);
   const wins = s.order.filter(id=>s.wins[id] && !s.wins[id].min).map((id, z)=>`<div class="oswin${id === s.active ? ' act' : ''}${s.hang === id ? ' hang' : ''}" style="${pos(id, s.wins[id])}; z-index:${z + 1}">
@@ -1895,7 +1895,7 @@ function osRender(s){
   el.innerHTML = `<div class="os-area">${wins}</div>
     ${s.start ? `<div class="os-start">${START.map(([i, t])=>`<div><span>${i}</span>${t}</div>`).join('')}<div class="foot"><span>👤 ${esc(player || 'Учень')}</span><span>⏻</span></div></div>` : ''}
     ${s.snip ? '<div class="os-snip"><div class="sbar">✂️ Виділи область для знімка</div><div class="sel"></div></div>' : ''}
-    ${s.panel === 'clip' ? '<div class="os-panel"><h5>📋 Буфер обміну</h5><div class="it">🖼️ Знімок екрана</div><div class="it">Синій кит — найбільша тварина</div><div class="it">school5.ua</div></div>' : ''}
+    ${s.panel === 'clip' ? '<div class="os-panel"><h5>📋 Буфер обміну</h5><div class="it">🖼️ Знімок екрана</div><div class="it">Синій кит — найбільша тварина</div><div class="it">school131.kyiv.ua</div></div>' : ''}
     ${s.panel === 'emoji' ? `<div class="os-panel"><h5>😀 Емодзі</h5><div class="emo">${'😀 😂 😍 🤔 👍 🎉 ❤️ ⭐ 🐱 🐶 🍎 🚀'.split(' ').map(e=>`<span>${e}</span>`).join('')}</div></div>` : ''}
     ${switching ? `<div class="os-switch">${s.order.filter(id=>s.wins[id]).reverse().map(id=>`<div class="${id === s.active ? 'on' : ''}"><span>${OS_APPS[id].ico}</span>${OS_APPS[id].title}</div>`).join('')}</div>` : ''}
     ${s.shut ? '<div class="os-shut">⏻ Завершення роботи<br><small style="font-weight:600">Вікон не лишилось — тепер Alt + F4 пропонує вимкнути комп\'ютер</small></div>' : ''}
