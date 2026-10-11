@@ -1,0 +1,1874 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Гарячі клавіші · Лабораторія</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Nunito+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#F6F5FB; --ink:#1B1B3A; --ink-soft:#514F72; --surface:#FFFFFF; --line:#E4E1F5;
+    --purple:#6C5CE7; --purple-dark:#5340c9; --teal:#16A3A0; --teal-dark:#0E7C7A; --coral:#FF6B4A;
+    --yellow:#FFC93C; --pink:#FF5D9E; --blue:#2D9CDB;
+    --radius-s:10px; --radius-m:16px; --radius-l:26px;
+    --key-plain:#F3F2FA; --key-mod:#E6E2FF;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0; background:var(--bg); color:var(--ink); font-family:'Nunito Sans',sans-serif; line-height:1.6; -webkit-font-smoothing:antialiased;}
+  h1,h2,h3{font-family:'Baloo 2',sans-serif; font-weight:700; margin:0; color:var(--ink);}
+  button{font:inherit;}
+  [hidden]{display:none !important;}
+  .container{max-width:980px; margin:0 auto; padding:0 16px;}
+
+  /* ---------- Верхня панель ---------- */
+  .topbar{position:sticky; top:0; z-index:10; background:rgba(246,245,251,.92); backdrop-filter:blur(6px); border-bottom:1px solid var(--line);}
+  .topbar-inner{max-width:980px; margin:0 auto; padding:12px 16px; display:flex; align-items:center; gap:12px;}
+  .back-link{font-family:'Baloo 2',sans-serif; font-weight:600; font-size:14px; color:var(--teal-dark); text-decoration:none; white-space:nowrap;}
+  .back-link:hover{text-decoration:underline;}
+  .game-title{font-family:'Baloo 2',sans-serif; font-weight:700; font-size:16px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
+  .top-btn{font-family:'Baloo 2',sans-serif; font-weight:700; font-size:14px; border:1.5px solid var(--teal); background:var(--surface); color:var(--teal-dark); border-radius:999px; padding:4px 14px; cursor:pointer; white-space:nowrap;}
+  .top-btn:hover{background:#E3F7F6;}
+  @media (max-width:560px){ .game-title{display:none;} .top-btn .long{display:none;} .top-btn{padding:4px 11px;} .topbar-inner{gap:8px;} }
+  main{padding:16px 0 40px;}
+
+  .neuron-counter{display:flex; align-items:center; gap:6px; margin-left:auto; background:var(--surface); border:1.5px solid var(--line); border-radius:999px; padding:3px 12px 3px 4px; font-family:'Baloo 2',sans-serif; font-weight:700; font-size:15px; white-space:nowrap;}
+  .neuron-counter svg{width:24px; height:24px;}
+  #neuronCount{display:inline-block; min-width:1.4em; transition:transform .25s ease;}
+  #neuronCount.pop{transform:scale(1.35);}
+  .nico{display:inline-block; width:1.15em; height:1.15em; vertical-align:-.22em;}
+  .player-btn{display:inline-flex; align-items:center; gap:6px; max-width:200px; overflow:hidden; text-overflow:ellipsis;}
+  .pb-bot{display:inline-block; width:24px; flex-shrink:0;}
+  .pb-bot svg{display:block; width:100%; height:auto;}
+
+  /* ---------- Робочий стіл ---------- */
+  .desk{position:relative; margin-top:8px; height:clamp(320px, 44vw, 410px); border-radius:var(--radius-l); overflow:hidden;
+    background-color:#BFE6FF; background-size:cover; background-position:center bottom; user-select:none;}
+  .appwin{position:absolute; left:3.5%; top:6%; width:min(650px, 70%); bottom:54px; display:flex; flex-direction:column;
+    background:var(--w-bg); color:var(--w-ink); border-radius:12px; overflow:hidden; box-shadow:0 14px 34px rgba(27,27,58,.28), 0 0 0 1px rgba(27,27,58,.08);}
+  .titlebar{display:flex; align-items:center; gap:6px; height:38px; flex:none; padding:0 8px 0 12px; background:var(--w-head); color:var(--w-head-ink);
+    font-family:'Baloo 2',sans-serif; font-weight:700; font-size:14px; border-bottom:1px solid rgba(27,27,58,.08);}
+  .titlebar .t{flex:1; min-width:60px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
+  .titlebar .wbtn{width:26px; height:22px; border-radius:6px; display:flex; align-items:center; justify-content:center; font-size:12px; opacity:.75;}
+  .titlebar .wbtn.x{background:rgba(232,69,60,.85); color:#fff; opacity:1;}
+  .tb{min-width:26px; height:24px; padding:0 6px; border-radius:6px; display:flex; align-items:center; justify-content:center; font-family:'Baloo 2',sans-serif; font-size:15px; color:inherit; opacity:.55; border:1.5px solid transparent;}
+  .tb.on{opacity:1; border-color:var(--w-caret); background:rgba(255,255,255,.12);}
+  .tb.b{font-weight:800;} .tb.i{font-style:italic;} .tb.u{text-decoration:underline;}
+  .tb.caps{font-size:12px; font-weight:800; letter-spacing:.5px;}
+  .clip{display:flex; align-items:center; gap:4px; max-width:34%; margin:0 4px; padding:1px 10px; border-radius:999px; background:rgba(127,127,127,.16); font-size:13px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; font-weight:700;}
+  .clip.flash{animation:flash .6s ease;}
+  @keyframes flash{30%{background:var(--yellow); color:var(--ink); transform:scale(1.08);}}
+  .doc{flex:1; overflow:auto; padding:10px 18px; font-size:clamp(16px, min(2.3vw, 3.4vh), 24px); font-weight:600; line-height:1.6; white-space:pre-wrap; word-break:break-word; cursor:text;}
+  .doc .b{font-weight:800;} .doc .i{font-style:italic;} .doc .u{text-decoration:underline; text-decoration-thickness:2px; text-underline-offset:3px;}
+  .doc .s{background:var(--w-sel); border-radius:2px;}
+  .caret{display:inline-block; width:0; height:1.15em; vertical-align:-.2em; border-left:2.5px solid var(--w-caret); margin-right:-2.5px; animation:blink 1s steps(1) infinite;}
+  .desk.typing .caret{animation:none;}
+  @keyframes blink{50%{border-left-color:transparent;}}
+  @media (max-height:760px){ body.playing .statusbar{display:none;} }
+  .statusbar{display:flex; gap:14px; padding:3px 12px; font-size:12px; font-weight:700; opacity:.7; background:var(--w-bar); border-top:1px solid rgba(27,27,58,.07);}
+  .saved-toast{position:absolute; right:12px; top:44px; padding:3px 12px; border-radius:999px; background:#16803C; color:#fff; font-family:'Baloo 2',sans-serif; font-weight:700; font-size:13px; opacity:0; transition:opacity .2s ease;}
+  .saved-toast.show{opacity:1;}
+  .appwin.shake{animation:shake .32s ease;}
+  @keyframes shake{25%{transform:translateX(-6px);} 50%{transform:translateX(5px);} 75%{transform:translateX(-3px);}}
+
+  .taskbar{position:absolute; left:0; right:0; bottom:0; height:42px; display:flex; align-items:center; gap:6px; padding:0 10px;
+    background:rgba(27,27,58,.72); backdrop-filter:blur(6px); color:#fff;}
+  .tbi{width:32px; height:32px; border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:18px; opacity:.55;}
+  .tbi.on{opacity:1; background:rgba(255,255,255,.16); box-shadow:inset 0 -2px 0 var(--yellow);}
+  .tbi.start{opacity:1;}
+  .clock{margin-left:10px; font-family:'Baloo 2',sans-serif; font-weight:600; font-size:14px; opacity:.9;}
+  .tb-stats{display:flex; gap:6px; margin-left:auto; min-width:0; overflow:hidden;}
+  .tb-stats .stat{background:rgba(255,255,255,.14); color:rgba(255,255,255,.85); border-radius:999px; padding:1px 10px; font-size:12px; white-space:nowrap;}
+  .tb-stats .stat b{font-family:'Baloo 2',sans-serif; font-weight:800; font-size:14.5px; color:#fff; margin-right:3px;}
+  .tb-stats .stat.hot{background:rgba(255,201,60,.45);}
+  .tb-stats .stat.warn{background:rgba(232,69,60,.7);}
+  @media (max-width:700px){ .tb-stats .stat:nth-child(n+4){display:none;} }
+  body.playing .desk{height:clamp(240px, calc(100vh - 420px), 410px);}
+
+  .robot{position:absolute; right:2.5%; bottom:46px; width:clamp(84px, 13vw, 128px); z-index:2; transition:transform .2s ease;}
+  .robot svg{display:block; width:100%; height:auto; overflow:visible;}
+  .robot.hop{animation:hop .5s ease;}
+  @keyframes hop{40%{transform:translateY(-12px);}}
+  .bubble{position:absolute; right:calc(2.5% + 18px); bottom:calc(46px + clamp(84px, 13vw, 128px) * 1.05); z-index:3; max-width:min(260px, 30%);
+    background:#fff; color:var(--ink); border-radius:16px; padding:8px 12px; font-family:'Baloo 2',sans-serif; font-weight:600; font-size:14.5px; line-height:1.3;
+    box-shadow:0 6px 18px rgba(27,27,58,.18);}
+  .bubble::after{content:""; position:absolute; right:26px; bottom:-8px; border:8px solid transparent; border-top-color:#fff; border-bottom:0;}
+  .bubble:empty{display:none;}
+  .bubble.ok{background:#DDF4E6;} .bubble.ok::after{border-top-color:#DDF4E6;}
+  .bubble.bad{background:#FFE9E2;} .bubble.bad::after{border-top-color:#FFE9E2;}
+  @media (max-width:700px){
+    .appwin{width:auto; right:3.5%;}
+    .robot{width:64px; bottom:48px; opacity:.95;}
+    .bubble{max-width:62%; bottom:118px; font-size:13px;}
+  }
+  .start-over{position:absolute; inset:0; z-index:4; display:flex; align-items:center; justify-content:center; background:rgba(27,27,58,.12);}
+  .start-over .btn{box-shadow:0 4px 0 var(--teal-dark), 0 10px 24px rgba(27,27,58,.3);}
+  .focus-note{position:absolute; inset:0; z-index:5; display:flex; align-items:center; justify-content:center; background:rgba(251,250,254,.8);
+    font-family:'Baloo 2',sans-serif; font-size:20px; font-weight:700; color:var(--teal-dark); cursor:pointer;}
+
+  /* ---------- Панелі ---------- */
+  .panel{background:var(--surface); border:1.5px solid var(--line); border-radius:var(--radius-l); padding:20px; margin-top:16px;}
+  .tabs{display:flex; gap:6px; flex-wrap:wrap; margin:-4px 0 18px; padding-bottom:12px; border-bottom:1.5px solid var(--line);}
+  .tab{font-family:'Baloo 2',sans-serif; font-weight:700; font-size:15px; border:none; background:none; color:var(--ink-soft); padding:6px 14px; border-radius:999px; cursor:pointer;}
+  .tab:hover{background:var(--bg);}
+  .tab.on{background:var(--ink); color:#fff;}
+  .tab-count{font-size:12px; background:var(--yellow); color:var(--ink); border-radius:999px; padding:0 7px; margin-left:2px;}
+  .opt + .opt{margin-top:20px;}
+  .opt h3{font-size:15px; color:var(--ink-soft); margin-bottom:8px;}
+  .seg{display:flex; flex-wrap:wrap; gap:8px;}
+  .seg button{font-family:'Baloo 2',sans-serif; font-weight:600; font-size:14.5px; line-height:1.25; text-align:left; border:1.5px solid var(--line); background:var(--surface); color:var(--ink); padding:8px 14px; border-radius:var(--radius-m); cursor:pointer; transition:all .15s ease;}
+  .seg button small{display:block; font-family:'Nunito Sans',sans-serif; font-weight:600; font-size:12px; color:var(--ink-soft);}
+  .seg button:hover:not(:disabled){border-color:var(--teal);}
+  .seg button.on{background:#E3F7F6; border-color:var(--teal); box-shadow:inset 0 0 0 1px var(--teal);}
+  .seg button:disabled{opacity:.45; cursor:not-allowed;}
+  .note-small{font-size:13px; color:var(--ink-soft); margin:6px 0 0;}
+
+  .btn{font-family:'Baloo 2',sans-serif; font-weight:700; font-size:15px; border:none; border-radius:999px; padding:10px 20px; cursor:pointer;}
+  .btn-primary{background:var(--teal); color:#fff;}
+  .btn-primary:hover{background:var(--teal-dark);}
+  .btn-big{font-size:19px; padding:12px 30px; box-shadow:0 4px 0 var(--teal-dark);}
+  .btn-big:active{transform:translateY(2px); box-shadow:0 2px 0 var(--teal-dark);}
+  .btn-ghost{background:var(--bg); color:var(--ink); border:1.5px solid var(--line);}
+  .btn-ghost:hover{border-color:var(--teal);}
+  .btn-small{font-size:13.5px; padding:7px 14px;}
+  .btn:disabled{opacity:.5; cursor:not-allowed;}
+  .link-btn{border:none; background:none; color:var(--teal-dark); font-weight:700; font-size:12.5px; cursor:pointer; padding:0; text-decoration:underline;}
+  .link-btn.danger{color:#C2410C;}
+
+  /* Вибір: шпалери, робот, теми */
+  .cards{display:grid; gap:10px; grid-template-columns:repeat(auto-fill, minmax(118px, 1fr));}
+  .pick{position:relative; border:1.5px solid var(--line); background:var(--surface); border-radius:var(--radius-m); padding:0; cursor:pointer; overflow:hidden; text-align:center; transition:all .15s ease;}
+  .pick:hover:not(:disabled){border-color:var(--teal); transform:translateY(-2px);}
+  .pick.on{border-color:var(--teal); box-shadow:0 0 0 2px var(--teal);}
+  .pick:disabled{cursor:not-allowed;}
+  .pick .label{display:block; font-family:'Baloo 2',sans-serif; font-weight:700; font-size:14.5px; line-height:1.2; padding:7px 6px 2px;}
+  .pick small{display:block; font-size:11.5px; font-weight:600; color:var(--ink-soft); line-height:1.25; padding:0 6px 8px;}
+  .pick .label:last-child{padding-bottom:10px;}
+  .wall-prev{height:62px; background-size:cover; background-position:center bottom;}
+  .pick:disabled .wall-prev, .pick:disabled .theme-prev{filter:grayscale(1) opacity(.45);}
+  .pick .bot-prev{display:block; width:62px; margin:10px auto 0;}
+  .pick .bot-prev svg{display:block; width:100%; height:auto; overflow:visible;}
+  .pick:disabled .bot-prev svg{filter:brightness(0) opacity(.16);}
+  .theme-prev{height:62px; padding:10px 12px 0; background:var(--bg);}
+  .theme-prev i{display:block; height:100%; border-radius:8px 8px 0 0; overflow:hidden; box-shadow:0 0 0 1px rgba(27,27,58,.1);}
+  .theme-prev i::before{content:""; display:block; height:12px; background:var(--h);}
+  .theme-prev i::after{content:"Аа|"; display:block; padding:2px 8px; text-align:left; font-weight:800; font-size:14px; background:var(--b); color:var(--k); height:100%;}
+  .swatches{display:flex; gap:10px; margin-top:12px; flex-wrap:wrap;}
+  .swatch{width:34px; height:34px; border-radius:50%; border:3px solid #fff; box-shadow:0 0 0 1.5px var(--line); cursor:pointer; padding:0;}
+  .swatch.on{box-shadow:0 0 0 3px var(--ink);}
+
+  /* Режими */
+  .modes{display:grid; grid-template-columns:repeat(auto-fill, minmax(min(280px, 100%), 1fr)); gap:10px;}
+  .mode{text-align:left; border:1.5px solid var(--line); background:var(--surface); border-radius:var(--radius-m); padding:12px 14px; cursor:pointer; transition:all .15s ease; font-size:13.5px; color:var(--ink-soft);}
+  .mode b{display:block; font-family:'Baloo 2',sans-serif; font-weight:700; font-size:17px; color:var(--ink);}
+  .mode:hover{border-color:var(--teal);}
+  .mode.on{background:#E3F7F6; border-color:var(--teal); box-shadow:inset 0 0 0 1px var(--teal);}
+
+  /* ---------- Гра ---------- */
+  .play-panel{position:relative;}
+  .exit-btn{position:absolute; top:12px; right:12px; z-index:2; width:34px; height:34px; border-radius:50%; border:1.5px solid var(--line); background:var(--surface); color:var(--ink-soft); font-size:16px; font-weight:700; line-height:1; cursor:pointer;}
+  .exit-btn:hover{border-color:var(--coral); color:var(--coral);}
+  .play-panel{padding-top:14px; padding-bottom:16px;}
+  .play-info{font-family:'Baloo 2',sans-serif; font-weight:600; font-size:13px; line-height:1.3; color:var(--ink-soft);}
+  .task{display:flex; align-items:center; gap:12px; margin-right:44px; padding:8px 14px; border-radius:var(--radius-m); background:#FBFAFE; border:1.5px solid var(--line);}
+  .task-body{flex:1; min-width:0;}
+  .task-text{font-family:'Baloo 2',sans-serif; font-weight:700; font-size:clamp(19px, 2.6vw, 25px); line-height:1.25;}
+  .task-num{font-family:'Baloo 2',sans-serif; font-weight:800; font-size:14px; color:var(--teal-dark); background:#E3F7F6; border-radius:999px; padding:2px 10px; white-space:nowrap;}
+  .hint{display:flex; align-items:center; flex-wrap:wrap; gap:4px 10px; margin:8px 0 10px; font-size:14px; color:var(--ink-soft); min-height:34px;}
+  .kbd{display:inline-block; font-family:'Baloo 2',sans-serif; font-weight:800; font-size:16px; line-height:1.5; color:var(--ink); background:var(--surface); border:1.5px solid var(--line); border-bottom-width:3px; border-radius:7px; padding:0 9px; min-width:30px; text-align:center;}
+  .kbd.mod{background:var(--key-mod);}
+  .plus{font-weight:800; color:var(--ink-soft);}
+  .hint-btn{font-family:'Baloo 2',sans-serif; font-weight:700; font-size:14px; border:1.5px dashed var(--yellow); background:#FFFBEF; color:#8A6200; border-radius:999px; padding:3px 14px; cursor:pointer;}
+  .hint-btn:hover{background:#FFF4D6;}
+  .hint .tipline{font-size:13.5px;}
+
+  /* Екранна клавіатура */
+  .kb{--k:min(44px, calc((min(100vw, 980px) - 150px) / 18.5)); --g:4px; display:flex; gap:calc(var(--k) * .5); justify-content:center; user-select:none;}
+  .kb-block{display:flex; flex-direction:column; gap:var(--g);}
+  .kb-row{display:flex; gap:var(--g);}
+  .kb-row.fn{display:none;}   /* F-клавіші знадобляться в темах «Файли» й «Браузер» */
+  .key, .gap{flex:none; width:calc(var(--k) * var(--w, 1) + var(--g) * (var(--w, 1) - 1)); height:calc(var(--k) * .8);}
+  .kb-row.fn .key, .kb-row.fn .gap{height:calc(var(--k) * .62);}
+  .key{position:relative; border-radius:7px; display:flex; align-items:center; justify-content:center; padding:0 3px;
+    font-family:'Baloo 2',sans-serif; font-weight:700; font-size:calc(var(--k) * .3); line-height:1; color:var(--ink); background:var(--key-plain);
+    border:1.5px solid rgba(27,27,58,.12); border-bottom-width:3px; transition:transform .08s ease, box-shadow .08s ease, background .08s ease; white-space:nowrap; overflow:hidden;}
+  .key.letter{font-size:calc(var(--k) * .4);}
+  .key .uk{position:absolute; right:4px; bottom:2px; font-size:calc(var(--k) * .25); color:var(--ink-soft); font-weight:600;}
+  .key .up{position:absolute; left:4px; top:2px; font-size:calc(var(--k) * .24); color:var(--ink-soft);}
+  .key.mod{background:var(--key-mod);}
+  .key.small{font-size:calc(var(--k) * .24);}
+  .key.next{background:var(--ink); color:#fff; border-color:var(--ink); transform:translateY(-2px); box-shadow:0 0 0 3px var(--yellow);}
+  .key.next .uk, .key.next .up{color:rgba(255,255,255,.7);}
+  .key.press{background:var(--yellow); color:var(--ink); transform:translateY(2px); border-bottom-width:1.5px;}
+  .key.press .uk, .key.press .up{color:var(--ink);}
+
+  /* ---------- Картки ---------- */
+  .stage-title{display:flex; align-items:baseline; gap:10px; margin:18px 0 8px; font-family:'Baloo 2',sans-serif; font-weight:700; font-size:16px;}
+  .stage-title:first-child{margin-top:0;}
+  .stage-title small{font-family:'Nunito Sans',sans-serif; font-weight:600; font-size:13px; color:var(--ink-soft);}
+  .hk-cards{display:grid; grid-template-columns:repeat(auto-fill, minmax(min(200px, 100%), 1fr)); gap:10px;}
+  .hk{position:relative; border:1.5px solid var(--line); border-radius:var(--radius-m); padding:10px 12px 10px; background:var(--surface);}
+  .hk.l1{background:#FFF6EE; border-color:#F2C49B;} .hk.l2{background:#F4F6FA; border-color:#C5CCDA;} .hk.l3{background:#FFFBEF; border-color:#F5D98A;}
+  .hk.soon{opacity:.5; border-style:dashed;}
+  .hk .keys{display:flex; flex-wrap:wrap; align-items:center; gap:4px; margin-bottom:6px; padding-right:28px;}
+  .hk .keys .kbd{font-size:14px;}
+  .hk h4{font-family:'Baloo 2',sans-serif; font-weight:700; font-size:15.5px; line-height:1.2; margin:0;}
+  .hk p{margin:2px 0 6px; font-size:12.5px; color:var(--ink-soft); line-height:1.35;}
+  .hk .lvl{position:absolute; top:8px; right:10px; font-size:22px; line-height:1;}
+  .hk .lvl.none{filter:grayscale(1); opacity:.25;}
+  .bar{height:8px; border-radius:999px; background:var(--line); overflow:hidden;}
+  .bar i{display:block; height:100%; border-radius:999px; background:linear-gradient(90deg, var(--yellow), var(--coral));}
+  .hk .prog{display:flex; align-items:center; gap:8px; font-size:11.5px; font-weight:700; color:var(--ink-soft);}
+  .hk .prog .bar{flex:1;}
+
+  /* ---------- Місії ---------- */
+  .comps{display:grid; grid-template-columns:repeat(auto-fill, minmax(min(380px, 100%), 1fr)); gap:12px;}
+  .comp{position:relative; display:flex; flex-direction:column; gap:5px; border:1.5px solid var(--line); border-radius:var(--radius-m); padding:10px 12px; background:var(--surface); transition:border-color .15s ease, box-shadow .15s ease;}
+  .comp.got{background:#FFFBEF; border-color:#F5D98A;}
+  .comp.hl{box-shadow:0 0 0 3px var(--teal);}
+  .comp-head{display:flex; align-items:center; gap:10px;}
+  .comp-head .badge-ico{width:38px; height:38px;}
+  .comp:not(.got) .comp-head .badge-ico{filter:grayscale(1) opacity(.35);}
+  .comp-num{font-family:'Baloo 2',sans-serif; font-weight:600; font-size:12px; line-height:1.2; color:var(--ink-soft);}
+  .comp h4{font-family:'Baloo 2',sans-serif; font-weight:700; font-size:17px; line-height:1.15; margin:0;}
+  .comp-best{margin-left:auto; font-size:30px; line-height:1;}
+  .comp-desc{font-size:13.5px; color:var(--ink-soft); line-height:1.4; margin:0;}
+  .comp-rules{display:flex; flex-wrap:wrap; gap:4px;}
+  .stage-chip{font-size:12.5px; font-weight:700; background:var(--bg); border-radius:999px; padding:2px 9px;}
+  .comp-foot{display:flex; align-items:center; gap:8px; margin-top:auto; padding-top:2px; font-size:13px; font-weight:700;}
+  .comp-foot .btn{margin-left:auto; white-space:nowrap; padding:7px 13px;}
+
+  /* ---------- Бейджики ---------- */
+  .badge-ico{display:inline-block; width:1.4em; height:1.4em; vertical-align:-.3em; flex-shrink:0;}
+  .badge-ico svg{display:block; width:100%; height:100%;}
+
+  /* ---------- Вікна поверх ---------- */
+  .overlay{position:fixed; inset:0; z-index:20; background:rgba(27,27,58,.45); display:none; align-items:center; justify-content:center; padding:16px;}
+  .overlay.show{display:flex;}
+  .win{background:var(--surface); border-radius:var(--radius-l); padding:26px 24px; max-width:480px; width:100%; text-align:center; box-shadow:0 20px 50px rgba(27,27,58,.25); max-height:90vh; overflow:auto;}
+  .win h2{font-size:26px; margin-bottom:2px;}
+  .win h3{font-size:16px; margin:18px 0 4px; text-align:left;}
+  .win .sub{color:var(--ink-soft); font-size:14.5px; margin:0;}
+  .win .sub:empty{display:none;}
+  .win .big{font-size:56px; line-height:1; margin-bottom:6px; animation:bounce 1s ease infinite alternate;}
+  @keyframes bounce{to{transform:translateY(-8px) rotate(-6deg);}}
+  .win.left{text-align:left; max-width:600px;}
+  .win.left p, .win.left li{font-size:14.5px;}
+  .win.left ol{padding-left:20px; margin:6px 0;}
+  .stars{font-size:44px; letter-spacing:6px; line-height:1; margin:12px 0 14px;}
+  .stars span{display:inline-block; animation:star-in .4s ease both;}
+  .stars span:nth-child(2){animation-delay:.25s;} .stars span:nth-child(3){animation-delay:.5s;}
+  .stars .dim{filter:grayscale(1); opacity:.25;}
+  @keyframes star-in{from{transform:scale(0) rotate(-90deg);} to{transform:scale(1) rotate(0);}}
+  .result{display:flex; justify-content:center; gap:10px; flex-wrap:wrap; margin-bottom:12px;}
+  .result div{background:var(--bg); border-radius:var(--radius-m); padding:8px 14px; min-width:105px;}
+  .result b{display:block; font-family:'Baloo 2',sans-serif; font-weight:800; font-size:26px; line-height:1.1; color:var(--teal-dark);}
+  .result small{font-size:13px; color:var(--ink-soft);}
+  .gain{display:inline-flex; align-items:center; gap:6px; font-family:'Baloo 2',sans-serif; font-weight:800; font-size:22px; color:#8A6200; background:#FFF4D6; border-radius:999px; padding:2px 16px; margin-bottom:8px;}
+  .gain .nico{width:26px; height:26px;}
+  .ups{display:flex; flex-wrap:wrap; justify-content:center; gap:6px; margin:4px 0 10px;}
+  .up-chip{font-family:'Baloo 2',sans-serif; font-weight:700; font-size:14px; background:var(--bg); border-radius:999px; padding:3px 12px;}
+  .unlock{border:2px dashed var(--yellow); border-radius:var(--radius-m); padding:10px 12px 12px; margin:4px 0 14px; animation:star-in .5s ease .6s both;}
+  .unlock b{font-family:'Baloo 2',sans-serif; font-size:17px;}
+  .next-unlock{font-size:13px; color:var(--ink-soft); margin:2px 0 12px;}
+  .next-unlock .bar{margin-top:4px;}
+  .mbox{border:2px dashed var(--teal); border-radius:var(--radius-m); padding:10px 12px; margin:4px 0 14px; font-size:14px;}
+  .mbox.fail{border-color:var(--coral);}
+  .mbox.final{position:relative; padding-right:58px; border-color:var(--yellow); background:#FFFBEF; text-align:left;}
+  .win-actions{display:flex; gap:10px; justify-content:center; flex-wrap:wrap; margin-top:6px;}
+  .confetti{position:fixed; top:-20px; width:10px; height:16px; border-radius:3px; z-index:30; pointer-events:none; animation:fall linear forwards;}
+  @keyframes fall{to{transform:translateY(110vh) rotate(720deg);}}
+
+  .field{display:flex; gap:8px; margin:14px 0 6px;}
+  .field input{flex:1; min-width:0; font:inherit; font-size:16px; padding:9px 14px; border:1.5px solid var(--line); border-radius:999px; outline:none; color:var(--ink);}
+  .field input:focus{border-color:var(--teal);}
+  .known{display:flex; flex-wrap:wrap; gap:8px; justify-content:center; margin:14px 0 4px;}
+  .chip-btn{font-family:'Baloo 2',sans-serif; font-weight:600; font-size:14px; border:1.5px solid var(--line); background:var(--surface); color:var(--ink); border-radius:999px; padding:5px 14px; cursor:pointer;}
+  .chip-btn:hover{border-color:var(--teal);}
+
+  .share-ico{position:absolute; top:10px; right:10px; width:38px; height:38px; border-radius:var(--radius-s); border:1.5px solid var(--line); background:var(--surface); color:var(--teal-dark); cursor:pointer; display:flex; align-items:center; justify-content:center; padding:0;}
+  .share-ico svg{width:26px; height:26px;}
+  .share-ico:hover{border-color:var(--teal); background:#E3F7F6;}
+  .share-ico.done{border-color:#16803C; color:#16803C;}
+  .mbox.final .share-ico{top:50%; transform:translateY(-50%);}
+
+  /* Профіль */
+  .win.prof{position:relative; text-align:left;}
+  .win.prof > #profShare .share-ico{top:16px; right:16px;}
+  .win.prof h2{text-align:center; font-size:24px;}
+  .prof-avatar{position:relative; width:150px; margin:0 auto 6px; padding:16px 26px 8px; border-radius:var(--radius-l); background:linear-gradient(180deg, #E3F7F6, #F6F5FB);}
+  .prof-avatar svg{display:block; width:100%; height:auto; overflow:visible;}
+  .prof-avatar .badge-ico{position:absolute; top:-8px; right:-10px; width:52px; height:52px;}
+  .prof-stats{display:flex; justify-content:center; flex-wrap:wrap; gap:6px 16px; margin:4px 0 6px; font-size:14px; color:var(--ink-soft);}
+  .prof-stats b{font-family:'Baloo 2',sans-serif; font-size:17px; color:var(--ink);}
+  .players{display:flex; flex-direction:column; gap:6px; margin-top:8px;}
+  .pl-row{display:flex; align-items:center; gap:10px; border:1.5px solid var(--line); border-radius:var(--radius-m); padding:6px 8px 6px 10px; background:var(--surface);}
+  .pl-row.me{border-color:var(--teal); background:#F2FBF7;}
+  .pl-row .pb-bot{width:30px;}
+  .pl-name{flex:1; min-width:0; font-family:'Baloo 2',sans-serif; font-weight:700; font-size:15.5px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
+  .pl-name small{display:block; font-family:'Nunito Sans',sans-serif; font-weight:600; font-size:12px; color:var(--ink-soft);}
+  .pl-you{font-family:'Baloo 2',sans-serif; font-weight:700; font-size:13px; color:var(--teal-dark); padding:0 6px;}
+  .pl-del{width:30px; height:30px; border-radius:50%; border:none; background:none; color:var(--ink-soft); font-size:15px; cursor:pointer;}
+  .pl-del:hover{background:#FFEFE9; color:#C2410C;}
+  .prof-foot{display:flex; align-items:center; justify-content:space-between; gap:10px; margin-top:16px; padding-top:12px; border-top:1.5px dashed var(--line);}
+
+  /* Перегляд за посиланням */
+  body.ro .neuron-counter, body.ro #playerBtn{display:none;}
+  .ach-head{display:flex; align-items:center; gap:20px; flex-wrap:wrap;}
+  .ach-head .prof-avatar{margin:0; flex-shrink:0;}
+  .ach-head h2{font-size:28px; line-height:1.15;}
+  .ach-head .prof-stats{justify-content:flex-start; margin:6px 0 2px;}
+  .cert-kicker{font-family:'Baloo 2',sans-serif; font-weight:600; font-size:13px; letter-spacing:.8px; text-transform:uppercase; color:var(--ink-soft);}
+  .share-sec h3{font-size:15px; color:var(--ink-soft); margin:18px 0 8px;}
+  .share-date{color:var(--ink-soft); font-size:13.5px;}
+  .medals{display:grid; grid-template-columns:repeat(auto-fill, minmax(110px, 1fr)); gap:10px;}
+  .medal-item{position:relative; display:flex; flex-direction:column; align-items:center; gap:4px; text-align:center; border:1.5px solid var(--line); border-radius:var(--radius-m); padding:10px 6px 8px;}
+  .medal-item.got{background:#FFFBEF; border-color:#F5D98A;}
+  .medal-item .badge-ico{width:44px; height:44px;}
+  .medal-item:not(.got) .badge-ico{filter:grayscale(1) opacity(.3);}
+  .medal-item .m{position:absolute; top:4px; right:6px; font-size:22px; line-height:1;}
+  .medal-item small{font-family:'Baloo 2',sans-serif; font-weight:600; font-size:12.5px; line-height:1.2; color:var(--ink-soft);}
+  .medal-item.got small{color:var(--ink);}
+  .cert{border:2px solid #F5D98A; border-radius:var(--radius-l); padding:20px; background:linear-gradient(180deg, #FFFBEF 0%, #FFFFFF 45%);}
+  .cert-head{display:flex; align-items:center; gap:14px; flex-wrap:wrap;}
+  .cert-head .badge-ico{width:62px; height:62px;}
+  .cert-head h2{font-size:28px; line-height:1.1;}
+  .cert-medal{margin-left:auto; text-align:center; font-size:50px; line-height:1;}
+  .cert-medal small{display:block; font-family:'Baloo 2',sans-serif; font-weight:700; font-size:14px; color:var(--ink-soft);}
+  .cert-who{margin:12px 0 14px; font-size:15px;}
+  .res-table{border-collapse:collapse; font-size:14px; width:100%;}
+  .res-table th, .res-table td{padding:7px 8px; border-bottom:1px solid var(--line); text-align:left; vertical-align:middle;}
+  .res-table th{font-family:'Baloo 2',sans-serif; font-weight:600; color:var(--ink-soft);}
+  .share-actions{display:flex; gap:10px; flex-wrap:wrap; align-items:center; margin-top:22px;}
+  .teacher-links{display:grid; gap:6px; margin-top:8px;}
+  .tl-row{display:flex; align-items:center; gap:10px; border:1.5px solid var(--line); border-radius:var(--radius-m); padding:6px 8px 6px 12px; font-size:14px; font-weight:700;}
+  .tl-row span{flex:1;}
+
+  .toast{position:fixed; left:50%; bottom:24px; z-index:40; transform:translate(-50%, 20px); opacity:0; pointer-events:none;
+    background:var(--ink); color:#fff; font-family:'Baloo 2',sans-serif; font-weight:600; font-size:15px; padding:8px 18px; border-radius:999px;
+    box-shadow:0 8px 20px rgba(27,27,58,.25); transition:opacity .2s ease, transform .2s ease;}
+  .toast.show{opacity:1; transform:translate(-50%, 0);}
+  @media (max-width:600px){ .panel{padding:16px 14px;} }
+</style>
+</head>
+<body>
+
+<div class="topbar"><div class="topbar-inner">
+  <a class="back-link" href="https://tkc-teacher.github.io/cikavo/labs/index.html">← Лабораторія</a>
+  <span class="game-title">Гарячі клавіші</span>
+  <div class="neuron-counter" title="Нейрончики — твій досвід. За них відкриваються шпалери, робот-помічник, теми й місії.">
+    <span id="neuronIco"></span><span id="neuronCount">0</span>
+  </div>
+  <button class="top-btn" id="guideBtn" type="button">❓<span class="long"> Як грати</span></button>
+  <button class="top-btn player-btn" id="playerBtn" type="button" title="Профіль гравця"><span class="pb-bot" id="playerBot"></span><span class="long" id="playerName">Гравець</span></button>
+</div></div>
+
+<main class="container">
+  <!-- Робочий стіл -->
+  <section class="desk" id="desk" aria-label="Робочий стіл">
+    <div class="appwin" id="appwin">
+      <div class="titlebar"><span>📄</span><span class="t" id="docTitle">Документ</span>
+        <span class="tb b" id="tbB" title="Жирний">Ж</span><span class="tb i" id="tbI" title="Курсив">К</span><span class="tb u" id="tbU" title="Підкреслений">П</span>
+        <span class="tb caps" id="tbCaps" title="Caps Lock">CAPS</span>
+        <span class="clip" id="clip" title="Буфер обміну">📋 <span id="clipText">порожньо</span></span>
+        <span class="wbtn">─</span><span class="wbtn x">✕</span></div>
+      <div class="doc" id="doc"></div>
+      <div class="statusbar"><span id="stPos">Рядок 1, символ 1</span><span id="stChars"></span></div>
+      <div class="saved-toast" id="savedToast">💾 Збережено</div>
+    </div>
+    <div class="taskbar">
+      <span class="tbi start" title="Меню">🤖</span><span class="tbi on">📄</span><span class="tbi">📁</span><span class="tbi">🌐</span>
+      <div class="tb-stats" id="stats"></div><span class="clock" id="clock"></span>
+    </div>
+    <div class="bubble" id="bubble"></div>
+    <div class="robot" id="robot"></div>
+    <div class="start-over" id="startBar"><button class="btn btn-primary btn-big" id="startBtn" type="button">▶ Почати!</button></div>
+    <div class="focus-note" id="focusNote" hidden>Клацни тут, щоб продовжити</div>
+  </section>
+
+  <!-- Вибір режиму -->
+  <section class="panel" id="setup">
+    <div class="tabs" role="tablist">
+      <button type="button" class="tab on" data-tab="paneTrain">🎯 Тренування</button>
+      <button type="button" class="tab" data-tab="paneMissions">🏆 Місії <span class="tab-count" id="missionCount"></span></button>
+      <button type="button" class="tab" data-tab="paneCards">🃏 Картки <span class="tab-count" id="cardCount"></span></button>
+      <button type="button" class="tab" data-tab="paneDesk">🎨 Мій стіл</button>
+    </div>
+
+    <div class="pane" id="paneTrain">
+      <div class="opt"><h3>Тема</h3><div class="seg" id="segTheme"></div></div>
+      <div class="opt"><h3>Етап</h3><div class="seg" id="segStage"></div></div>
+      <div class="opt"><h3>Режим</h3><div class="modes" id="segMode"></div></div>
+    </div>
+    <div class="pane" id="paneMissions" hidden><div class="comps" id="missionList"></div></div>
+    <div class="pane" id="paneCards" hidden><div id="cardList"></div></div>
+    <div class="pane" id="paneDesk" hidden>
+      <div class="opt"><h3>Шпалери</h3><div class="cards" id="wallCards"></div></div>
+      <div class="opt"><h3>Робот-помічник</h3><div class="cards" id="accCards"></div><div class="swatches" id="swatches"></div></div>
+      <div class="opt"><h3>Тема вікон</h3><div class="cards" id="themeCards"></div></div>
+    </div>
+  </section>
+
+  <!-- Гра -->
+  <section class="panel play-panel" id="play" hidden>
+    <button class="exit-btn" id="exitBtn" type="button" title="Вийти (Esc)" aria-label="Вийти">✕</button>
+    <div class="task"><span class="task-num" id="taskNum"></span><div class="task-body"><div class="play-info" id="playInfo"></div><div class="task-text" id="taskText"></div></div></div>
+    <div class="hint" id="hint"></div>
+    <div class="kb" id="kb" aria-hidden="true"></div>
+  </section>
+
+  <section class="panel" id="shareView" hidden></section>
+</main>
+
+<!-- Результат -->
+<div class="overlay" id="overlay">
+  <div class="win" role="dialog" aria-labelledby="winTitle">
+    <div class="big" id="wBig">🏆</div>
+    <h2 id="winTitle"></h2>
+    <p class="sub" id="wSub"></p>
+    <div class="stars" id="wStars"></div>
+    <div class="result" id="wResult"></div>
+    <div id="wGain"></div>
+    <div id="wMission"></div>
+    <div id="wUnlock"></div>
+    <div class="win-actions">
+      <button class="btn btn-primary" id="againBtn" type="button">🔁 Ще раз</button>
+      <button class="btn btn-ghost" id="toSetupBtn" type="button">До меню</button>
+    </div>
+  </div>
+</div>
+
+<!-- Вибір гравця -->
+<div class="overlay" id="nameOverlay">
+  <div class="win" role="dialog" aria-labelledby="nameTitle">
+    <div class="big">👋</div>
+    <h2 id="nameTitle">Привіт! Як тебе звати?</h2>
+    <p class="sub">Під цим ім'ям на цьому пристрої збережуться твої нейрончики, картки, медалі й робот.</p>
+    <div class="known" id="knownPlayers"></div>
+    <form class="field" id="nameForm">
+      <input id="nameInput" maxlength="24" placeholder="Ім'я та прізвище" autocomplete="off">
+      <button class="btn btn-primary" type="submit">Почати</button>
+    </form>
+    <p class="note-small" id="nameErr"></p>
+    <button class="btn btn-ghost btn-small" id="nameCancel" type="button" hidden>Скасувати</button>
+  </div>
+</div>
+
+<!-- Профіль -->
+<div class="overlay" id="profileOverlay">
+  <div class="win prof" role="dialog" aria-labelledby="profTitle">
+    <div id="profShare"></div>
+    <div class="prof-avatar" id="profAvatar"></div>
+    <h2 id="profTitle"></h2>
+    <div class="prof-stats" id="profStats"></div>
+    <h3>Гравці на цьому пристрої</h3>
+    <div class="players" id="playerList"></div>
+    <form class="field" id="addForm">
+      <input id="addInput" maxlength="24" placeholder="Ім'я нового гравця" autocomplete="off">
+      <button class="btn btn-primary" type="submit">＋ Додати</button>
+    </form>
+    <p class="note-small" id="addErr"></p>
+    <div class="prof-foot">
+      <button class="link-btn danger" id="resetBtn" type="button">скинути мій прогрес</button>
+      <button class="btn btn-ghost btn-small" id="profClose" type="button">Закрити</button>
+    </div>
+  </div>
+</div>
+
+<!-- Як грати -->
+<div class="overlay" id="guideOverlay">
+  <div class="win left" role="dialog" aria-labelledby="guideTitle">
+    <h2 id="guideTitle">Як грати</h2>
+    <ol>
+      <li>Обери етап і режим, натисни «Почати».</li>
+      <li>Читай завдання й натискай комбінацію на справжній клавіатурі. Що вона робить, одразу видно в документі.</li>
+      <li>Кнопка «💡 Підказка» показує клавіші, але нейрончиків тоді менше.</li>
+      <li>Кожна комбінація — картка. Вона росте від бронзи до золота, якщо виконувати її правильно кілька днів поспіль.</li>
+      <li>Місії — ланцюжок завдань на час. Медаль залежить від помилок, підказок і швидкості.</li>
+    </ol>
+    <p>Модифікатори (Ctrl, Shift, Alt) треба тримати, поки натискаєш другу клавішу. Розкладка клавіатури значення не має.</p>
+    <h3>Для вчителя</h3>
+    <p class="note-small">Посилання відкриває потрібний етап або місію. Місія за посиланням доступна навіть тоді, коли учень ще не назбирав на неї нейрончиків.</p>
+    <div class="teacher-links" id="teacherLinks"></div>
+    <div class="win-actions" style="margin-top:16px"><button class="btn btn-ghost" id="guideClose" type="button">Закрити</button></div>
+  </div>
+</div>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+/* ================= Довідники клавіш ================= */
+// Літери української розкладки за фізичною клавішею (event.code), щоб гра працювала за будь-якої розкладки
+const UK = { KeyQ:'й',KeyW:'ц',KeyE:'у',KeyR:'к',KeyT:'е',KeyY:'н',KeyU:'г',KeyI:'ш',KeyO:'щ',KeyP:'з',BracketLeft:'х',BracketRight:'ї',
+  KeyA:'ф',KeyS:'і',KeyD:'в',KeyF:'а',KeyG:'п',KeyH:'р',KeyJ:'о',KeyK:'л',KeyL:'д',Semicolon:'ж',Quote:'є',
+  KeyZ:'я',KeyX:'ч',KeyC:'с',KeyV:'м',KeyB:'и',KeyN:'т',KeyM:'ь',Comma:'б',Period:'ю',Backslash:'ґ',Backquote:'\'' };
+const DIGIT_SHIFT = { Digit1:'!',Digit2:'"',Digit3:'№',Digit4:';',Digit5:'%',Digit6:':',Digit7:'?',Digit8:'*',Digit9:'(',Digit0:')',Minus:'_',Equal:'+' };
+const LEFT_HAND = new Set(['KeyQ','KeyW','KeyE','KeyR','KeyT','KeyA','KeyS','KeyD','KeyF','KeyG','KeyZ','KeyX','KeyC','KeyV','KeyB']);
+const MOD_CODES = new Set(['ControlLeft','ControlRight','ShiftLeft','ShiftRight','AltLeft','AltRight','MetaLeft','MetaRight']);
+
+const KEY_LABEL = { Enter:'Enter', Space:'пробіл', Backspace:'Backspace', Delete:'Delete', Escape:'Esc', Tab:'Tab', CapsLock:'Caps Lock',
+  ArrowLeft:'←', ArrowRight:'→', ArrowUp:'↑', ArrowDown:'↓', Home:'Home', End:'End', PageUp:'Page Up', PageDown:'Page Down', Insert:'Insert' };
+function keyLabel(code, ukr){
+  if(KEY_LABEL[code]) return KEY_LABEL[code];
+  if(/^Key[A-Z]$/.test(code)) return ukr ? UK[code].toUpperCase() : code.slice(3);
+  if(/^Digit\d$/.test(code)) return code.slice(5);
+  if(/^F\d+$/.test(code)) return code;
+  return UK[code] ? UK[code].toUpperCase() : code;
+}
+// Комбінація записується як "Ctrl+Shift+KeyZ": модифікатори в сталому порядку + фізична клавіша
+const MOD_ORDER = ['Ctrl','Alt','Shift','Win'];
+const comboOf = e => [e.ctrlKey && 'Ctrl', e.altKey && 'Alt', e.shiftKey && 'Shift', e.metaKey && 'Win', codeOf(e)].filter(Boolean).join('+');
+// Деякі віддалені робочі столи й екранні клавіатури не передають event.code — тоді відновлюємо клавішу з event.key
+const UK_CODE = Object.fromEntries(Object.entries(UK).map(([c, l])=>[l, c]));
+const KEY_CODE = { ' ':'Space', Enter:'Enter', Backspace:'Backspace', Delete:'Delete', Escape:'Escape', Tab:'Tab', CapsLock:'CapsLock',
+  ArrowLeft:'ArrowLeft', ArrowRight:'ArrowRight', ArrowUp:'ArrowUp', ArrowDown:'ArrowDown', Home:'Home', End:'End',
+  Control:'ControlLeft', Shift:'ShiftLeft', Alt:'AltLeft', Meta:'MetaLeft', AltGraph:'AltRight' };
+function codeOf(e){
+  if(e.code) return e.code;
+  const k = e.key || '';
+  if(KEY_CODE[k]) return KEY_CODE[k];
+  if(/^[a-z]$/i.test(k)) return 'Key' + k.toUpperCase();
+  if(/^\d$/.test(k)) return 'Digit' + k;
+  return UK_CODE[k.toLowerCase()] || k;
+}
+const comboParts = c => c.split('+');
+// Підписи для підказки: у "Shift+літера" показуємо українську літеру, в інших — латинську, як на клавіші
+function comboLabels(combo){
+  const p = comboParts(combo), code = p[p.length-1];
+  const ukr = p.length === 2 && p[0] === 'Shift' && (UK[code] && !/^Arrow/.test(code));
+  return p.map((x, i)=> i < p.length-1 ? x : keyLabel(x, ukr));
+}
+const kbdHTML = (labels, sep='+') => labels.map(l=>`<span class="kbd${MOD_ORDER.includes(l) ? ' mod' : ''}">${l}</span>`).join(`<span class="plus">${sep}</span>`);
+
+/* ================= Картки (тема «Текст») ================= */
+// У тексті завдання: | — курсор, [ … ] — виділення
+// before — стан до «випадкової» дії (для Ctrl+Z), after — скасована дія (для Ctrl+Y)
+const CARDS = [
+  // ----- Етап 1 -----
+  { id:'enter', stage:1, keys:['Enter'], name:'Новий рядок', what:'Переносить текст після курсора на новий рядок.', tip:'Enter — «ввести». Велика клавіша праворуч.', expect:['Enter'],
+    tasks:[ { say:'Перенеси «Як справи?» на новий рядок', text:'Привіт!|Як справи?' },
+            { say:'Розділи вірш на два рядки', text:'Сонце світить,|пташки співають.' },
+            { say:'Почни новий рядок для другої справи', text:'1. Зробити уроки|' } ] },
+  { id:'space', stage:1, keys:['пробіл'], name:'Пробіл', what:'Ставить проміжок між словами.', tip:'Найдовша клавіша. Натискай великим пальцем.', expect:['Space'],
+    tasks:[ { say:'Слова злиплися — розділи їх пробілом', text:'Мій|друг' },
+            { say:'Постав пробіл між словами', text:'Весела|перерва' },
+            { say:'Розділи назву папки пробілом', text:'Нова|папка' } ] },
+  { id:'backspace', stage:1, keys:['Backspace'], name:'Стерти ліворуч', what:'Стирає символ ліворуч від курсора.', tip:'Стрілочка на клавіші дивиться вліво — туди й стирає.', expect:['Backspace'],
+    tasks:[ { say:'Зітри зайву літеру ліворуч від курсора', text:'Котикк| спить.' },
+            { say:'Зітри зайву літеру ліворуч від курсора', text:'Школаа| — це цікаво.' },
+            { say:'Зітри зайвий знак ліворуч від курсора', text:'Привіт!!| Як ти?' } ] },
+  { id:'delete', stage:1, keys:['Delete'], name:'Стерти праворуч', what:'Стирає символ праворуч від курсора.', tip:'Delete — «видалити». Стирає те, що попереду.', expect:['Delete'],
+    tasks:[ { say:'Зітри зайву літеру праворуч від курсора', text:'Зошит|т на парті.' },
+            { say:'Зітри зайву літеру праворуч від курсора', text:'Принтер|р друкує.' },
+            { say:'Зітри зайву літеру праворуч від курсора', text:'Сонце|е сяє.' } ] },
+  { id:'lr', stage:1, keys:['←','→'], or:true, name:'Курсор ліворуч і праворуч', what:'Пересувають курсор на один символ.', tip:'Стрілки внизу праворуч. Куди дивиться стрілка — туди йде курсор.', expect:['ArrowLeft'],
+    tasks:[ { say:'Пересунь курсор на один символ ліворуч', text:'Клавіша|', expect:['ArrowLeft'] },
+            { say:'Пересунь курсор на один символ праворуч', text:'Кла|віша', expect:['ArrowRight'] },
+            { say:'Постав курсор перед крапкою', text:'Кінець.|', expect:['ArrowLeft'] } ] },
+  { id:'ud', stage:1, keys:['↑','↓'], or:true, name:'Курсор вгору і вниз', what:'Переносять курсор на рядок вище або нижче.', tip:'Стрілка вгору — на рядок вище, вниз — на рядок нижче.', expect:['ArrowUp'],
+    tasks:[ { say:'Перейди на рядок вище', text:'Понеділок\nВівто|рок', expect:['ArrowUp'] },
+            { say:'Перейди на рядок нижче', text:'Ран|ок\nВечір', expect:['ArrowDown'] },
+            { say:'Перейди на рядок вище', text:'Яблуко\nГруша\nСли|ва', expect:['ArrowUp'] } ] },
+  { id:'shift', stage:1, keys:['Shift','літера'], name:'Велика літера', what:'Поки тримаєш Shift, літера друкується великою.', tip:'Тримай Shift мізинцем іншої руки й натисни літеру.', expect:['Shift+KeyJ'],
+    tasks:[ { say:'Ім\'я пишемо з великої! Надрукуй «О»', text:'|ксана читає.', expect:['Shift+KeyJ'] },
+            { say:'Назва міста з великої! Надрукуй «К»', text:'|иїв — столиця України.', expect:['Shift+KeyR'] },
+            { say:'Надрукуй велику літеру «Л»', text:'|ьвів — гарне місто.', expect:['Shift+KeyK'] },
+            { say:'Надрукуй велику літеру «М»', text:'|арійка малює.', expect:['Shift+KeyV'] } ] },
+  { id:'copy', stage:1, keys:['Ctrl','C'], name:'Копіювати', what:'Кладе копію виділеного в буфер обміну. Текст лишається на місці.', tip:'C — Copy, копія.', expect:['Ctrl+KeyC'],
+    tasks:[ { say:'Скопіюй виділене слово', text:'Наш [робот] вчиться друкувати.' },
+            { say:'Скопіюй виділене слово', text:'[Інформатика] — мій улюблений урок.' },
+            { say:'Скопіюй виділене слово', text:'Файли зберігаються в [папках].' } ] },
+  { id:'paste', stage:1, keys:['Ctrl','V'], name:'Вставити', what:'Вставляє вміст буфера обміну туди, де стоїть курсор.', tip:'V стоїть поруч із C: скопіював — вставив.', expect:['Ctrl+KeyV'],
+    tasks:[ { say:'Встав слово з буфера обміну', clip:'кіт', text:'Мій | спить на клавіатурі.' },
+            { say:'Встав слово з буфера обміну', clip:'миша', text:'Клавіатура і | — пристрої введення.' },
+            { say:'Встав слово з буфера обміну', clip:'урок', text:'Цікавий | інформатики.' } ] },
+  { id:'undo', stage:1, keys:['Ctrl','Z'], name:'Скасувати', what:'Повертає документ на крок назад.', tip:'Z — перша в нижньому ряду: крок назад.', expect:['Ctrl+KeyZ'],
+    tasks:[ { say:'Ой! Слово стерлося. Поверни його', before:'Наш робот| вчиться друкувати.', text:'Наш | вчиться друкувати.' },
+            { say:'Скасуй зайві літери', before:'Тиха вода|', text:'Тиха водаааа|' },
+            { say:'Весь текст зник! Скасуй останню дію', before:'Мій вірш про весну.|', text:'|' } ] },
+  // ----- Етап 2 -----
+  { id:'cut', stage:2, keys:['Ctrl','X'], name:'Вирізати', what:'Прибирає виділене й кладе його в буфер обміну.', tip:'X схожа на розкриті ножиці.', expect:['Ctrl+KeyX'],
+    tasks:[ { say:'Виріж зайве слово', text:'Кіт [кіт ]спить.' },
+            { say:'Виріж виділене речення', text:'Привіт! [Тут нічого немає.]' },
+            { say:'Виріж виділене слово', text:'Монітор показує [яскраве ]зображення.' } ] },
+  { id:'all', stage:2, keys:['Ctrl','A'], name:'Виділити все', what:'Виділяє весь текст документа.', tip:'A — All, усе.', expect:['Ctrl+KeyA'],
+    tasks:[ { say:'Виділи весь текст', text:'Перший рядок.\nДругий рядок.|' },
+            { say:'Виділи весь текст', text:'Сонце, повітря|\nі вода.' } ] },
+  { id:'save', stage:2, keys:['Ctrl','S'], name:'Зберегти', what:'Записує документ у файл. Зірочка * біля назви зникає.', tip:'S — Save, зберегти. Зберігай часто!', expect:['Ctrl+KeyS'],
+    tasks:[ { say:'Збережи документ', text:'Мій твір про літо.|' },
+            { say:'Не втрать роботу — збережи файл', text:'Домашнє завдання:\nвправа 5.|' } ] },
+  { id:'redo', stage:2, keys:['Ctrl','Y'], name:'Повторити', what:'Повертає дію, яку ти щойно скасував.', tip:'Y стоїть поруч із T. Скасував забагато — Ctrl + Y.', expect:['Ctrl+KeyY','Ctrl+Shift+KeyZ'],
+    tasks:[ { say:'Ти скасував зайве. Поверни дію', text:'Список: хліб|', after:'Список: хліб, молоко|' },
+            { say:'Поверни скасоване привітання', text:'Привіт|', after:'Привіт, світе!|' } ] },
+  { id:'bold', stage:2, keys:['Ctrl','B'], name:'Жирний', what:'Робить виділений текст жирним.', tip:'B — Bold, жирний.', expect:['Ctrl+KeyB'],
+    tasks:[ { say:'Зроби виділене слово жирним', text:'[Увага]! Завтра екскурсія.' },
+            { say:'Зроби тему жирною', text:'Тема: [Клавіатура]' } ] },
+  { id:'italic', stage:2, keys:['Ctrl','I'], name:'Курсив', what:'Робить виділений текст похилим.', tip:'I — Italic, похилий.', expect:['Ctrl+KeyI'],
+    tasks:[ { say:'Зроби ім\'я автора похилим', text:'Автор: [Леся Українка]' },
+            { say:'Зроби виділене слово курсивом', text:'Комп\'ютерна [миша] має кнопки.' } ] },
+  { id:'under', stage:2, keys:['Ctrl','U'], name:'Підкреслити', what:'Підкреслює виділений текст.', tip:'U — Underline, підкреслити.', expect:['Ctrl+KeyU'],
+    tasks:[ { say:'Підкресли виділені слова', text:'Не забудь [домашнє завдання].' },
+            { say:'Підкресли виділене слово', text:'Перевір [помилки] у тексті.' } ] },
+  { id:'select', stage:2, keys:['Shift','←','→'], name:'Виділення стрілками', what:'Shift разом зі стрілкою виділяє текст по одному символу.', tip:'Тримай Shift і натискай стрілку.', expect:['Shift+ArrowRight'],
+    tasks:[ { say:'Виділи одну літеру праворуч від курсора', text:'|Кіт', expect:['Shift+ArrowRight'] },
+            { say:'Виділи останню літеру слова', text:'Сонце|', expect:['Shift+ArrowLeft'] },
+            { say:'Виділи знак оклику', text:'Ура|!', expect:['Shift+ArrowRight'] } ] },
+  { id:'homeend', stage:2, keys:['Home','End'], or:true, name:'Початок і кінець рядка', what:'Home — на початок рядка, End — у кінець.', tip:'Home — «дім», звідки все починається. End — «кінець».', expect:['Home'],
+    tasks:[ { say:'Перейди на початок рядка', text:'Клавіатура — пристрій| введення.', expect:['Home'] },
+            { say:'Перейди в кінець рядка', text:'Миша| — пристрій введення.', expect:['End'] },
+            { say:'Перейди в кінець рядка', text:'Ра|нок\nВечір', expect:['End'] } ] },
+  { id:'caps', stage:2, keys:['Caps Lock'], name:'Caps Lock', what:'Вмикає й вимикає друк самими великими літерами.', tip:'Над лівим Shift. Коли увімкнено, світиться CAPS.', expect:['CapsLock'],
+    tasks:[ { say:'Увімкни режим великих літер', text:'Заголовок великими: |' },
+            { say:'Ой, усе друкується великими! Вимкни цей режим', text:'ПРИВІТ|', caps:true } ] }
+];
+const SOON_CARDS = [
+  ['Ctrl','←'], ['Ctrl','Home'], ['Ctrl','Backspace'], ['Ctrl','P'], ['Tab']
+];
+const cardById = id => CARDS.find(c=>c.id===id);
+const STAGES = [
+  { n:1, name:'Перші кроки', desc:'Enter, стрілки, копіювати й вставити' },
+  { n:2, name:'Майстер тексту', desc:'вирізати, зберегти, оформлення' },
+  { n:3, name:'Профі', desc:'скоро', soon:true }
+];
+const THEMES_SOON = [ ['text','📝 Текст', false], ['files','📁 Файли', true], ['browser','🌐 Браузер', true], ['win','🖥️ Windows', true] ];
+
+/* ================= Місії ================= */
+// Крок без text продовжує документ попереднього кроку; place ставить курсор або виділення в поточному тексті
+const MISSIONS = [
+  { id:'letter', stage:1, at:0, badge:'envelope', name:'Лист бабусі', limit:120, par:45, minAcc:70,
+    desc:'Допоможи дописати лист: нові рядки, пробіли, велика літера.',
+    steps:[
+      { card:'enter', say:'Перенеси «Як справи?» на новий рядок', text:'Привіт, бабусю!|Як справи?' },
+      { card:'space', say:'Слова злиплися — постав пробіл', text:'Привіт, бабусю!\nЯк справи? У мене|все добре.' },
+      { card:'backspace', say:'Зітри зайву літеру ліворуч від курсора', text:'Привіт, бабусю!\nЯк справи? У мене все доброо|.' },
+      { card:'shift', say:'Кличка кота — з великої. Надрукуй «М»', expect:['Shift+KeyV'], text:'Привіт, бабусю!\nЯк справи? У мене все добре.\nКіт |урчик передає привіт.' },
+      { card:'undo', say:'Ой! Робот стер рядок про кота. Скасуй це', before:'Привіт, бабусю!\nЯк справи? У мене все добре.\nКіт Мурчик передає привіт.|', text:'Привіт, бабусю!\nЯк справи? У мене все добре.\n|' },
+      { card:'delete', say:'Зітри зайву літеру праворуч від курсора', text:'Привіт, бабусю!\nЯк справи? У мене все добре.\nКіт Мурчик передає привіт.\nЦілую|ю!' }
+    ] },
+  { id:'paper', stage:1, at:30, badge:'pin', name:'Стінгазета', limit:120, par:50, minAcc:70,
+    desc:'Збери перший випуск класної газети.',
+    steps:[
+      { card:'copy', say:'Скопіюй назву газети', text:'[Шкільні новини]\nВипуск 1' },
+      { card:'paste', say:'Встав назву газети в лапки', clip:'Шкільні новини', text:'Шкільні новини\nВипуск 1\nЧитайте «|»!' },
+      { card:'ud', say:'Перейди на рядок вище', expect:['ArrowUp'], text:'Шкільні новини\nВипуск 1\nЧитайте «Шкільні| новини»!' },
+      { card:'shift', say:'Новина з великої літери: надрукуй «В»', expect:['Shift+KeyD'], text:'Шкільні новини\n|есна прийшла!' },
+      { card:'enter', say:'Почни новий рядок для наступної новини', text:'Шкільні новини\nВесна прийшла!|' },
+      { card:'space', say:'Слова злиплися — постав пробіл', text:'Шкільні новини\nВесна прийшла!\nНаш|клас — чемпіон!' },
+      { card:'undo', say:'Ой, кінець новини зник! Поверни його', before:'Шкільні новини\nВесна прийшла!\nНаш клас — чемпіон!|', text:'Шкільні новини\nВесна прийшла!\nНаш клас|' }
+    ] },
+  { id:'rescue', stage:1, at:80, badge:'lifebuoy', name:'Рятуємо твір', limit:100, par:45, minAcc:75,
+    desc:'Робот-помічник трохи нашкодив. Виправ усе якнайшвидше!',
+    steps:[
+      { card:'undo', say:'Робот стер увесь твір! Скасуй це', before:'Моє літо\nВлітку я їздив до моря.|', text:'|' },
+      { card:'backspace', say:'Зітри зайву літеру ліворуч від курсора', text:'Моє літо\nВлітку я їздив до моряя|.' },
+      { card:'delete', say:'Зітри зайву літеру праворуч від курсора', text:'Моє літо\nВлітку я їздив до моря.\nТам були|и чайки.' },
+      { card:'shift', say:'Речення — з великої літери. Надрукуй «Р»', expect:['Shift+KeyH'], text:'Моє літо\nВлітку я їздив до моря.\nТам були чайки.\n|ано-вранці ми купалися.' },
+      { card:'copy', say:'Скопіюй слово «моря»', text:'Моє літо\nВлітку я їздив до [моря].\nТам були чайки.\nРано-вранці ми купалися.' },
+      { card:'paste', say:'Встав скопійоване слово', clip:'моря', text:'Моє літо\nВлітку я їздив до моря.\nТам були чайки.\nРано-вранці ми купалися.\nСумую за шумом |.' },
+      { card:'lr', say:'Постав курсор перед крапкою', expect:['ArrowLeft'], text:'Моє літо\nВлітку я їздив до моря.\nТам були чайки.\nРано-вранці ми купалися.\nСумую за шумом моря.|' }
+    ] },
+  { id:'poster', stage:2, at:120, badge:'megaphone', name:'Оголошення', limit:100, par:40, minAcc:75,
+    desc:'Оформи оголошення про шкільний ярмарок і не забудь його зберегти.',
+    steps:[
+      { card:'all', say:'Виділи весь текст', text:'Шкільний ярмарок\n12 травня о 10:00|' },
+      { card:'bold', say:'Зроби весь текст жирним' },
+      { card:'under', say:'Підкресли дату', place:'[12 травня]' },
+      { card:'homeend', say:'Перейди в кінець першого рядка', expect:['End'], place:'Шкільний| ярмарок' },
+      { card:'caps', say:'Увімкни режим великих літер' },
+      { card:'save', say:'Збережи оголошення' }
+    ] },
+  { id:'journal', stage:2, at:220, badge:'quill', name:'Редактор журналу', limit:110, par:50, minAcc:75,
+    desc:'Переставляй речення, оформлюй назви й не загуби правки.',
+    steps:[
+      { card:'cut', say:'Виріж речення «Привіт, читачі!»', text:'Сьогодні про космос. [Привіт, читачі!]' },
+      { card:'homeend', say:'Перейди на початок рядка', expect:['Home'] },
+      { card:'paste', say:'Встав вирізане речення' },
+      { card:'space', say:'Постав пробіл після знака оклику' },
+      { card:'italic', say:'Назву книжки — курсивом', text:'Привіт, читачі! Сьогодні про космос.\nРаджу книжку «[Маленький принц]».' },
+      { card:'undo', say:'Ой, передумали. Скасуй курсив' },
+      { card:'redo', say:'Ні, курсив був гарний! Поверни його' },
+      { card:'save', say:'Збережи номер журналу' }
+    ] },
+  { id:'master', stage:2, at:350, badge:'trophy', name:'Майстер тексту', limit:100, par:55, minAcc:80,
+    desc:'Фінальне випробування: комбінації обох етапів упереміш.',
+    steps:[
+      { card:'enter', say:'Перенеси «Купити хліб» на новий рядок', text:'Список справ:|Купити хліб.' },
+      { card:'select', say:'Виділи крапку в кінці, не торкаючись миші', expect:['Shift+ArrowLeft'], text:'Список справ:\nКупити хліб.|' },
+      { card:'delete', say:'Видали виділену крапку', expect:['Delete','Backspace'] },
+      { card:'all', say:'Виділи весь список' },
+      { card:'copy', say:'Скопіюй його' },
+      { card:'bold', say:'Зроби весь список жирним' },
+      { card:'caps', say:'Увімкни режим великих літер' },
+      { card:'caps', say:'А тепер вимкни його' },
+      { card:'undo', say:'Скасуй жирний шрифт' },
+      { card:'save', say:'Збережи список' }
+    ] }
+];
+const missionById = id => MISSIONS.find(m=>m.id===id);
+const MEDALS = { gold:['🥇','Золото'], silver:['🥈','Срібло'], bronze:['🥉','Бронза'] };
+const MEDAL_RANK = { bronze:1, silver:2, gold:3 };
+const MEDAL_BONUS = { gold:40, silver:25, bronze:15 };
+// Золото — без помилок і підказок, не довше за норму часу; срібло — точність від 90% і не більше однієї підказки
+function medalOf(r, m){
+  if(r.errors === 0 && r.hints === 0 && r.time <= m.par * 1000) return 'gold';
+  if(r.acc >= 90 && r.hints <= 1) return 'silver';
+  return 'bronze';
+}
+
+/* ================= Нейрончики й відкриття ================= */
+const COLORS = ['#16A3A0','#6C5CE7','#FF6B4A','#2D9CDB','#FF5D9E','#E8A33D'];
+const WALLS = [
+  { id:'sky',    name:'Небо',            at:0 },
+  { id:'forest', name:'Ліс',             at:40 },
+  { id:'sea',    name:'Море',            at:140 },
+  { id:'space',  name:'Космос',          at:260 },
+  { id:'sunset', name:'Захід сонця',     at:420 }
+];
+const ACCS = [
+  { id:'none',    name:'Без нічого', at:0 },
+  { id:'cap',     name:'Кепка',      at:25 },
+  { id:'headset', name:'Навушники',  at:90 },
+  { id:'bow',     name:'Бантик',     at:180 },
+  { id:'crown',   name:'Корона',     at:500 }
+];
+const WTHEMES = [
+  { id:'classic', name:'Класична',   at:0,   v:{ head:'#FFFFFF', headInk:'#1B1B3A', bg:'#FFFFFF', ink:'#1B1B3A', bar:'#F6F5FB', sel:'#CDE7FF', caret:'#6C5CE7' } },
+  { id:'night',   name:'Нічна',      at:70,  v:{ head:'#2A2A4A', headInk:'#FFFFFF', bg:'#1F1F38', ink:'#ECEBFF', bar:'#2A2A4A', sel:'#4B3FA8', caret:'#FFC93C' } },
+  { id:'candy',   name:'Цукеркова',  at:220, v:{ head:'#FF5D9E', headInk:'#FFFFFF', bg:'#FFF6FA', ink:'#5A1E3A', bar:'#FFE3EF', sel:'#FFC2DB', caret:'#FF5D9E' } },
+  { id:'neon',    name:'Неон',       at:360, v:{ head:'#0E0E1E', headInk:'#3DDC84', bg:'#0B0B18', ink:'#B6FFD9', bar:'#15152A', sel:'#14532D', caret:'#3DDC84' } }
+];
+const UNLOCKS = [
+  ...WALLS.map(x=>({ kind:'wall', ...x, label:`Шпалери «${x.name}»` })),
+  ...ACCS.filter(x=>x.at).map(x=>({ kind:'acc', ...x, label:`Робот: ${x.name.toLowerCase()}` })),
+  ...WTHEMES.map(x=>({ kind:'theme', ...x, label:`Тема вікон «${x.name}»` })),
+  ...MISSIONS.map(x=>({ kind:'mission', id:x.id, at:x.at, name:x.name, label:`Місія «${x.name}»` }))
+].filter(u=>u.at > 0).sort((a, b)=>a.at - b.at);
+const isOpenAt = (at, n = profile.neurons) => n >= at;
+
+// Нейрончики за завдання: етап + швидкість, з підказкою або з помилкою — менше
+function neuronsForTask(stage, ms, hint, errs){
+  const base = stage === 1 ? 2 : 3;
+  const speed = ms < 2500 ? 2 : ms < 5000 ? 1 : 0;
+  let n = base + speed;
+  if(hint) n = Math.floor(n / 2);
+  if(errs) n = Math.max(1, Math.floor(n / 2));
+  return n;
+}
+// Картка росте за правильні відповіді без підказок у різні дні
+const LEVELS = [ { n:0, days:0 }, { n:3, days:1 }, { n:8, days:2 }, { n:15, days:3 } ];
+const LEVEL_ICON = ['🥉', '🥉', '🥈', '🥇'];
+const LEVEL_NAME = ['', 'бронза', 'срібло', 'золото'];
+const LEVEL_BONUS = [0, 5, 10, 20];
+function cardLevel(c){
+  if(!c) return 0;
+  let l = 0;
+  LEVELS.forEach((x, i)=>{ if(c.n >= x.n && c.days.length >= x.days) l = i; });
+  return l;
+}
+const NEURON = `<svg class="nico" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+  <line x1="16.2" y1="12" x2="20.3" y2="12" stroke="#FFC93C" stroke-width="1.6" stroke-linecap="round"/><circle cx="20.3" cy="12" r="1.2" fill="#FFC93C"/>
+  <line x1="14.1" y1="15.6" x2="16.6" y2="20" stroke="#FFC93C" stroke-width="1.6" stroke-linecap="round"/><circle cx="16.6" cy="20" r="1.2" fill="#FFC93C"/>
+  <line x1="9.9" y1="15.6" x2="7.4" y2="20" stroke="#FFC93C" stroke-width="1.6" stroke-linecap="round"/><circle cx="7.4" cy="20" r="1.2" fill="#FFC93C"/>
+  <line x1="7.8" y1="12" x2="3.7" y2="12" stroke="#FFC93C" stroke-width="1.6" stroke-linecap="round"/><circle cx="3.7" cy="12" r="1.2" fill="#FFC93C"/>
+  <line x1="9.9" y1="8.4" x2="7.4" y2="4" stroke="#FFC93C" stroke-width="1.6" stroke-linecap="round"/><circle cx="7.4" cy="4" r="1.2" fill="#FFC93C"/>
+  <line x1="14.1" y1="8.4" x2="16.6" y2="4" stroke="#FFC93C" stroke-width="1.6" stroke-linecap="round"/><circle cx="16.6" cy="4" r="1.2" fill="#FFC93C"/>
+  <circle cx="12" cy="12" r="4.4" fill="#FFC93C"/><circle cx="12" cy="12" r="1.6" fill="#E0A800" opacity="0.6"/></svg>`;
+
+/* ================= Бейджики місій ================= */
+// Малюються у квадраті 40×40 з білою «вирубкою» навколо — як у «Клавіатурних перегонах»
+const OUT = 'stroke="#fff" stroke-width="3.5" stroke-linejoin="round" paint-order="stroke"';
+const BADGES = {
+  envelope:`<rect x="4" y="9" width="32" height="23" rx="4" fill="#2D9CDB" ${OUT}/><path d="M6 12 L20 23 L34 12" fill="none" stroke="#fff" stroke-width="2.6" stroke-linejoin="round" stroke-linecap="round"/>
+    <path d="M31 4.5 C33 2 37 3.5 36 7 C35.2 9.6 31 12 31 12 C31 12 26.8 9.6 26 7 C25 3.5 29 2 31 4.5 Z" fill="#FF5D9E" ${OUT}/>`,
+  pin:`<rect x="6" y="7" width="28" height="29" rx="4" fill="#F5E9D0" ${OUT}/><rect x="10" y="13" width="20" height="5" rx="1.5" fill="#E8A33D"/>
+    <rect x="10" y="21" width="20" height="2.4" rx="1" fill="#B9A98A"/><rect x="10" y="26" width="14" height="2.4" rx="1" fill="#B9A98A"/><circle cx="20" cy="6" r="4.5" fill="#E8453C" ${OUT}/>`,
+  lifebuoy:`<circle cx="20" cy="20" r="16" fill="#FF6B4A" ${OUT}/><circle cx="20" cy="20" r="11.5" fill="none" stroke="#fff" stroke-width="7" stroke-dasharray="9.03 9.03" transform="rotate(-25 20 20)"/>
+    <circle cx="20" cy="20" r="6.5" fill="#E3F7F6" stroke="#fff" stroke-width="1.5"/>`,
+  megaphone:`<path d="M6 16 L24 7 V33 L6 24 Z" fill="#FFC93C" ${OUT}/><rect x="3" y="15" width="6" height="10" rx="2" fill="#E8A33D" ${OUT}/>
+    <path d="M10 25 L13 34 H18 L16 27" fill="#6C5CE7" ${OUT}/><g fill="none" stroke="#FF6B4A" stroke-width="2.6" stroke-linecap="round"><path d="M29 14 Q32 20 29 26"/><path d="M33 10 Q38 20 33 30"/></g>`,
+  quill:`<path d="M34 4 C22 6 12 16 9 31 L13 32 C17 22 24 14 34 4 Z" fill="#6C5CE7" ${OUT}/><path d="M34 4 C30 12 24 19 15 26" fill="none" stroke="#fff" stroke-width="1.6"/>
+    <path d="M9 31 L6 37 L12 33 Z" fill="#1B1B3A" ${OUT}/>`,
+  trophy:`<path d="M11 6 H29 V15 C29 21 25 25 20 25 C15 25 11 21 11 15 Z" fill="#FFC93C" ${OUT}/><path d="M11 9 H6 C6 15 8 18 12 18 M29 9 H34 C34 15 32 18 28 18" fill="none" stroke="#E8A33D" stroke-width="2.6"/>
+    <rect x="17" y="24" width="6" height="6" fill="#E8A33D"/><rect x="11" y="29" width="18" height="6" rx="2" fill="#6C5CE7" ${OUT}/><path d="M20 10 L21.3 13 L24.4 13.2 L22 15.2 L22.8 18.3 L20 16.6 L17.2 18.3 L18 15.2 L15.6 13.2 L18.7 13 Z" fill="#fff"/>`
+};
+const badgeHTML = (id, title='') => BADGES[id] ? `<span class="badge-ico"${title ? ` title="${esc(title)}"` : ''}><svg viewBox="-2 -2 44 44" aria-hidden="true">${BADGES[id]}</svg></span>` : '';
+
+/* ================= Робот-помічник ================= */
+function shade(hex, k){
+  const n = parseInt(hex.slice(1), 16);
+  const f = c => Math.max(0, Math.min(255, Math.round(c * k)));
+  return '#' + [f(n >> 16), f(n >> 8 & 255), f(n & 255)].map(x=>x.toString(16).padStart(2, '0')).join('');
+}
+function robotSVG(color, acc='none', mood='idle'){
+  const dk = shade(color, .78);
+  const eyes = mood === 'happy'
+    ? `<path d="M41 52 Q46 45 51 52 M69 52 Q74 45 79 52" fill="none" stroke="#7CF5E6" stroke-width="4" stroke-linecap="round"/>`
+    : mood === 'oops'
+      ? `<circle cx="46" cy="50" r="6" fill="#FFC93C"/><circle cx="74" cy="50" r="6" fill="#FFC93C"/>`
+      : `<circle cx="46" cy="50" r="5.5" fill="#7CF5E6"/><circle cx="74" cy="50" r="5.5" fill="#7CF5E6"/><circle cx="48" cy="48" r="1.6" fill="#fff"/><circle cx="76" cy="48" r="1.6" fill="#fff"/>`;
+  const mouth = mood === 'oops' ? `<ellipse cx="60" cy="62" rx="4" ry="3.4" fill="#FFC93C"/>`
+    : `<path d="M52 60 Q60 ${mood === 'happy' ? 68 : 65} 68 60" fill="none" stroke="#7CF5E6" stroke-width="3" stroke-linecap="round"/>`;
+  const armR = mood === 'happy' ? `<path d="M87 94 Q100 86 102 72" fill="none" stroke="${dk}" stroke-width="7" stroke-linecap="round"/><circle cx="102" cy="70" r="5.5" fill="${dk}"/>`
+    : `<path d="M87 96 Q98 102 100 112" fill="none" stroke="${dk}" stroke-width="7" stroke-linecap="round"/><circle cx="100" cy="113" r="5.5" fill="${dk}"/>`;
+  const ACC = {
+    none:'',
+    cap:`<path d="M24 32 Q26 12 60 12 Q94 12 96 32 Z" fill="#FF6B4A"/><path d="M60 30 L104 30 Q104 37 90 37 L60 37 Z" fill="#E8453C"/><circle cx="60" cy="13" r="3.5" fill="#FFC93C"/>`,
+    headset:`<path d="M18 50 Q18 14 60 14 Q102 14 102 50" fill="none" stroke="#1B1B3A" stroke-width="5"/><rect x="10" y="40" width="12" height="22" rx="5" fill="#1B1B3A"/><rect x="98" y="40" width="12" height="22" rx="5" fill="#1B1B3A"/>
+      <path d="M16 62 Q20 76 38 74" fill="none" stroke="#1B1B3A" stroke-width="3"/><circle cx="40" cy="74" r="3.5" fill="#FF5D9E"/>`,
+    bow:`<path d="M78 22 L92 14 L92 30 Z M78 22 L64 14 L64 30 Z" fill="#FF5D9E" stroke="#fff" stroke-width="2" stroke-linejoin="round"/><circle cx="78" cy="22" r="4" fill="#E0457F"/>`,
+    crown:`<path d="M34 26 L32 6 L46 16 L60 2 L74 16 L88 6 L86 26 Z" fill="#FFC93C" stroke="#fff" stroke-width="2.5" stroke-linejoin="round"/><circle cx="60" cy="18" r="3" fill="#FF5D9E"/><circle cx="45" cy="21" r="2.2" fill="#16A3A0"/><circle cx="75" cy="21" r="2.2" fill="#6C5CE7"/>`
+  };
+  const antenna = acc === 'crown' || acc === 'cap' ? '' : `<line x1="60" y1="26" x2="60" y2="12" stroke="${dk}" stroke-width="4" stroke-linecap="round"/><circle cx="60" cy="10" r="5.5" fill="#FFC93C"/>`;
+  return `<svg viewBox="0 0 120 132" aria-hidden="true">
+    ${antenna}
+    <rect x="14" y="40" width="10" height="22" rx="5" fill="${dk}"/><rect x="96" y="40" width="10" height="22" rx="5" fill="${dk}"/>
+    <rect x="20" y="24" width="80" height="58" rx="18" fill="${color}"/>
+    <rect x="30" y="35" width="60" height="36" rx="12" fill="#1B1B3A"/>
+    ${eyes}${mouth}
+    <path d="M33 96 Q22 102 20 112" fill="none" stroke="${dk}" stroke-width="7" stroke-linecap="round"/><circle cx="20" cy="113" r="5.5" fill="${dk}"/>
+    ${armR}
+    <rect x="34" y="84" width="52" height="38" rx="12" fill="${color}"/>
+    <circle cx="60" cy="101" r="7" fill="#FFC93C"/><circle cx="60" cy="101" r="3" fill="#fff" opacity=".7"/>
+    ${ACC[acc] || ''}
+  </svg>`;
+}
+
+/* ================= Шпалери ================= */
+const svgURL = s => `url("data:image/svg+xml,${encodeURIComponent(s)}")`;
+function wallSVG(id){
+  const W = (inner, defs='') => `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 400" preserveAspectRatio="xMidYMax slice"><defs>${defs}</defs>${inner}</svg>`;
+  const grad = (gid, a, b) => `<linearGradient id="${gid}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${a}"/><stop offset="1" stop-color="${b}"/></linearGradient>`;
+  const cloud = (x, y, s) => `<g fill="#fff" opacity=".92" transform="translate(${x} ${y}) scale(${s})"><ellipse cx="0" cy="0" rx="46" ry="18"/><ellipse cx="-22" cy="-10" rx="22" ry="18"/><ellipse cx="16" cy="-16" rx="28" ry="22"/></g>`;
+  if(id === 'sky') return W(`<rect width="800" height="400" fill="url(#g)"/>${cloud(140,80,1)}${cloud(470,60,.8)}${cloud(690,120,1.1)}
+    <path d="M0 330 Q200 270 420 320 T800 300 V400 H0 Z" fill="#7FCB8F"/><path d="M0 360 Q260 320 520 360 T800 350 V400 H0 Z" fill="#5DB874"/>`, grad('g', '#7CC7F5', '#D8F0FF'));
+  if(id === 'forest'){
+    let t = '';
+    [[0,'#3FA66B',300],[1,'#2E8B57',330],[2,'#24704A',360]].forEach(([row, c, y])=>{
+      for(let x = -20 + row*30; x < 820; x += 70){ const h = 70 + ((x * 7 + row * 13) % 40); t += `<path d="M${x} ${y} L${x+28} ${y-h} L${x+56} ${y} Z" fill="${c}"/>`; }
+    });
+    return W(`<rect width="800" height="400" fill="url(#g)"/><circle cx="660" cy="80" r="38" fill="#FFE27A"/>${t}<rect y="355" width="800" height="45" fill="#24704A"/>`, grad('g', '#BDEBD0', '#EFFAF2'));
+  }
+  if(id === 'sea'){
+    let b = '';
+    [[90,260,6],[130,200,4],[600,240,7],[640,180,4],[420,300,5]].forEach(([x,y,r])=>b += `<circle cx="${x}" cy="${y}" r="${r}" fill="none" stroke="#fff" stroke-width="2" opacity=".7"/>`);
+    const fish = (x, y, c, f) => `<g transform="translate(${x} ${y}) scale(${f} 1)"><ellipse cx="0" cy="0" rx="24" ry="13" fill="${c}"/><path d="M20 0 L38 -12 L38 12 Z" fill="${c}"/><circle cx="-12" cy="-3" r="3" fill="#1B1B3A"/></g>`;
+    return W(`<rect width="800" height="400" fill="url(#g)"/>${b}${fish(250,170,'#FFC93C',1)}${fish(540,120,'#FF6B4A',-1)}${fish(700,280,'#FF5D9E',1)}
+      <path d="M0 360 Q100 340 200 360 T400 360 T600 360 T800 360 V400 H0 Z" fill="#F2D8A0"/>
+      <path d="M60 360 Q50 320 70 290 Q60 330 80 360 Z M720 360 Q740 310 720 270 Q760 310 740 360 Z" fill="#3FA66B"/>`, grad('g', '#5FB4DF', '#1E6FA8'));
+  }
+  if(id === 'space'){
+    let s = '';
+    for(let i = 0; i < 70; i++){ const x = (i * 137) % 800, y = (i * 61) % 400, r = (i % 3) * .6 + .8; s += `<circle cx="${x}" cy="${y}" r="${r}" fill="#fff" opacity="${.5 + (i % 4) * .12}"/>`; }
+    return W(`<rect width="800" height="400" fill="url(#g)"/>${s}<circle cx="640" cy="110" r="50" fill="#FF6B4A"/><ellipse cx="640" cy="110" rx="86" ry="16" fill="none" stroke="#FFC93C" stroke-width="6" transform="rotate(-18 640 110)"/>
+      <circle cx="150" cy="300" r="26" fill="#B79CE0"/><circle cx="142" cy="292" r="6" fill="#9A7FD0"/>`, grad('g', '#1B1B3A', '#3B2D7A'));
+  }
+  return W(`<rect width="800" height="400" fill="url(#g)"/><circle cx="400" cy="300" r="90" fill="#FFE27A" opacity=".95"/>
+    <path d="M0 320 L130 220 L230 290 L360 190 L480 300 L600 210 L800 330 V400 H0 Z" fill="#6C4A8C"/><path d="M0 360 L160 290 L300 350 L460 280 L620 350 L800 300 V400 H0 Z" fill="#4A3168"/>`, grad('g', '#FF9A5A', '#FF5D9E'));
+}
+
+/* ================= Гравці (localStorage цього пристрою) ================= */
+const today = () => { const d = new Date(); return Math.floor((d - d.getTimezoneOffset()*60000) / 86400000); };
+const fmtDay = day => new Date(day * 86400000).toLocaleDateString('uk-UA', { timeZone:'UTC' });
+const fmtTime = ms => { const s = Math.round(ms / 1000); return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`; };
+const esc = s => String(s).replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
+const STORE_KEY = 'hot-keys-v1';
+const DEFAULT_SETTINGS = { stage:1, mode:'train', wall:'sky', acc:'none', color:COLORS[0], theme:'classic', badge:'' };
+const newProfile = () => ({ neurons:0, tasks:0, rounds:0, cards:{}, missions:{}, since:today(), settings:{ ...DEFAULT_SETTINGS } });
+let store = { current:null, players:{} };
+try{ const s = JSON.parse(localStorage.getItem(STORE_KEY)); if(s && s.players) store = s; }catch(e){}
+function saveStore(){ if(player) try{ localStorage.setItem(STORE_KEY, JSON.stringify(store)); }catch(e){} }
+
+let player = null;
+let profile = newProfile();
+let settings = profile.settings;
+
+function loadPlayer(name){
+  if(!store.players[name]) store.players[name] = newProfile();
+  player = name;
+  store.current = name;
+  profile = store.players[name];
+  profile.cards ||= {}; profile.missions ||= {};
+  profile.settings = settings = { ...DEFAULT_SETTINGS, ...profile.settings };
+  saveStore();
+  renderPlayerBtn();
+  renderHUD();
+  applyLook();
+}
+const earnedBadges = p => MISSIONS.filter(m=>p.missions[m.id]).map(m=>m.badge);
+
+const neuronEl = document.getElementById('neuronCount');
+document.getElementById('neuronIco').innerHTML = NEURON.replace('class="nico"', 'style="width:24px;height:24px;display:block"');
+function renderHUD(pop){
+  neuronEl.textContent = profile.neurons;
+  if(pop){ neuronEl.classList.add('pop'); setTimeout(()=>neuronEl.classList.remove('pop'), 250); }
+}
+
+/* ================= Звук ================= */
+let actx = null;
+function tone(freq, dur=0.12, type='sine', vol=0.07, delay=0){
+  try{
+    actx = actx || new (window.AudioContext || window.webkitAudioContext)();
+    const t = actx.currentTime + delay;
+    const o = actx.createOscillator(), g = actx.createGain();
+    o.type = type; o.frequency.value = freq;
+    g.gain.setValueAtTime(vol, t);
+    g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+    o.connect(g).connect(actx.destination);
+    o.start(t); o.stop(t + dur + 0.02);
+  }catch(e){}
+}
+const fanfare = ()=>[523,659,784,1047].forEach((f,i)=>tone(f, .22, 'triangle', .08, i*.12));
+const dingOk = ()=>{ tone(784, .1, 'triangle', .07); tone(1047, .14, 'triangle', .07, .08); };
+const buzz = ()=>tone(180, .18, 'square', .04);
+
+/* ================= Документ (міні-редактор) ================= */
+// Документ — масив символів з оформленням; курсор cur і початок виділення anc
+let doc = null;
+const cloneChars = cs => cs.map(c=>({ ...c }));
+const snap = d => ({ chars:cloneChars(d.chars), cur:d.cur, anc:d.anc });
+const cloneDoc = d => ({ ...snap(d), clip:d.clip, undo:d.undo.map(s=>({ ...s, chars:cloneChars(s.chars) })), redo:d.redo.map(s=>({ ...s, chars:cloneChars(s.chars) })), modified:d.modified, caps:d.caps });
+function parseSpec(spec){
+  const chars = []; let cur = null, anc = null;
+  for(const ch of spec){
+    if(ch === '|'){ cur = anc = chars.length; continue; }
+    if(ch === '['){ anc = chars.length; continue; }
+    if(ch === ']'){ cur = chars.length; continue; }
+    chars.push({ c:ch });
+  }
+  if(cur === null) cur = anc = chars.length;
+  if(anc === null) anc = cur;
+  return { chars, cur, anc };
+}
+function docFromTask(t, keep){
+  const p = parseSpec(t.text);
+  return { ...p, clip: t.clip !== undefined ? t.clip : (keep ? keep.clip : null),
+    undo: t.before ? [parseSpec(t.before)] : [], redo: t.after ? [parseSpec(t.after)] : [],
+    modified: true, caps: !!t.caps };
+}
+const plain = d => d.chars.map(c=>c.c).join('');
+const selRange = d => [Math.min(d.cur, d.anc), Math.max(d.cur, d.anc)];
+const hasSel = d => d.cur !== d.anc;
+// place: «текст|» — курсор після першого входження, «[текст]» — виділити його
+function placeIn(d, pat){
+  const txt = plain(d);
+  const m = pat.match(/^\[(.*)\]$/);
+  if(m){ const i = txt.indexOf(m[1]); if(i >= 0){ d.anc = i; d.cur = i + m[1].length; } return; }
+  const k = pat.indexOf('|'), raw = pat.replace('|', '');
+  const i = txt.indexOf(raw);
+  if(i >= 0) d.cur = d.anc = i + k;
+}
+const lineStart = (d, i) => { while(i > 0 && d.chars[i-1].c !== '\n') i--; return i; };
+const lineEnd = (d, i) => { while(i < d.chars.length && d.chars[i].c !== '\n') i++; return i; };
+
+function pushUndo(d){ d.undo.push(snap(d)); if(d.undo.length > 50) d.undo.shift(); d.redo = []; d.modified = true; }
+function delRange(d, a, b){ d.chars.splice(a, b - a); d.cur = d.anc = a; }
+function insertText(d, text){
+  const [a, b] = selRange(d);
+  if(a !== b) d.chars.splice(a, b - a);
+  const ins = [...text].map(c=>({ c }));
+  d.chars.splice(a, 0, ...ins);
+  d.cur = d.anc = a + ins.length;
+}
+function toggleFmt(d, key){
+  const [a, b] = selRange(d);
+  if(a === b) return false;
+  const all = d.chars.slice(a, b).every(c=>c[key] || c.c === '\n');
+  pushUndo(d);
+  for(let i = a; i < b; i++) d.chars[i][key] = !all;
+  return true;
+}
+function restore(d, s){ d.chars = s.chars; d.cur = s.cur; d.anc = s.anc; }
+
+// Виконує натиснуту комбінацію над документом. Повертає назву дії (для пояснень) або null, якщо клавіша тут нічого не робить
+function applyCombo(d, combo, e){
+  const [a, b] = selRange(d), sel = a !== b, len = d.chars.length;
+  switch(combo){
+    case 'Enter': pushUndo(d); insertText(d, '\n'); return 'новий рядок';
+    case 'Space': case 'Shift+Space': pushUndo(d); insertText(d, ' '); return 'пробіл';
+    case 'Backspace':
+      if(!sel && a === 0) return 'стерти ліворуч';
+      pushUndo(d); sel ? delRange(d, a, b) : delRange(d, a - 1, a); return 'стерти ліворуч';
+    case 'Delete':
+      if(!sel && a === len) return 'стерти праворуч';
+      pushUndo(d); sel ? delRange(d, a, b) : delRange(d, a, a + 1); return 'стерти праворуч';
+    case 'ArrowLeft': d.cur = d.anc = sel ? a : Math.max(0, d.cur - 1); return 'курсор ліворуч';
+    case 'ArrowRight': d.cur = d.anc = sel ? b : Math.min(len, d.cur + 1); return 'курсор праворуч';
+    case 'ArrowUp': case 'ArrowDown': {
+      const ls = lineStart(d, d.cur), col = d.cur - ls;
+      if(combo === 'ArrowUp'){
+        if(ls === 0){ d.cur = d.anc = 0; return 'курсор вгору'; }
+        const ps = lineStart(d, ls - 1); d.cur = d.anc = Math.min(ps + col, ls - 1);
+      }else{
+        const le = lineEnd(d, d.cur);
+        if(le === len){ d.cur = d.anc = len; return 'курсор вниз'; }
+        const ns = le + 1; d.cur = d.anc = Math.min(ns + col, lineEnd(d, ns));
+      }
+      return combo === 'ArrowUp' ? 'курсор вгору' : 'курсор вниз';
+    }
+    case 'Shift+ArrowLeft': d.cur = Math.max(0, d.cur - 1); return 'виділити ліворуч';
+    case 'Shift+ArrowRight': d.cur = Math.min(len, d.cur + 1); return 'виділити праворуч';
+    case 'Home': d.cur = d.anc = lineStart(d, d.cur); return 'на початок рядка';
+    case 'End': d.cur = d.anc = lineEnd(d, d.cur); return 'у кінець рядка';
+    case 'Shift+Home': d.cur = lineStart(d, d.cur); return 'виділити до початку рядка';
+    case 'Shift+End': d.cur = lineEnd(d, d.cur); return 'виділити до кінця рядка';
+    case 'Ctrl+KeyA': d.anc = 0; d.cur = len; return 'виділити все';
+    case 'Ctrl+KeyC': if(sel){ d.clip = d.chars.slice(a, b).map(c=>c.c).join(''); flashClip(); } return 'копіювати';
+    case 'Ctrl+KeyX': if(sel){ d.clip = d.chars.slice(a, b).map(c=>c.c).join(''); pushUndo(d); delRange(d, a, b); flashClip(); } return 'вирізати';
+    case 'Ctrl+KeyV': if(d.clip){ pushUndo(d); insertText(d, d.clip); } return 'вставити';
+    case 'Ctrl+KeyZ': if(d.undo.length){ d.redo.push(snap(d)); restore(d, d.undo.pop()); d.modified = true; } return 'скасувати';
+    case 'Ctrl+KeyY': case 'Ctrl+Shift+KeyZ': if(d.redo.length){ d.undo.push(snap(d)); restore(d, d.redo.pop()); d.modified = true; } return 'повторити';
+    case 'Ctrl+KeyB': toggleFmt(d, 'b'); return 'жирний';
+    case 'Ctrl+KeyI': toggleFmt(d, 'i'); return 'курсив';
+    case 'Ctrl+KeyU': toggleFmt(d, 'u'); return 'підкреслити';
+    case 'Ctrl+KeyS': d.modified = false; showSaved(); return 'зберегти';
+    case 'CapsLock': d.caps = !d.caps; return 'Caps Lock';
+  }
+  // Друк символів: літери — українською, великі при Shift або Caps Lock
+  const m = combo.match(/^(Shift\+)?(.+)$/), shift = !!m[1], code = m[2];
+  let ch = null;
+  if(UK[code]) ch = (shift !== d.caps) ? UK[code].toUpperCase() : UK[code];
+  else if(code === 'Slash') ch = shift ? ',' : '.';
+  else if(/^Digit\d$/.test(code) || code === 'Minus' || code === 'Equal') ch = shift ? DIGIT_SHIFT[code] : ({ Minus:'-', Equal:'=' }[code] || code.slice(5));
+  if(ch === null) return null;
+  pushUndo(d); insertText(d, ch);
+  return `літера «${ch}»`;
+}
+
+const docEl = document.getElementById('doc');
+function renderDoc(){
+  const d = doc;
+  if(!d){ docEl.innerHTML = ''; return; }
+  const [a, b] = selRange(d);
+  let html = '';
+  const caret = '<span class="caret"></span>';
+  d.chars.forEach((c, i)=>{
+    if(i === d.cur) html += caret;
+    const cls = [c.b && 'b', c.i && 'i', c.u && 'u', i >= a && i < b && c.c !== '\n' && 's'].filter(Boolean).join(' ');
+    const t = c.c === '\n' ? '\n' : esc(c.c);
+    html += cls ? `<span class="${cls}">${t}</span>` : t;
+  });
+  if(d.cur === d.chars.length) html += caret;
+  docEl.innerHTML = html + '​';
+  // Курсор завжди в полі зору, навіть у довгому документі
+  const cr = docEl.querySelector('.caret');
+  if(cr){ const top = cr.offsetTop - docEl.offsetTop, h = cr.offsetHeight;
+    if(top < docEl.scrollTop) docEl.scrollTop = top - 8;
+    else if(top + h > docEl.scrollTop + docEl.clientHeight) docEl.scrollTop = top + h - docEl.clientHeight + 8; }
+  document.getElementById('docTitle').textContent = 'Документ' + (d.modified ? '*' : '');
+  const fmtOn = k => b > a && d.chars.slice(a, b).filter(c=>c.c !== '\n').every(c=>c[k]);
+  const before = d.chars[d.cur - 1];
+  [['tbB','b'],['tbI','i'],['tbU','u']].forEach(([id, k])=>document.getElementById(id).classList.toggle('on', a !== b ? fmtOn(k) : !!(before && before[k])));
+  document.getElementById('tbCaps').classList.toggle('on', d.caps);
+  document.getElementById('clipText').textContent = d.clip ? (d.clip.length > 22 ? d.clip.slice(0, 21) + '…' : d.clip) : 'порожньо';
+  const ls = lineStart(d, d.cur);
+  const line = d.chars.slice(0, d.cur).filter(c=>c.c === '\n').length + 1;
+  document.getElementById('stPos').textContent = `Рядок ${line}, символ ${d.cur - ls + 1}`;
+  document.getElementById('stChars').textContent = a !== b ? `виділено: ${b - a}` : '';
+}
+function flashClip(){ const c = document.getElementById('clip'); c.classList.remove('flash'); void c.offsetWidth; c.classList.add('flash'); }
+let savedTimer = null;
+function showSaved(){ const t = document.getElementById('savedToast'); t.classList.add('show'); clearTimeout(savedTimer); savedTimer = setTimeout(()=>t.classList.remove('show'), 1100); }
+
+/* ================= Робочий стіл, робот, вигляд ================= */
+const deskEl = document.getElementById('desk');
+const robotEl = document.getElementById('robot');
+const bubbleEl = document.getElementById('bubble');
+function applyLook(){
+  deskEl.style.backgroundImage = svgURL(wallSVG(settings.wall));
+  const th = (WTHEMES.find(t=>t.id===settings.theme) || WTHEMES[0]).v;
+  const st = document.getElementById('appwin').style;
+  st.setProperty('--w-head', th.head); st.setProperty('--w-head-ink', th.headInk); st.setProperty('--w-bg', th.bg); st.setProperty('--w-ink', th.ink);
+  st.setProperty('--w-bar', th.bar); st.setProperty('--w-sel', th.sel); st.setProperty('--w-caret', th.caret);
+  const cur = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M3 2 L3 19 L8 14.5 L11.5 22 L14.5 20.6 L11 13.3 L18 13.3 Z" fill="${th.caret}" stroke="#fff" stroke-width="1.6" stroke-linejoin="round"/></svg>`;
+  deskEl.style.cursor = `url("data:image/svg+xml,${encodeURIComponent(cur)}") 3 2, auto`;
+  setRobot('idle');
+  renderPlayerBtn();
+}
+function setRobot(mood){ robotEl.innerHTML = robotSVG(settings.color, settings.acc, mood); }
+let sayTimer = null;
+function say(text, kind='', mood='idle', ms=0){
+  bubbleEl.textContent = text;
+  bubbleEl.className = 'bubble' + (kind ? ' ' + kind : '');
+  setRobot(mood);
+  if(mood === 'happy'){ robotEl.classList.remove('hop'); void robotEl.offsetWidth; robotEl.classList.add('hop'); }
+  clearTimeout(sayTimer);
+  if(ms) sayTimer = setTimeout(()=>{ bubbleEl.textContent = ''; setRobot('idle'); }, ms);
+}
+function tickClock(){ const d = new Date(); document.getElementById('clock').textContent = `${d.getHours()}:${String(d.getMinutes()).padStart(2, '0')}`; }
+tickClock(); setInterval(tickClock, 15000);
+
+/* ================= Екранна клавіатура ================= */
+const K = (code, label, w, cls) => ({ code, label, w, cls });
+const G = w => ({ gap:true, w });
+const letterRow = codes => codes.map(c=>K(c, null, 1, 'letter'));
+const KB_MAIN = [
+  [K('Escape','Esc',1,'small'), G(1), ...['F1','F2','F3','F4'].map(f=>K(f,f,1,'small')), G(.5), ...['F5','F6','F7','F8'].map(f=>K(f,f,1,'small')), G(.5), ...['F9','F10','F11','F12'].map(f=>K(f,f,1,'small'))],
+  [K('Backquote','\'',1), ...[1,2,3,4,5,6,7,8,9,0].map(n=>K('Digit'+n, String(n), 1)), K('Minus','-',1), K('Equal','=',1), K('Backspace','⌫ Backspace',2,'small')],
+  [K('Tab','Tab',1.5,'small'), ...letterRow(['KeyQ','KeyW','KeyE','KeyR','KeyT','KeyY','KeyU','KeyI','KeyO','KeyP']), K('BracketLeft','[',1,'letter'), K('BracketRight',']',1,'letter'), K('Backslash','\\',1.5)],
+  [K('CapsLock','Caps Lock',1.75,'small'), ...letterRow(['KeyA','KeyS','KeyD','KeyF','KeyG','KeyH','KeyJ','KeyK','KeyL']), K('Semicolon',';',1,'letter'), K('Quote','\'',1,'letter'), K('Enter','Enter ↵',2.25,'small')],
+  [K('ShiftLeft','Shift',2.25,'mod small'), ...letterRow(['KeyZ','KeyX','KeyC','KeyV','KeyB','KeyN','KeyM']), K('Comma',',',1,'letter'), K('Period','.',1,'letter'), K('Slash','/',1), K('ShiftRight','Shift',2.75,'mod small')],
+  [K('ControlLeft','Ctrl',1.25,'mod small'), K('MetaLeft','Win',1.25,'mod small'), K('AltLeft','Alt',1.25,'mod small'), K('Space','',6.25), K('AltRight','Alt',1.25,'mod small'), K('MetaRight','Win',1.25,'mod small'), K('ContextMenu','☰',1.25,'small'), K('ControlRight','Ctrl',1.25,'mod small')]
+];
+const KB_NAV = [
+  [G(3)],
+  [K('Insert','Ins',1,'small'), K('Home','Home',1,'small'), K('PageUp','PgUp',1,'small')],
+  [K('Delete','Del',1,'small'), K('End','End',1,'small'), K('PageDown','PgDn',1,'small')],
+  [G(3)],
+  [G(1), K('ArrowUp','↑',1), G(1)],
+  [K('ArrowLeft','←',1), K('ArrowDown','↓',1), K('ArrowRight','→',1)]
+];
+const kbEl = document.getElementById('kb');
+const keyEls = {};
+function buildKeyboard(){
+  kbEl.innerHTML = '';
+  for(const block of [KB_MAIN, KB_NAV]){
+    const bl = document.createElement('div'); bl.className = 'kb-block';
+    block.forEach((row, r)=>{
+      const rowEl = document.createElement('div'); rowEl.className = 'kb-row' + (r === 0 ? ' fn' : '');
+      row.forEach(k=>{
+        const el = document.createElement('div');
+        el.style.setProperty('--w', k.w);
+        if(k.gap){ el.className = 'gap'; rowEl.appendChild(el); return; }
+        el.className = 'key ' + (k.cls || '');
+        if(k.cls && k.cls.includes('letter') && /^Key/.test(k.code)) el.innerHTML = `${k.code.slice(3)}<span class="uk">${UK[k.code]}</span>`;
+        else if(k.cls && k.cls.includes('letter')) el.innerHTML = `${k.label}<span class="uk">${UK[k.code] || ''}</span>`;
+        else el.textContent = k.label;
+        keyEls[k.code] = el;
+        rowEl.appendChild(el);
+      });
+      bl.appendChild(rowEl);
+    });
+    kbEl.appendChild(bl);
+  }
+}
+buildKeyboard();
+// Підсвітка клавіш комбінації: Shift — протилежною рукою від літери
+function highlightCombo(combo){
+  kbEl.querySelectorAll('.next').forEach(k=>k.classList.remove('next'));
+  if(!combo) return;
+  const p = comboParts(combo), code = p[p.length-1];
+  const codes = [code];
+  p.slice(0, -1).forEach(m=>{
+    if(m === 'Ctrl') codes.push('ControlLeft');
+    if(m === 'Alt') codes.push('AltLeft');
+    if(m === 'Win') codes.push('MetaLeft');
+    if(m === 'Shift') codes.push(LEFT_HAND.has(code) ? 'ShiftRight' : 'ShiftLeft');
+  });
+  codes.forEach(c=>keyEls[c]?.classList.add('next'));
+}
+const pressKey = (code, on) => keyEls[code]?.classList.toggle('press', on);
+const clearPress = () => kbEl.querySelectorAll('.press').forEach(k=>k.classList.remove('press'));
+
+/* ================= Меню ================= */
+const setupEl = document.getElementById('setup');
+const playEl = document.getElementById('play');
+const startBar = document.getElementById('startBar');
+let highlightMission = null;
+const linkOpen = new Set();   // місії, відкриті вчителем за посиланням
+
+function showTab(id){
+  document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('on', t.dataset.tab === id));
+  document.querySelectorAll('.pane').forEach(p=>p.hidden = p.id !== id);
+  startBar.hidden = id !== 'paneTrain';
+  renderSetup();
+}
+document.querySelectorAll('.tab').forEach(t=>t.addEventListener('click', ()=>showTab(t.dataset.tab)));
+const activeTab = () => document.querySelector('.tab.on')?.dataset.tab || 'paneTrain';
+
+function renderSetup(){
+  // Теми й етапи
+  const segTheme = document.getElementById('segTheme');
+  segTheme.innerHTML = THEMES_SOON.map(([id, label, soon])=>`<button type="button" class="${id === 'text' ? 'on' : ''}" ${soon ? 'disabled' : ''}>${label}${soon ? '<small>скоро</small>' : `<small>${CARDS.length} карток</small>`}</button>`).join('');
+  const segStage = document.getElementById('segStage');
+  segStage.innerHTML = STAGES.map(s=>{
+    const cs = CARDS.filter(c=>c.stage === s.n);
+    const gold = cs.filter(c=>cardLevel(profile.cards[c.id]) === 3).length;
+    return `<button type="button" data-stage="${s.n}" class="${settings.stage === s.n ? 'on' : ''}" ${s.soon ? 'disabled' : ''}>Етап ${s.n} · ${s.name}<small>${s.soon ? 'скоро' : `${s.desc} · 🥇 ${gold}/${cs.length}`}</small></button>`;
+  }).join('');
+  segStage.querySelectorAll('[data-stage]').forEach(b=>b.addEventListener('click', ()=>{ settings.stage = +b.dataset.stage; saveStore(); renderSetup(); }));
+  const segMode = document.getElementById('segMode');
+  const MODES = [ ['learn','👀 Знайомство','Кожна комбінація етапу по черзі, з підказкою на клавіатурі.'],
+                  ['train','🎯 Тренування','10 завдань упереміш. Більше нейрончиків, картки ростуть.'] ];
+  segMode.innerHTML = MODES.map(([id, t, d])=>`<button type="button" class="mode${settings.mode === id ? ' on' : ''}" data-mode="${id}"><b>${t}</b>${d}</button>`).join('');
+  segMode.querySelectorAll('[data-mode]').forEach(b=>b.addEventListener('click', ()=>{ settings.mode = b.dataset.mode; saveStore(); renderSetup(); }));
+
+  renderMissions();
+  renderCards();
+  renderDeskPane();
+  const done = MISSIONS.filter(m=>profile.missions[m.id]).length;
+  document.getElementById('missionCount').textContent = `${done}/${MISSIONS.length}`;
+  const got = CARDS.filter(c=>cardLevel(profile.cards[c.id]) > 0).length;
+  document.getElementById('cardCount').textContent = `${got}/${CARDS.length}`;
+}
+
+function renderMissions(){
+  const list = document.getElementById('missionList');
+  list.innerHTML = MISSIONS.map((m, i)=>{
+    const r = profile.missions[m.id];
+    const open = isOpenAt(m.at) || linkOpen.has(m.id);
+    return `<div class="comp${r ? ' got' : ''}${highlightMission === m.id ? ' hl' : ''}" id="ms-${m.id}">
+      <div class="comp-head">${badgeHTML(m.badge)}<div><div class="comp-num">Місія ${i+1} · етап ${m.stage}</div><h4>${m.name}</h4></div>
+        ${r ? `<span class="comp-best" title="${MEDALS[r.medal][1]}">${MEDALS[r.medal][0]}</span>` : ''}</div>
+      <p class="comp-desc">${m.desc}</p>
+      <div class="comp-rules"><span class="stage-chip">${m.steps.length} кроків</span><span class="stage-chip">⏱ до ${fmtTime(m.limit * 1000)}</span><span class="stage-chip">🥇 швидше за ${fmtTime(m.par * 1000)}</span></div>
+      <div class="comp-foot">${r ? `Рекорд: ${fmtTime(r.time)}` : ''}
+        ${open ? `<button type="button" class="btn btn-primary" data-mission="${m.id}">${r ? '🔁 Ще раз' : '▶ Почати'}</button>`
+               : `<button type="button" class="btn btn-ghost" disabled>🔒 ${m.at} ${NEURON}</button>`}</div>
+    </div>`;
+  }).join('');
+  list.querySelectorAll('[data-mission]').forEach(b=>b.addEventListener('click', ()=>startRound('mission', missionById(b.dataset.mission))));
+}
+
+function renderCards(){
+  const el = document.getElementById('cardList');
+  const cardHTML = c => {
+    const st = profile.cards[c.id], l = cardLevel(st);
+    const next = LEVELS[Math.min(3, l + 1)];
+    const n = st ? st.n : 0;
+    const pct = l === 3 ? 100 : Math.min(100, Math.round(n / next.n * 100));
+    const need = l === 3 ? 'усе зібрано' : `${n}/${next.n}${next.days > 1 ? ` · днів ${st ? st.days.length : 0}/${next.days}` : ''}`;
+    return `<div class="hk l${l}" title="${esc(c.tip)}">
+      <span class="lvl${l ? '' : ' none'}">${LEVEL_ICON[l]}</span>
+      <div class="keys">${kbdHTML(c.keys, c.or ? '/' : '+')}</div>
+      <h4>${c.name}</h4><p>${c.what}</p>
+      <div class="prog"><div class="bar"><i style="width:${pct}%"></i></div>${need}</div>
+    </div>`;
+  };
+  el.innerHTML = STAGES.map(s=>{
+    if(s.soon) return `<div class="stage-title">Етап ${s.n} · ${s.name} <small>скоро</small></div>
+      <div class="hk-cards">${SOON_CARDS.map(k=>`<div class="hk soon"><div class="keys">${kbdHTML(k)}</div><h4>?</h4><p>Відкриється згодом</p></div>`).join('')}</div>`;
+    return `<div class="stage-title">Етап ${s.n} · ${s.name} <small>бронза — 3 правильні відповіді без підказки, срібло — 8 за 2 дні, золото — 15 за 3 дні</small></div>
+      <div class="hk-cards">${CARDS.filter(c=>c.stage === s.n).map(cardHTML).join('')}</div>`;
+  }).join('');
+}
+
+function renderDeskPane(){
+  const lock = at => `<small>${isOpenAt(at) ? '&nbsp;' : `🔒 ${at} ${NEURON}`}</small>`;
+  const wc = document.getElementById('wallCards');
+  wc.innerHTML = WALLS.map(w=>`<button type="button" class="pick${settings.wall === w.id ? ' on' : ''}" data-wall="${w.id}" ${isOpenAt(w.at) ? '' : 'disabled'}>
+    <div class="wall-prev" style='background-image:${svgURL(wallSVG(w.id))}'></div><span class="label">${w.name}</span>${lock(w.at)}</button>`).join('');
+  wc.querySelectorAll('[data-wall]').forEach(b=>b.addEventListener('click', ()=>{ settings.wall = b.dataset.wall; saveStore(); applyLook(); renderDeskPane(); }));
+  const ac = document.getElementById('accCards');
+  ac.innerHTML = ACCS.map(a=>`<button type="button" class="pick${settings.acc === a.id ? ' on' : ''}" data-acc="${a.id}" ${isOpenAt(a.at) ? '' : 'disabled'}>
+    <span class="bot-prev">${robotSVG(settings.color, a.id)}</span><span class="label">${a.name}</span>${lock(a.at)}</button>`).join('');
+  ac.querySelectorAll('[data-acc]').forEach(b=>b.addEventListener('click', ()=>{ settings.acc = b.dataset.acc; saveStore(); applyLook(); renderDeskPane(); }));
+  const sw = document.getElementById('swatches');
+  sw.innerHTML = COLORS.map(c=>`<button type="button" class="swatch${settings.color === c ? ' on' : ''}" data-c="${c}" style="background:${c}" aria-label="Колір робота"></button>`).join('');
+  sw.querySelectorAll('.swatch').forEach(b=>b.addEventListener('click', ()=>{ settings.color = b.dataset.c; saveStore(); applyLook(); renderDeskPane(); }));
+  const tc = document.getElementById('themeCards');
+  tc.innerHTML = WTHEMES.map(t=>`<button type="button" class="pick${settings.theme === t.id ? ' on' : ''}" data-theme="${t.id}" ${isOpenAt(t.at) ? '' : 'disabled'}>
+    <div class="theme-prev"><i style="--h:${t.v.head}; --b:${t.v.bg}; --k:${t.v.ink}"></i></div><span class="label">${t.name}</span>${lock(t.at)}</button>`).join('');
+  tc.querySelectorAll('[data-theme]').forEach(b=>b.addEventListener('click', ()=>{ settings.theme = b.dataset.theme; saveStore(); applyLook(); renderDeskPane(); }));
+}
+
+function toSetup(){
+  round = null;
+  clearInterval(timerId);
+  document.body.classList.remove('playing');
+  statsEl.innerHTML = '';
+  playEl.hidden = true;
+  setupEl.hidden = false;
+  document.getElementById('shareView').hidden = true;
+  document.getElementById('focusNote').hidden = true;
+  document.body.classList.remove('ro');
+  deskEl.hidden = false;
+  overlay.classList.remove('show');
+  highlightCombo(null);
+  doc = docFromTask({ text: player ? `Привіт, ${player.replace(/[|\[\]]/g, '')}!\nОбери етап і натисни «Почати».|` : 'Привіт!|' });
+  doc.modified = false;
+  renderDoc();
+  showTab(activeTab());
+  say(player ? 'Я твій помічник. Підкажу, якщо що!' : 'Привіт! Як тебе звати?');
+}
+
+/* ================= Раунд ================= */
+let round = null, busy = false, timerId = null;
+const statsEl = document.getElementById('stats');
+const hintEl = document.getElementById('hint');
+
+function pickTraining(stage){
+  const cs = CARDS.filter(c=>c.stage === stage);
+  const out = [];
+  let last = null;
+  while(out.length < 10){
+    // Слабші картки випадають частіше
+    const pool = cs.filter(c=>c.id !== last).flatMap(c=>Array(5 - cardLevel(profile.cards[c.id])).fill(c));
+    const c = pool[Math.floor(Math.random() * pool.length)];
+    out.push({ card:c, task:c.tasks[Math.floor(Math.random() * c.tasks.length)] });
+    last = c.id;
+  }
+  return out;
+}
+
+function startRound(mode, mission){
+  if(!player){ openNameModal(true); return; }
+  document.activeElement?.blur();
+  const stage = mission ? mission.stage : settings.stage;
+  const tasks = mode === 'mission' ? mission.steps.map(s=>({ card:cardById(s.card), task:s }))
+    : mode === 'learn' ? CARDS.filter(c=>c.stage === stage).map(c=>({ card:c, task:c.tasks[0] }))
+    : pickTraining(stage);
+  round = { mode, mission, stage, tasks, i:0, start:performance.now(), pause:0, errors:0, hints:0, gained:0, streak:0, bestStreak:0,
+            times:[], ups:[], before:profile.neurons, taskErrors:0, taskHint:false, taskStart:0 };
+  doc = null;
+  document.body.classList.add('playing');
+  setupEl.hidden = true;
+  playEl.hidden = false;
+  startBar.hidden = true;
+  overlay.classList.remove('show');
+  const st = STAGES[stage - 1];
+  document.getElementById('playInfo').textContent = mode === 'mission'
+    ? `🏆 Місія «${mission.name}» · етап ${stage}` : `${mode === 'learn' ? '👀 Знайомство' : '🎯 Тренування'} · Етап ${stage} · ${st.name}`;
+  clearInterval(timerId);
+  timerId = setInterval(tick, 250);
+  loadTask();
+  window.scrollTo({ top:0, behavior:'smooth' });
+}
+
+function expectOf(t){ return t.task.expect || t.card.expect; }
+
+function loadTask(){
+  const t = round.tasks[round.i];
+  if(t.task.text !== undefined || !doc) doc = docFromTask(t.task.text !== undefined ? t.task : { text:'|' }, doc);
+  if(t.task.place) placeIn(doc, t.task.place);
+  if(t.task.clip !== undefined) doc.clip = t.task.clip;
+  round.snapshot = cloneDoc(doc);
+  round.taskStart = performance.now();
+  round.taskErrors = 0;
+  round.taskHint = round.mode === 'learn';
+  busy = false;
+  renderDoc();
+  document.getElementById('taskNum').textContent = `${round.i + 1}/${round.tasks.length}`;
+  document.getElementById('taskText').textContent = t.task.say;
+  renderHint();
+  renderStats();
+  if(round.mode === 'learn') say(`${t.card.name}: ${t.card.what}`, '', 'idle');
+  else say('', '', 'idle');
+}
+
+function renderHint(){
+  const t = round.tasks[round.i];
+  const combo = expectOf(t)[0];
+  if(round.taskHint){
+    hintEl.innerHTML = `<span>Натисни:</span> ${kbdHTML(comboLabels(combo))}<span class="tipline">💡 ${esc(t.card.tip)}</span>`;
+    highlightCombo(combo);
+  }else{
+    hintEl.innerHTML = `<button type="button" class="hint-btn" id="hintBtn">💡 Підказка</button><span>не знаєш? Підказка покаже клавіші, але нейрончиків буде менше</span>`;
+    document.getElementById('hintBtn').addEventListener('click', ()=>{ round.taskHint = true; round.hints++; renderHint(); renderStats(); });
+    highlightCombo(null);
+  }
+}
+
+function elapsed(){ return round ? performance.now() - round.start - round.pause : 0; }
+function renderStats(){
+  if(!round) return;
+  const done = round.i, acc = done + round.errors ? Math.round(done / (done + round.errors) * 100) : 100;
+  let html = '';
+  if(round.mode === 'mission'){
+    const left = round.mission.limit * 1000 - elapsed();
+    html += `<span class="stat${left < 20000 ? ' warn' : ''}"><b>${fmtTime(Math.max(0, left))}</b>лишилось</span>`;
+  }else html += `<span class="stat"><b>${fmtTime(elapsed())}</b>час</span>`;
+  html += `<span class="stat"><b>${acc}%</b>точність</span><span class="stat"><b>${round.errors}</b>помилок</span>`;
+  html += `<span class="stat${round.streak >= 3 ? ' hot' : ''}"><b>${round.streak}</b>🔥</span>`;
+  html += `<span class="stat"><b>+${round.gained}</b>${NEURON}</span>`;
+  statsEl.innerHTML = html;
+}
+function tick(){
+  if(!round || blurAt) return;
+  renderStats();
+  if(round.mode === 'mission' && elapsed() > round.mission.limit * 1000) finishRound(false, 'time');
+}
+
+const PRAISE = ['Супер!', 'Чудово!', 'Точно!', 'Клас!', 'Так тримати!', 'Молодець!'];
+function onCombo(combo){
+  if(!round || busy) return;
+  const t = round.tasks[round.i];
+  const exp = expectOf(t);
+  const ok = exp.includes(combo);
+  const action = applyCombo(doc, combo);
+  renderDoc();
+  deskEl.classList.add('typing'); clearTimeout(onCombo.tt); onCombo.tt = setTimeout(()=>deskEl.classList.remove('typing'), 500);
+  if(ok) return success(t);
+  wrong(t, combo, action);
+}
+
+function success(t){
+  busy = true;
+  const ms = performance.now() - round.taskStart;
+  round.times.push(ms);
+  let gain = round.mode === 'learn' ? 1 : neuronsForTask(round.stage, ms, round.taskHint, round.taskErrors);
+  const clean = !round.taskHint && !round.taskErrors;
+  if(clean){ round.streak++; round.bestStreak = Math.max(round.bestStreak, round.streak); } else round.streak = 0;
+  let extra = '';
+  if(round.streak && round.streak % 5 === 0){ gain += 3; extra = ` Серія ${round.streak}! 🔥`; }
+  // Картка росте тільки за відповідь без помилок і без підказки (у Знайомстві підказка завжди є)
+  if(clean && round.mode !== 'learn'){
+    const st = profile.cards[t.card.id] ||= { n:0, days:[], best:0 };
+    const was = cardLevel(st);
+    st.n++;
+    if(!st.days.includes(today())) st.days = [...st.days, today()].slice(-5);
+    st.best = st.best ? Math.min(st.best, Math.round(ms)) : Math.round(ms);
+    const now = cardLevel(st);
+    if(now > was){ gain += LEVEL_BONUS[now]; round.ups.push([t.card, now]); showToast(`Картка «${t.card.name}» — ${LEVEL_NAME[now]} ${LEVEL_ICON[now]}`); }
+  }
+  round.gained += gain;
+  profile.neurons += gain;
+  profile.tasks++;
+  saveStore();
+  renderHUD(true);
+  dingOk();
+  say(`${PRAISE[Math.floor(Math.random() * PRAISE.length)]} +${gain}${extra}`, 'ok', 'happy');
+  highlightCombo(null);
+  round.i++;
+  renderStats();
+  setTimeout(()=>{
+    if(!round) return;
+    if(round.i >= round.tasks.length) finishRound(true);
+    else loadTask();
+  }, 750);
+}
+
+function wrong(t, combo, action){
+  busy = true;
+  round.errors++;
+  round.taskErrors++;
+  round.streak = 0;
+  buzz();
+  const win = document.getElementById('appwin');
+  win.classList.remove('shake'); void win.offsetWidth; win.classList.add('shake');
+  // Пояснення: якщо клавіша правильна, а модифікатора бракує чи забагато — кажемо, якого саме
+  const exp = expectOf(t)[0];
+  const ep = comboParts(exp), cp = comboParts(combo);
+  let msg;
+  if(ep[ep.length-1] === cp[cp.length-1]){
+    const need = ep.slice(0, -1).filter(m=>!cp.includes(m)), extra = cp.slice(0, -1).filter(m=>!ep.includes(m));
+    msg = need.length ? `Майже! Клавіша та, але тримай ще ${need.join(' і ')}.` : `Майже! Тільки без ${extra.join(' і ')}.`;
+  }else if(action && action.startsWith('літера')){
+    msg = `Надрукувалась ${action}. Спробуй ще.`;
+  }else if(action){
+    msg = `Ой! ${comboLabels(combo).join(' + ')} — це «${action}». Спробуй ще.`;
+  }else msg = `${comboLabels(combo).join(' + ')} тут нічого не робить. Спробуй ще.`;
+  if(round.taskErrors >= 2 && !round.taskHint) msg += ' Можна взяти 💡 підказку.';
+  say(msg, 'bad', 'oops');
+  renderStats();
+  setTimeout(()=>{
+    if(!round) return;
+    doc = cloneDoc(round.snapshot);
+    renderDoc();
+    busy = false;
+  }, 900);
+}
+
+function finishRound(completed, why){
+  const r = round;
+  clearInterval(timerId);
+  round = null;
+  highlightCombo(null);
+  const time = performance.now() - r.start - r.pause;
+  const done = r.i, acc = done + r.errors ? Math.round(done / (done + r.errors) * 100) : 100;
+  const avgMs = r.times.length ? r.times.reduce((s, x)=>s + x, 0) / r.times.length : 0;
+  profile.rounds++;
+  let medal = null, missionHTML = '', failed = !completed;
+  if(r.mode === 'mission' && completed){
+    if(acc < r.mission.minAcc){ failed = true; why = 'acc'; }
+    else{
+      medal = medalOf({ errors:r.errors, hints:r.hints, time, acc }, r.mission);
+      const prev = profile.missions[r.mission.id];
+      const better = !prev || MEDAL_RANK[medal] > MEDAL_RANK[prev.medal];
+      const bonus = better ? MEDAL_BONUS[medal] : 5;
+      r.gained += bonus; profile.neurons += bonus;
+      if(!prev || MEDAL_RANK[medal] > MEDAL_RANK[prev.medal] || (medal === prev.medal && time < prev.time))
+        profile.missions[r.mission.id] = { medal, time:Math.round(time), acc, errors:r.errors, hints:r.hints, day:today() };
+      else profile.missions[r.mission.id].time = Math.min(prev.time, Math.round(time));
+      settings.badge = earnedBadges(profile).pop() || '';
+      renderPlayerBtn();
+      const link = makeResultLink(r.mission, { medal, time:Math.round(time), acc, errors:r.errors, hints:r.hints });
+      missionHTML = `<div class="mbox final"><b>${MEDALS[medal][0]} ${MEDALS[medal][1]}</b> за місію «${r.mission.name}»${better ? ` · бонус +${bonus}` : ''}<br>
+        <span class="note-small">${medal === 'gold' ? 'Ідеально!' : medal === 'silver' ? `Для золота: без помилок, без підказок і швидше за ${fmtTime(r.mission.par * 1000)}.` : 'Для срібла: точність від 90% і не більше однієї підказки.'}</span>
+        <button type="button" class="share-ico" data-url="${esc(link)}" title="Скопіювати посилання на результат для вчителя">${LINK_ICON}</button></div>`;
+    }
+  }
+  if(r.mode === 'mission' && failed){
+    missionHTML = `<div class="mbox fail">${why === 'time' ? `⏱ Час вийшов: пройдено ${done} з ${r.tasks.length} кроків.` : `Точність ${acc}% — для цієї місії треба від ${r.mission.minAcc}%.`} Спробуй ще раз!</div>`;
+  }
+  saveStore();
+  renderHUD(true);
+
+  document.getElementById('wBig').textContent = failed ? '🔧' : medal ? MEDALS[medal][0] : '🎉';
+  document.getElementById('winTitle').textContent = failed ? 'Майже вийшло!' : r.mode === 'mission' ? 'Місію виконано!' : r.mode === 'learn' ? 'Знайомство завершено!' : 'Тренування завершено!';
+  document.getElementById('wSub').textContent = r.mode === 'mission' ? `«${r.mission.name}»` : `Етап ${r.stage} · ${STAGES[r.stage - 1].name}`;
+  const stars = failed ? 0 : acc >= 95 && r.hints <= 1 ? 3 : acc >= 80 ? 2 : 1;
+  document.getElementById('wStars').innerHTML = r.mode === 'mission' ? '' : [0,1,2].map(i=>`<span class="${i < stars ? '' : 'dim'}">⭐</span>`).join('');
+  document.getElementById('wResult').innerHTML =
+    `<div><b>${acc}%</b><small>точність</small></div><div><b>${(avgMs / 1000).toFixed(1)} с</b><small>на завдання</small></div><div><b>${fmtTime(time)}</b><small>час</small></div>`;
+  document.getElementById('wGain').innerHTML = `<div class="gain">+${r.gained} ${NEURON}</div>` +
+    (r.ups.length ? `<div class="ups">${r.ups.map(([c, l])=>`<span class="up-chip">${LEVEL_ICON[l]} ${c.name}</span>`).join('')}</div>` : '');
+  document.getElementById('wMission').innerHTML = missionHTML;
+  bindLinkButtons(document.getElementById('wMission'));
+  const newly = UNLOCKS.filter(u=>u.at > r.before && u.at <= profile.neurons);
+  const next = UNLOCKS.find(u=>u.at > profile.neurons);
+  document.getElementById('wUnlock').innerHTML =
+    (newly.length ? `<div class="unlock"><b>🎁 Відкрито!</b><br>${newly.map(u=>u.label).join('<br>')}</div>` : '') +
+    (next ? `<div class="next-unlock">Далі: ${next.label} — ще ${next.at - profile.neurons} ${NEURON}<div class="bar"><i style="width:${Math.round(profile.neurons / next.at * 100)}%"></i></div></div>` : '');
+  overlay.classList.add('show');
+  if(!failed){ fanfare(); if(medal || stars === 3) confetti(); }
+  else tone(260, .3, 'triangle', .06);
+  againBtn.onclick = ()=>startRound(r.mode, r.mission);
+  say(failed ? 'Нічого страшного, ще раз!' : 'Ура! Ти молодець!', failed ? '' : 'ok', failed ? 'idle' : 'happy');
+}
+
+function confetti(){
+  const cs = ['#FF6B4A','#16A3A0','#FFC93C','#6C5CE7','#FF5D9E','#2D9CDB'];
+  for(let i = 0; i < 60; i++){
+    const c = document.createElement('div');
+    c.className = 'confetti';
+    c.style.left = Math.random() * 100 + 'vw';
+    c.style.background = cs[i % cs.length];
+    c.style.animationDuration = 1.8 + Math.random() * 1.8 + 's';
+    c.style.animationDelay = Math.random() * .5 + 's';
+    document.body.appendChild(c);
+    setTimeout(()=>c.remove(), 4500);
+  }
+}
+
+const overlay = document.getElementById('overlay');
+const againBtn = document.getElementById('againBtn');
+document.getElementById('toSetupBtn').addEventListener('click', toSetup);
+document.getElementById('startBtn').addEventListener('click', ()=>startRound(settings.mode));
+document.getElementById('exitBtn').addEventListener('click', exitRound);
+function exitRound(){
+  if(round && round.mode === 'mission' && round.i > 0 && !confirm('Вийти з місії? Пройдені кроки не збережуться.')) return;
+  toSetup();
+}
+
+/* ================= Клавіатура: перехоплення ================= */
+const modalOpen = () => document.querySelector('.overlay.show');
+document.addEventListener('keydown', e=>{
+  const code = codeOf(e);
+  pressKey(code, true);
+  if(!round || modalOpen()) return;
+  if(code === 'F12' || code === 'F11') return;
+  e.preventDefault();
+  if(code === 'Escape'){ exitRound(); return; }
+  if(e.repeat || MOD_CODES.has(code)) return;
+  onCombo(comboOf(e));
+}, true);
+document.addEventListener('keyup', e=>{
+  pressKey(codeOf(e), false);
+  if(round && (e.key === 'Alt' || e.key === 'Meta')) e.preventDefault();
+}, true);
+// Поки вікно не у фокусі, натискання не доходять — показуємо підказку і ставимо час на паузу
+let blurAt = 0;
+window.addEventListener('blur', ()=>{
+  clearPress();
+  if(!round) return;
+  blurAt = performance.now();
+  document.getElementById('focusNote').hidden = false;
+});
+window.addEventListener('focus', ()=>{
+  if(blurAt && round){ const d = performance.now() - blurAt; round.pause += d; round.taskStart += d; }
+  blurAt = 0;
+  document.getElementById('focusNote').hidden = true;
+});
+document.getElementById('focusNote').addEventListener('click', ()=>{ window.focus(); document.getElementById('focusNote').hidden = true; });
+// Випадковий Ctrl+W браузер перехопить сам — хоча б попередимо, щоб не загубити місію
+window.addEventListener('beforeunload', e=>{ if(round){ e.preventDefault(); e.returnValue = ''; } });
+
+/* ================= Вибір гравця ================= */
+const nameOverlay = document.getElementById('nameOverlay');
+const nameInput = document.getElementById('nameInput');
+const nameErr = document.getElementById('nameErr');
+let nameRequired = true;
+function openNameModal(required){
+  nameRequired = required;
+  document.getElementById('nameCancel').hidden = required;
+  const names = Object.keys(store.players);
+  const known = document.getElementById('knownPlayers');
+  known.innerHTML = names.length
+    ? `<span class="note-small" style="width:100%; margin:0">Уже грали на цьому пристрої — обери себе:</span>` +
+      names.map(n=>`<button type="button" class="chip-btn" data-n="${esc(n)}">👤 ${esc(n)}</button>`).join('')
+    : '';
+  known.querySelectorAll('.chip-btn').forEach(b=>b.addEventListener('click', ()=>enterGame(b.dataset.n)));
+  nameInput.value = '';
+  nameErr.textContent = '';
+  nameOverlay.classList.add('show');
+  setTimeout(()=>nameInput.focus(), 50);
+}
+document.getElementById('nameForm').addEventListener('submit', e=>{
+  e.preventDefault();
+  const n = nameInput.value.trim().replace(/\s+/g, ' ');
+  if(n.length < 2){ nameErr.textContent = 'Введи своє ім\'я (хоча б 2 літери).'; nameInput.focus(); return; }
+  enterGame(n);
+});
+document.getElementById('nameCancel').addEventListener('click', ()=>nameOverlay.classList.remove('show'));
+function enterGame(name){
+  loadPlayer(name);
+  nameOverlay.classList.remove('show');
+  profileOverlay.classList.remove('show');
+  toSetup();
+  applyPending();
+}
+
+/* ================= Профіль ================= */
+const profileOverlay = document.getElementById('profileOverlay');
+const miniBot = s => `<span class="pb-bot">${robotSVG(s?.color || COLORS[0], s?.acc || 'none')}</span>`;
+function renderPlayerBtn(){
+  document.getElementById('playerBot').innerHTML = robotSVG(settings.color, settings.acc);
+  document.getElementById('playerName').textContent = player || 'Гравець';
+}
+function renderProfile(){
+  document.getElementById('profShare').innerHTML =
+    `<button type="button" class="share-ico" data-url="${esc(makeShareLink())}" title="Поділитися досягненнями">${LINK_ICON}</button>`;
+  bindLinkButtons(document.getElementById('profShare'));
+  document.getElementById('profAvatar').innerHTML = robotSVG(settings.color, settings.acc, 'happy') + badgeHTML(settings.badge);
+  document.getElementById('profTitle').textContent = player;
+  const lv = [0,0,0,0]; CARDS.forEach(c=>lv[cardLevel(profile.cards[c.id])]++);
+  document.getElementById('profStats').innerHTML =
+    `<span>${NEURON} <b>${profile.neurons}</b></span><span>завдань <b>${profile.tasks}</b></span>` +
+    `<span>картки 🥇<b>${lv[3]}</b> 🥈<b>${lv[2]}</b> 🥉<b>${lv[1]}</b></span><span>місій <b>${MISSIONS.filter(m=>profile.missions[m.id]).length}/${MISSIONS.length}</b></span>`;
+  const list = document.getElementById('playerList');
+  const names = Object.keys(store.players).sort((a, b)=>a===player ? -1 : b===player ? 1 : a.localeCompare(b, 'uk'));
+  list.innerHTML = names.map(n=>{
+    const p = store.players[n], me = n === player;
+    return `<div class="pl-row${me ? ' me' : ''}">${miniBot(p.settings)}
+      <span class="pl-name">${esc(n)}<small>${NEURON} ${p.neurons || 0}</small></span>
+      ${me ? '<span class="pl-you">це ти</span>' : `<button type="button" class="btn btn-primary btn-small" data-play="${esc(n)}">Грати</button>`}
+      <button type="button" class="pl-del" data-del="${esc(n)}" title="Видалити гравця">✕</button>
+    </div>`;
+  }).join('');
+  list.querySelectorAll('[data-play]').forEach(b=>b.addEventListener('click', ()=>enterGame(b.dataset.play)));
+  list.querySelectorAll('[data-del]').forEach(b=>b.addEventListener('click', ()=>deletePlayer(b.dataset.del)));
+  document.getElementById('addInput').value = '';
+  document.getElementById('addErr').textContent = '';
+}
+function openProfile(){
+  if(!player){ openNameModal(true); return; }
+  if(round) toSetup();
+  renderProfile();
+  profileOverlay.classList.add('show');
+}
+function deletePlayer(name){
+  if(!confirm(`Видалити гравця «${name}» з цього пристрою разом із прогресом?`)) return;
+  delete store.players[name];
+  if(name !== player){ saveStore(); renderProfile(); return; }
+  const other = Object.keys(store.players)[0];
+  if(other){ enterGame(other); return; }
+  store.current = null;
+  saveStore();
+  player = null;
+  profile = newProfile();
+  settings = profile.settings;
+  renderHUD(); applyLook();
+  profileOverlay.classList.remove('show');
+  toSetup();
+  openNameModal(true);
+}
+document.getElementById('addForm').addEventListener('submit', e=>{
+  e.preventDefault();
+  const n = document.getElementById('addInput').value.trim().replace(/\s+/g, ' ');
+  if(n.length < 2){ document.getElementById('addErr').textContent = 'Введи ім\'я (хоча б 2 літери).'; return; }
+  enterGame(n);
+});
+document.getElementById('playerBtn').addEventListener('click', openProfile);
+document.getElementById('profClose').addEventListener('click', ()=>profileOverlay.classList.remove('show'));
+profileOverlay.addEventListener('click', e=>{ if(e.target === profileOverlay) profileOverlay.classList.remove('show'); });
+document.addEventListener('keydown', e=>{
+  if(e.key !== 'Escape') return;
+  profileOverlay.classList.remove('show');
+  guideOverlay.classList.remove('show');
+  if(!nameRequired) nameOverlay.classList.remove('show');
+});
+document.getElementById('resetBtn').addEventListener('click', ()=>{
+  if(!confirm(`Скинути весь прогрес гравця «${player}»? Нейрончики, картки й медалі почнуться спочатку.`)) return;
+  store.players[player] = newProfile();
+  enterGame(player);
+});
+
+/* ================= Як грати ================= */
+const guideOverlay = document.getElementById('guideOverlay');
+document.getElementById('guideBtn').addEventListener('click', ()=>{
+  if(round) toSetup();
+  const rows = [ ...STAGES.filter(s=>!s.soon).map(s=>[`Етап ${s.n} · ${s.name}`, `#e=${s.n}`]),
+                 ...MISSIONS.map((m, i)=>[`Місія ${i+1} · ${m.name}`, `#m=${i+1}`]) ];
+  const tl = document.getElementById('teacherLinks');
+  tl.innerHTML = rows.map(([t, h])=>`<div class="tl-row"><span>${t}</span><button type="button" class="btn btn-ghost btn-small" data-url="${esc(baseURL() + h)}">Копіювати посилання</button></div>`).join('');
+  bindLinkButtons(tl);
+  guideOverlay.classList.add('show');
+});
+document.getElementById('guideClose').addEventListener('click', ()=>guideOverlay.classList.remove('show'));
+guideOverlay.addEventListener('click', e=>{ if(e.target === guideOverlay) guideOverlay.classList.remove('show'); });
+
+/* ================= Посилання ================= */
+// Дані кодуються в частину адреси після «#», тож сервер не потрібен:
+// #r=… — досягнення гравця, #c=… — результат місії, #e=N — відкрити етап, #m=N — відкрити місію
+const LINK_ICON = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 14a4.5 4.5 0 0 0 6.4 0l3-3a4.5 4.5 0 0 0-6.4-6.4l-1 1"/><path d="M14 10a4.5 4.5 0 0 0-6.4 0l-3 3a4.5 4.5 0 0 0 6.4 6.4l1-1"/></svg>`;
+const CHECK_ICON = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>`;
+function b64urlEncode(str){
+  let bin = '';
+  new TextEncoder().encode(str).forEach(b=>bin += String.fromCharCode(b));
+  return btoa(bin).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
+}
+function b64urlDecode(s){
+  s = s.replace(/-/g,'+').replace(/_/g,'/');
+  while(s.length % 4) s += '=';
+  return new TextDecoder().decode(Uint8Array.from(atob(s), c=>c.charCodeAt(0)));
+}
+const baseURL = () => location.href.split('#')[0];
+const num = (x, max) => Math.max(0, Math.min(max, Math.round(+x) || 0));
+const cleanName = n => String(n || 'Гравець').slice(0, 24);
+const RANK_MEDAL = ['', 'bronze', 'silver', 'gold'];
+
+function makeShareLink(){
+  const ms = {};
+  for(const m of MISSIONS){ const r = profile.missions[m.id]; if(r) ms[m.id] = [MEDAL_RANK[r.medal], r.day, r.time]; }
+  const cd = {};
+  for(const c of CARDS){ const l = cardLevel(profile.cards[c.id]); if(l) cd[c.id] = l; }
+  const data = { v:1, n:player, x:profile.neurons, t:profile.tasks, c:settings.color, a:settings.acc, bd:settings.badge, ms, cd, f:profile.since, d:today() };
+  return baseURL() + '#r=' + b64urlEncode(JSON.stringify(data));
+}
+function makeResultLink(m, r){
+  const data = { v:1, n:player, bd:settings.badge, c:settings.color, a:settings.acc, m:m.id, md:MEDAL_RANK[r.medal], t:r.time, ac:r.acc, e:r.errors, h:r.hints, d:today() };
+  return baseURL() + '#c=' + b64urlEncode(JSON.stringify(data));
+}
+function readHash(prefix){
+  const m = location.hash.match(new RegExp(`^#${prefix}=([A-Za-z0-9_-]+)$`));
+  if(!m) return null;
+  try{ return JSON.parse(b64urlDecode(m[1])); }catch(e){ return null; }
+}
+const lookOf = d => ({ c: COLORS.includes(d.c) ? d.c : COLORS[0], a: ACCS.some(x=>x.id === d.a) ? d.a : 'none', bd: BADGES[d.bd] ? d.bd : '' });
+function readProfileLink(){
+  const d = readHash('r');
+  if(!d || d.v !== 1) return null;
+  const ms = {};
+  for(const m of MISSIONS){ const x = d.ms?.[m.id]; if(Array.isArray(x) && RANK_MEDAL[num(x[0], 3)]) ms[m.id] = { medal:RANK_MEDAL[num(x[0], 3)], day:num(x[1], 1e6), time:num(x[2], 36e5) }; }
+  const cd = {};
+  for(const c of CARDS){ const l = num(d.cd?.[c.id], 3); if(l) cd[c.id] = l; }
+  return { n:cleanName(d.n), x:num(d.x, 1e7), t:num(d.t, 1e7), ...lookOf(d), ms, cd, d:num(d.d, 1e6) };
+}
+function readResultLink(){
+  const d = readHash('c');
+  const m = d && missionById(d.m);
+  if(!m || !RANK_MEDAL[num(d.md, 3)]) return null;
+  return { n:cleanName(d.n), ...lookOf(d), m, medal:RANK_MEDAL[num(d.md, 3)], t:num(d.t, 36e5), ac:num(d.ac, 100), e:num(d.e, 999), h:num(d.h, 999), d:num(d.d, 1e6) };
+}
+
+let toastTimer = null;
+function showToast(text){
+  const t = document.getElementById('toast');
+  t.textContent = text;
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(()=>t.classList.remove('show'), 2200);
+}
+function copyText(text){
+  if(navigator.clipboard && window.isSecureContext){ navigator.clipboard.writeText(text).catch(()=>fallbackCopy(text)); return; }
+  fallbackCopy(text);
+}
+function fallbackCopy(text){
+  const ta = document.createElement('textarea');
+  ta.value = text; ta.style.cssText = 'position:fixed; opacity:0;';
+  document.body.appendChild(ta); ta.select();
+  try{ document.execCommand('copy'); }catch(e){ prompt('Скопіюй посилання:', text); }
+  ta.remove();
+}
+function bindLinkButtons(root){
+  root.querySelectorAll('[data-url]').forEach(b=>b.addEventListener('click', ()=>{
+    copyText(b.dataset.url);
+    showToast('Посилання скопійоване');
+    if(b.classList.contains('share-ico')){ b.classList.add('done'); b.innerHTML = CHECK_ICON; setTimeout(()=>{ b.classList.remove('done'); b.innerHTML = LINK_ICON; }, 1600); }
+  }));
+}
+
+/* ================= Сторінки за посиланням ================= */
+const shareView = document.getElementById('shareView');
+function prepareShared(){
+  document.body.classList.add('ro');
+  document.body.classList.remove('playing');
+  round = null;
+  clearInterval(timerId);
+  overlay.classList.remove('show');
+  setupEl.hidden = true;
+  playEl.hidden = true;
+  deskEl.hidden = true;
+  shareView.hidden = false;
+}
+function showResult(d){
+  prepareShared();
+  const m = d.m;
+  shareView.innerHTML = `
+    <div class="cert">
+      <div class="cert-head">${badgeHTML(m.badge)}
+        <div><div class="cert-kicker">Результат місії · етап ${m.stage}</div><h2>${m.name}</h2></div>
+        <div class="cert-medal">${MEDALS[d.medal][0]}<small>${MEDALS[d.medal][1]}</small></div>
+      </div>
+      <div class="cert-who">Учасник: <b>${badgeHTML(d.bd)} ${esc(d.n)}</b>${d.d ? ` · ${fmtDay(d.d)}` : ''}</div>
+      <table class="res-table"><thead><tr><th>Кроків</th><th>Час</th><th>Точність</th><th>Помилок</th><th>Підказок</th></tr></thead>
+        <tbody><tr><td>${m.steps.length}</td><td>${fmtTime(d.t)}</td><td>${d.ac}%</td><td>${d.e}</td><td>${d.h}</td></tr></tbody></table>
+    </div>
+    <div class="share-actions"><button class="btn btn-ghost" id="ownBtn" type="button">Закрити</button></div>`;
+  document.getElementById('ownBtn').addEventListener('click', leaveShared);
+}
+function showProfile(d){
+  prepareShared();
+  shareView.innerHTML = `
+    <div class="ach-head">
+      <div class="prof-avatar">${robotSVG(d.c, d.a, 'happy')}${badgeHTML(d.bd)}</div>
+      <div>
+        <div class="cert-kicker">Досягнення гравця</div>
+        <h2>${esc(d.n)}</h2>
+        <div class="prof-stats"><span>${NEURON} <b>${d.x}</b></span><span>завдань <b>${d.t}</b></span></div>
+        ${d.d ? `<span class="share-date">станом на ${fmtDay(d.d)}</span>` : ''}
+      </div>
+    </div>
+    <div class="share-sec"><h3>Місії · ${Object.keys(d.ms).length}/${MISSIONS.length}</h3><div class="medals">
+      ${MISSIONS.map(m=>{ const x = d.ms[m.id];
+        return `<div class="medal-item${x ? ' got' : ''}" title="${x ? `${MEDALS[x.medal][1]} · ${fmtDay(x.day)} · ${fmtTime(x.time)}` : 'Ще не пройдено'}">
+          ${badgeHTML(m.badge)}${x ? `<span class="m">${MEDALS[x.medal][0]}</span>` : ''}<small>${m.name}</small></div>`; }).join('')}
+    </div></div>
+    ${STAGES.filter(s=>!s.soon).map(s=>`<div class="share-sec"><h3>Картки · етап ${s.n}</h3><div class="hk-cards">
+      ${CARDS.filter(c=>c.stage === s.n).map(c=>{ const l = d.cd[c.id] || 0;
+        return `<div class="hk l${l}"><span class="lvl${l ? '' : ' none'}">${LEVEL_ICON[l]}</span><div class="keys">${kbdHTML(c.keys, c.or ? '/' : '+')}</div><h4>${c.name}</h4></div>`; }).join('')}
+    </div></div>`).join('')}
+    <div class="share-actions"><button class="btn btn-ghost" id="ownBtn" type="button">Закрити</button></div>`;
+  document.getElementById('ownBtn').addEventListener('click', leaveShared);
+}
+function leaveShared(){
+  history.replaceState(null, '', location.pathname + location.search);
+  startGame();
+}
+function startGame(){
+  if(store.current && store.players[store.current]) enterGame(store.current);
+  else { loadDefaults(); toSetup(); openNameModal(true); }
+}
+function loadDefaults(){ applyLook(); renderPlayerBtn(); renderHUD(); }
+
+// Посилання вчителя: #e=N — етап у тренуванні, #m=N — місія (відкривається навіть без нейрончиків)
+let pending = null;
+function applyPending(){
+  if(!pending) return;
+  const p = pending; pending = null;
+  history.replaceState(null, '', location.pathname + location.search);
+  if(p.e){ settings.stage = p.e; saveStore(); showTab('paneTrain'); }
+  if(p.m){
+    const m = MISSIONS[p.m - 1];
+    linkOpen.add(m.id);
+    highlightMission = m.id;
+    showTab('paneMissions');
+    setTimeout(()=>document.getElementById('ms-' + m.id)?.scrollIntoView({ behavior:'smooth', block:'center' }), 100);
+  }
+}
+function route(){
+  const res = readResultLink(), prof = readProfileLink();
+  const e = location.hash.match(/^#e=(\d)$/), m = location.hash.match(/^#m=(\d+)$/);
+  if(e && STAGES[+e[1] - 1] && !STAGES[+e[1] - 1].soon) pending = { e:+e[1] };
+  if(m && +m[1] >= 1 && +m[1] <= MISSIONS.length) pending = { m:+m[1] };
+  if(res) showResult(res);
+  else if(prof) showProfile(prof);
+  else startGame();
+}
+route();
+window.addEventListener('hashchange', ()=>{ if(readResultLink() || readProfileLink()) route(); });
+</script>
+</body>
+</html>
