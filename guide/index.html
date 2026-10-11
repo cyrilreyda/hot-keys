@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Для вчителя · Гарячі клавіші</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Nunito+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#F6F5FB; --ink:#1B1B3A; --ink-soft:#514F72; --surface:#FFFFFF; --line:#E4E1F5;
+    --purple:#6C5CE7; --teal:#16A3A0; --teal-dark:#0E7C7A; --coral:#FF6B4A; --yellow:#FFC93C;
+    --radius-s:10px; --radius-m:16px; --radius-l:26px;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0; background:var(--bg); color:var(--ink); font-family:'Nunito Sans',sans-serif; font-size:16px; line-height:1.6; -webkit-font-smoothing:antialiased;}
+  h1,h2,h3{font-family:'Baloo 2',sans-serif; font-weight:700; margin:0; color:var(--ink); line-height:1.25;}
+  .container{max-width:860px; margin:0 auto; padding:0 16px;}
+
+  .topbar{position:sticky; top:0; z-index:10; background:rgba(246,245,251,.92); backdrop-filter:blur(6px); border-bottom:1px solid var(--line);}
+  .topbar-inner{max-width:860px; margin:0 auto; padding:12px 16px; display:flex; align-items:center; gap:12px;}
+  .back-link{font-family:'Baloo 2',sans-serif; font-weight:600; font-size:14px; color:var(--teal-dark); text-decoration:none; white-space:nowrap;}
+  .back-link:hover{text-decoration:underline;}
+  .play-link{margin-left:auto; font-family:'Baloo 2',sans-serif; font-weight:700; font-size:14px; text-decoration:none; background:var(--teal); color:#fff; border-radius:999px; padding:4px 16px; white-space:nowrap;}
+  .play-link:hover{background:var(--teal-dark);}
+
+  .hero{padding:28px 0 6px;}
+  .eyebrow{font-family:'Baloo 2',sans-serif; font-weight:700; font-size:13px; letter-spacing:.06em; text-transform:uppercase; color:var(--teal-dark);}
+  .hero h1{font-size:32px; margin:2px 0 4px;}
+  .hero p{margin:0; color:var(--ink-soft); font-size:17px;}
+  @media (max-width:600px){ .hero h1{font-size:26px;} }
+
+  .toc{display:flex; flex-wrap:wrap; gap:6px; margin:16px 0 0; padding:0; list-style:none;}
+  .toc a{display:inline-block; font-family:'Baloo 2',sans-serif; font-weight:600; font-size:14px; color:var(--ink); text-decoration:none; background:var(--surface); border:1.5px solid var(--line); border-radius:999px; padding:2px 12px;}
+  .toc a:hover{border-color:var(--teal);}
+
+  .sec{background:var(--surface); border:1.5px solid var(--line); border-radius:var(--radius-l); padding:20px 22px; margin-top:14px; scroll-margin-top:70px;}
+  .sec.key{border:2px solid var(--teal); box-shadow:0 5px 0 #D2F0EF;}
+  .sec-head{display:flex; align-items:center; gap:12px; margin-bottom:8px;}
+  .num{flex:none; width:40px; height:40px; border-radius:50%; background:var(--teal); color:#fff; display:flex; align-items:center; justify-content:center; font-family:'Baloo 2',sans-serif; font-weight:800; font-size:20px;}
+  .sec h2{font-size:22px;}
+  .sec h3{font-size:16.5px; margin:16px 0 4px;}
+  .sec p{margin:6px 0; color:var(--ink-soft); font-size:15.5px;}
+  .sec ul, .sec ol{margin:6px 0; padding-left:22px; color:var(--ink-soft); font-size:15.5px;}
+  .sec li + li{margin-top:3px;}
+  @media (max-width:600px){ .sec{padding:16px 14px;} .num{width:34px; height:34px; font-size:17px;} }
+
+  .kbd{display:inline-block; font-family:'Baloo 2',sans-serif; font-weight:800; font-size:13.5px; line-height:1.45; color:var(--ink); background:var(--surface); border:1.5px solid var(--line); border-bottom-width:3px; border-radius:7px; padding:0 7px; white-space:nowrap;}
+  .kbd.mod{background:#E6E2FF;}
+  .ui{display:inline-flex; align-items:center; gap:4px; font-family:'Baloo 2',sans-serif; font-weight:700; font-size:14px; line-height:1.3; white-space:nowrap; vertical-align:1px;
+    border:1.5px solid var(--line); background:var(--surface); color:var(--ink); border-radius:999px; padding:1px 10px;}
+  .ui.primary{background:var(--teal); border-color:var(--teal); color:#fff;}
+  code{font-size:14px; background:var(--bg); border-radius:6px; padding:1px 6px;}
+
+  .grid{display:grid; grid-template-columns:repeat(auto-fill, minmax(min(240px, 100%), 1fr)); gap:10px; margin-top:10px;}
+  .tile{background:var(--bg); border-radius:var(--radius-m); padding:12px 14px; font-size:14.5px; color:var(--ink-soft);}
+  .tile h3{margin:0 0 2px; font-size:16.5px;}
+  .tile .big{font-size:26px; line-height:1; margin-bottom:4px;}
+
+  .table-scroll{overflow-x:auto; margin-top:8px;}
+  table{border-collapse:collapse; width:100%; font-size:14.5px;}
+  th, td{padding:7px 10px; border-bottom:1px solid var(--line); text-align:left; vertical-align:top;}
+  th{font-family:'Baloo 2',sans-serif; font-weight:600; color:var(--ink-soft); white-space:nowrap;}
+  td.keys{white-space:normal; line-height:2;}
+  .soon td{color:var(--ink-soft);}
+
+  .note{background:#FFF4D6; color:#6B4D00; border-radius:var(--radius-s); padding:9px 14px; font-size:14.5px; margin-top:10px;}
+  .idea-list{display:grid; gap:8px; margin-top:10px;}
+  .idea{display:grid; grid-template-columns:32px 1fr; gap:10px; background:var(--bg); border-radius:var(--radius-m); padding:10px 14px; font-size:14.5px; color:var(--ink-soft);}
+  .idea .i{font-size:22px; line-height:1.2;}
+  .idea h3{margin:0; font-size:16px;}
+
+  footer{margin:36px 0 30px; text-align:center; font-size:13.5px; color:var(--ink-soft);}
+  @media print{
+    body{background:#fff;}
+    .topbar, .toc{display:none;}
+    .sec{break-inside:avoid; box-shadow:none;}
+  }
+</style>
+</head>
+<body>
+
+<div class="topbar"><div class="topbar-inner">
+  <a class="back-link" href="../index.html">← До гри</a>
+  <a class="play-link" href="../index.html">⌨️ Грати</a>
+</div></div>
+
+<main class="container">
+
+  <header class="hero">
+    <div class="eyebrow">Гарячі клавіші · Для вчителя</div>
+    <h1>Що вміє гра і як її використати на уроці</h1>
+    <p>Тренажер клавіатурних скорочень для 2–7 класів. Учень натискає комбінацію на справжній клавіатурі й одразу бачить, що вона зробила з документом.</p>
+    <ul class="toc">
+      <li><a href="#about">Коротко</a></li>
+      <li><a href="#structure">Етапи й картки</a></li>
+      <li><a href="#modes">Режими</a></li>
+      <li><a href="#rewards">Нагороди</a></li>
+      <li><a href="#links">Посилання</a></li>
+      <li><a href="#lesson">На уроці</a></li>
+      <li><a href="#limits">Особливості</a></li>
+      <li><a href="#future">Ідеї на майбутнє</a></li>
+    </ul>
+  </header>
+
+  <!-- 1 -->
+  <section class="sec" id="about">
+    <div class="sec-head"><span class="num">1</span><h2>Коротко про гру</h2></div>
+    <p>На екрані намальований робочий стіл із документом. Гра дає завдання словами, наприклад «Скопіюй виділене слово», а учень натискає потрібну комбінацію. Правильна комбінація справді змінює документ: слово потрапляє в буфер обміну, текст стає жирним, зірочка біля назви файлу зникає після збереження.</p>
+    <div class="grid">
+      <div class="tile"><div class="big">🧒</div><h3>Для кого</h3>2–7 класи. Етапи не прив'язані до класів, тож кожен починає з того, що вже вміє.</div>
+      <div class="tile"><div class="big">💻</div><h3>Що потрібно</h3>Комп'ютер із Windows, справжня клавіатура, Chrome або Edge. Реєстрація й інтернет-сервер не потрібні.</div>
+      <div class="tile"><div class="big">⏱</div><h3>Скільки часу</h3>Тренування — 2–3 хвилини, місія — до 2 хвилин. На уроці зручно відвести 10–15 хвилин.</div>
+      <div class="tile"><div class="big">🤖</div><h3>Робот-помічник</h3>Пояснює помилку: що зробила натиснута комбінація або якої клавіші бракує («тримай ще Shift»).</div>
+    </div>
+    <p>Гра з тієї ж серії, що й «Клавіатурні перегони»: такий самий вигляд, нейрончики й бейджі.</p>
+  </section>
+
+  <!-- 2 -->
+  <section class="sec" id="structure">
+    <div class="sec-head"><span class="num">2</span><h2>Етапи й картки</h2></div>
+    <p>Скорочення згруповані за темами. Зараз доступна тема «Текст», інші позначені «скоро». Тема ділиться на етапи, а кожне скорочення в етапі — це картка.</p>
+    <div class="table-scroll"><table>
+      <thead><tr><th>Етап</th><th>Орієнтовно</th><th>Картки</th></tr></thead>
+      <tbody>
+        <tr><td>1 · Перші кроки</td><td>2–3 класи</td><td class="keys">
+          <span class="kbd">Enter</span> <span class="kbd">пробіл</span> <span class="kbd">Backspace</span> <span class="kbd">Delete</span>
+          <span class="kbd">←</span><span class="kbd">→</span> <span class="kbd">↑</span><span class="kbd">↓</span>
+          <span class="kbd mod">Shift</span>+літера <span class="kbd mod">Ctrl</span>+<span class="kbd">C</span> <span class="kbd mod">Ctrl</span>+<span class="kbd">V</span> <span class="kbd mod">Ctrl</span>+<span class="kbd">Z</span></td></tr>
+        <tr><td>2 · Майстер тексту</td><td>4–5 класи</td><td class="keys">
+          <span class="kbd mod">Ctrl</span>+<span class="kbd">X</span> <span class="kbd mod">Ctrl</span>+<span class="kbd">A</span> <span class="kbd mod">Ctrl</span>+<span class="kbd">S</span> <span class="kbd mod">Ctrl</span>+<span class="kbd">Y</span>
+          <span class="kbd mod">Ctrl</span>+<span class="kbd">B</span> <span class="kbd mod">Ctrl</span>+<span class="kbd">I</span> <span class="kbd mod">Ctrl</span>+<span class="kbd">U</span>
+          <span class="kbd mod">Shift</span>+стрілки <span class="kbd">Home</span> <span class="kbd">End</span> <span class="kbd">Caps Lock</span></td></tr>
+        <tr class="soon"><td>3 · Профі</td><td>6–7 класи</td><td>Скоро: Ctrl+стрілки, Ctrl+Home/End, Ctrl+Backspace, Ctrl+P, Tab</td></tr>
+      </tbody>
+    </table></div>
+    <h3>Чому класи не показані учням</h3>
+    <p>Свідомо: щоб старші учні не вважали перший етап «дитячим». У них є свої причини туди повернутися: зібрати всі картки на золото, побити свій рекорд часу в місіях, заробити нейрончики на нові шпалери й робота.</p>
+  </section>
+
+  <!-- 3 -->
+  <section class="sec" id="modes">
+    <div class="sec-head"><span class="num">3</span><h2>Режими</h2></div>
+    <div class="grid">
+      <div class="tile"><div class="big">👀</div><h3>Знайомство</h3>Усі картки етапу по черзі. Потрібні клавіші одразу підсвічені на екранній клавіатурі, робот пояснює, що робить комбінація. Добре для першого уроку з теми.</div>
+      <div class="tile"><div class="big">🎯</div><h3>Тренування</h3>10 завдань упереміш. Підказка лише на вимогу, і тоді нейрончиків менше. Картки, які учень знає гірше, трапляються частіше.</div>
+      <div class="tile"><div class="big">🏆</div><h3>Місії</h3>Сюжет із кількох кроків на час: «Лист бабусі», «Стінгазета», «Оголошення»… Документ змінюється від кроку до кроку. Медаль залежить від помилок, підказок і швидкості.</div>
+    </div>
+    <div class="table-scroll"><table>
+      <thead><tr><th>Місія</th><th>Етап</th><th>Кроків</th><th>Ліміт часу</th><th>Золото — швидше за</th><th>Відкривається</th></tr></thead>
+      <tbody>
+        <tr><td>1 · Лист бабусі</td><td>1</td><td>6</td><td>2:00</td><td>0:45</td><td>одразу</td></tr>
+        <tr><td>2 · Стінгазета</td><td>1</td><td>7</td><td>2:00</td><td>0:50</td><td>30 нейрончиків</td></tr>
+        <tr><td>3 · Рятуємо твір</td><td>1</td><td>7</td><td>1:40</td><td>0:45</td><td>80</td></tr>
+        <tr><td>4 · Оголошення</td><td>2</td><td>6</td><td>1:40</td><td>0:40</td><td>120</td></tr>
+        <tr><td>5 · Редактор журналу</td><td>2</td><td>8</td><td>1:50</td><td>0:50</td><td>220</td></tr>
+        <tr><td>6 · Майстер тексту</td><td>2</td><td>10</td><td>1:40</td><td>0:55</td><td>350</td></tr>
+      </tbody>
+    </table></div>
+    <p>Будь-яку місію можна відкрити посиланням, навіть якщо учень ще не назбирав на неї нейрончиків (див. розділ 5).</p>
+  </section>
+
+  <!-- 4 -->
+  <section class="sec" id="rewards">
+    <div class="sec-head"><span class="num">4</span><h2>Нейрончики, картки й медалі</h2></div>
+    <h3>Нейрончики</h3>
+    <ul>
+      <li>За завдання: 2 на першому етапі, 3 на другому. Ще +2, якщо відповідь швидша за 2,5 с, або +1, якщо швидша за 5 с.</li>
+      <li>З підказкою або після помилки — половина (не менше 1). У Знайомстві — 1 за завдання.</li>
+      <li>Серія з 5 завдань без помилок і підказок: +3.</li>
+      <li>Нова медаль картки: +5, +10 або +20. Медаль місії: +15, +25 або +40, але тільки якщо вона краща за попередню. Повторне проходження дає +5, тож «накручувати» нейрончики однією місією не вийде.</li>
+    </ul>
+    <h3>Картки</h3>
+    <p>Картка зараховує лише відповіді без помилок і без підказки. Щоб дійти до золота, потрібні кілька днів, тому одним уроком його не взяти: це підштовхує повертатися до гри.</p>
+    <div class="grid">
+      <div class="tile"><div class="big">🥉</div><h3>Бронза</h3>3 правильні відповіді.</div>
+      <div class="tile"><div class="big">🥈</div><h3>Срібло</h3>8 правильних відповідей за щонайменше 2 різні дні.</div>
+      <div class="tile"><div class="big">🥇</div><h3>Золото</h3>15 правильних відповідей за щонайменше 3 різні дні.</div>
+    </div>
+    <h3>Медалі місій</h3>
+    <ul>
+      <li>Золото: без помилок, без підказок і швидше за норму часу місії.</li>
+      <li>Срібло: точність від 90% і не більше однієї підказки.</li>
+      <li>Бронза: місію пройдено.</li>
+      <li>Місію не зараховано, якщо скінчився час або точність нижча за мінімум (70–80% залежно від місії).</li>
+    </ul>
+    <p>Бейдж найскладнішої пройденої місії стоїть біля імені учня, як у перегонах.</p>
+    <h3>Що відкривається</h3>
+    <div class="table-scroll"><table>
+      <thead><tr><th>Нейрончики</th><th>Нагорода</th></tr></thead>
+      <tbody>
+        <tr><td>25</td><td>Робот: кепка</td></tr>
+        <tr><td>30</td><td>Місія «Стінгазета»</td></tr>
+        <tr><td>40</td><td>Шпалери «Ліс»</td></tr>
+        <tr><td>70</td><td>Тема вікон «Нічна»</td></tr>
+        <tr><td>80</td><td>Місія «Рятуємо твір»</td></tr>
+        <tr><td>90</td><td>Робот: навушники</td></tr>
+        <tr><td>120</td><td>Місія «Оголошення»</td></tr>
+        <tr><td>140</td><td>Шпалери «Море»</td></tr>
+        <tr><td>180</td><td>Робот: бантик</td></tr>
+        <tr><td>220</td><td>Місія «Редактор журналу», тема вікон «Цукеркова»</td></tr>
+        <tr><td>260</td><td>Шпалери «Космос»</td></tr>
+        <tr><td>350</td><td>Місія «Майстер тексту»</td></tr>
+        <tr><td>360</td><td>Тема вікон «Неон»</td></tr>
+        <tr><td>420</td><td>Шпалери «Захід сонця»</td></tr>
+        <tr><td>500</td><td>Робот: корона</td></tr>
+      </tbody>
+    </table></div>
+    <p>Колір робота можна обрати одразу. Усе налаштовується на вкладці <span class="ui">🎨 Мій стіл</span>.</p>
+  </section>
+
+  <!-- 5 -->
+  <section class="sec key" id="links">
+    <div class="sec-head"><span class="num">5</span><h2>Посилання: завдання й результати</h2></div>
+    <p>Сервера немає, тому все передається посиланнями. Дані закодовані в самому посиланні, після знака <code>#</code>. Це не шифрування: прочитати їх може будь-хто, хто має посилання.</p>
+    <h3>Учитель → учням</h3>
+    <p>У грі натисніть <span class="ui">❓ Як грати</span>, внизу є блок «Для вчителя» з кнопками <span class="ui">Копіювати посилання</span>:</p>
+    <ul>
+      <li>етап (<code>#e=1</code>, <code>#e=2</code>) — відкриває тренування потрібного етапу;</li>
+      <li>місія (<code>#m=1</code> … <code>#m=6</code>) — відкриває вкладку місій і підсвічує потрібну. Місія доступна навіть без нейрончиків.</li>
+    </ul>
+    <p>Посилання можна дати в Classroom, месенджері або на дошці уроку.</p>
+    <h3>Учень → учителю</h3>
+    <ul>
+      <li>Результат місії: у вікні перемоги натиснути ланцюжок 🔗. Відкриється сертифікат: медаль, час, точність, кількість помилок і підказок, дата.</li>
+      <li>Усі досягнення: кнопка з ім'ям учня вгорі праворуч, у профілі ланцюжок 🔗. Видно нейрончики, медалі всіх місій і рівні всіх карток.</li>
+    </ul>
+    <div class="note">Посилання показує результат на момент копіювання. Щоб побачити свіжий прогрес, попросіть учня скопіювати посилання ще раз.</div>
+  </section>
+
+  <!-- 6 -->
+  <section class="sec" id="lesson">
+    <div class="sec-head"><span class="num">6</span><h2>Ідеї для уроку</h2></div>
+    <ol>
+      <li>Фронтально, 5 хв. Через проєктор пройдіть «Знайомство» першого етапу разом із класом: учні кажуть комбінацію вголос, ви натискаєте.</li>
+      <li>Самостійно, 5–7 хв. Кожен проходить «Тренування» свого етапу. Старшим можна відразу дати другий етап посиланням.</li>
+      <li>Підсумок, 3–5 хв. Місія за посиланням, результат учень надсилає вчителю. Медаль — природна оцінка: золото, срібло, бронза.</li>
+      <li>Між уроками. Попросіть за тиждень довести 3 картки до срібла: для цього потрібно грати в різні дні.</li>
+      <li>Класний виклик. Хто першим збере всі картки етапу на золото або пройде «Майстра тексту» найшвидше.</li>
+    </ol>
+    <p>Підказка робота «Майже! Тримай ще Shift» — хороший привід поговорити про клавіші-модифікатори: їх тримають, поки натискають другу клавішу.</p>
+  </section>
+
+  <!-- 7 -->
+  <section class="sec" id="limits">
+    <div class="sec-head"><span class="num">7</span><h2>Особливості й обмеження</h2></div>
+    <h3>Прогрес</h3>
+    <ul>
+      <li>Прогрес зберігається в браузері конкретного комп'ютера під іменем учня. За іншим комп'ютером або в іншому браузері прогрес буде порожній.</li>
+      <li>Кілька учнів за одним комп'ютером — не проблема: кожен обирає себе зі списку гравців.</li>
+      <li>Очищення історії браузера або режим інкогніто стирає прогрес. Якщо на шкільних комп'ютерах браузер чиститься після кожного сеансу, покладайтеся на посилання з результатами.</li>
+    </ul>
+    <h3>Клавіатура</h3>
+    <ul>
+      <li>Розкладка значення не має: гра розпізнає фізичну клавішу, тож Ctrl+C працює і з українською розкладкою.</li>
+      <li>Якщо учень клацнув поза грою (у рядок адреси, на інше вікно), гра ставить час на паузу й просить клацнути по ній.</li>
+      <li><span class="kbd">Esc</span> виходить із завдання. Випадкове закриття вкладки під час гри браузер попросить підтвердити.</li>
+      <li>Caps Lock у завданнях перемикається по-справжньому. Якщо після гри все друкується великими, натисніть його ще раз.</li>
+    </ul>
+    <h3>Що браузер не віддає грі</h3>
+    <p>Комбінації <span class="kbd mod">Win</span>+…, <span class="kbd mod">Alt</span>+<span class="kbd">Tab</span>, <span class="kbd mod">Ctrl</span>+<span class="kbd">W</span>, <span class="kbd mod">Ctrl</span>+<span class="kbd">T</span>, <span class="kbd mod">Ctrl</span>+<span class="kbd">N</span>, <span class="kbd mod">Alt</span>+<span class="kbd">F4</span> обробляє сам браузер або Windows, і сторінка їх не бачить. Тому в темі «Текст» їх немає. Для тем «Браузер» і «Windows» такі комбінації учні збиратимуть кліками на екранній клавіатурі.</p>
+    <div class="note">Перед першим уроком перевірте на шкільному комп'ютері <span class="kbd mod">Ctrl</span>+<span class="kbd">S</span>, <span class="kbd mod">Ctrl</span>+<span class="kbd">U</span> і <span class="kbd mod">Ctrl</span>+<span class="kbd">B</span> у грі. Гра має їх перехопити, а не відкрити вікно збереження сторінки, перегляд коду чи закладки браузера.</div>
+  </section>
+
+  <!-- 8 -->
+  <section class="sec" id="future">
+    <div class="sec-head"><span class="num">8</span><h2>Ідеї на майбутнє</h2></div>
+    <p>Гра — прототип. Ось що можна додати; пропозиції з уроків вітаються.</p>
+    <div class="idea-list">
+      <div class="idea"><span class="i">📝</span><div><h3>Етап 3 теми «Текст»</h3>Переходи між словами Ctrl+стрілки, Ctrl+Home/End, Ctrl+Backspace, друк Ctrl+P, відступ Tab. Для 6–7 класів.</div></div>
+      <div class="idea"><span class="i">📁</span><div><h3>Тема «Файли»</h3>Мініпровідник: перейменувати (F2), виділити всі файли, копіювати й вставити файл, створити папку (Ctrl+Shift+N), відкрити (Enter).</div></div>
+      <div class="idea"><span class="i">🌐</span><div><h3>Тема «Браузер»</h3>Пошук на сторінці (Ctrl+F), оновлення (F5), масштаб (Ctrl+плюс/мінус), рядок адреси (Ctrl+L), закладка (Ctrl+D). Вкладки Ctrl+T, Ctrl+W — на екранній клавіатурі.</div></div>
+      <div class="idea"><span class="i">🖥️</span><div><h3>Тема «Windows»</h3>Win+D, Win+E, Alt+Tab, Win+Shift+S, Win+L, Ctrl+Shift+Esc на намальованій панелі задач. Збирати на екранній клавіатурі, а частину, можливо, ловити по-справжньому в повноекранному режимі.</div></div>
+      <div class="idea"><span class="i">🧠</span><div><h3>Спільні нейрончики з перегонами</h3>Один баланс і спільні бейджі в межах Лабораторії. Можливо, якщо обидві гри лежатимуть на одному сайті.</div></div>
+      <div class="idea"><span class="i">📅</span><div><h3>Щоденний виклик</h3>Одне завдання дня для всіх із бонусом. Ще одна причина повертатися в різні дні.</div></div>
+      <div class="idea"><span class="i">🖨️</span><div><h3>Шпаргалка для друку</h3>Сторінка з картками етапу для друку або проєктора, з мнемоніками: C — Copy, X — ножиці.</div></div>
+      <div class="idea"><span class="i">👩‍🏫</span><div><h3>Таблиця класу</h3>Учитель вставляє кілька посилань учнів і бачить зведену таблицю результатів місій.</div></div>
+      <div class="idea"><span class="i">⚙️</span><div><h3>Налаштування вчителя</h3>Посилання, що вимикає підказки або задає свій набір карток на урок.</div></div>
+      <div class="idea"><span class="i">🍎</span><div><h3>macOS і англійська мова</h3>Перемикач Ctrl ↔ Cmd і англійський інтерфейс, як у перегонах.</div></div>
+    </div>
+  </section>
+
+  <footer>Гарячі клавіші · Для вчителя · Лабораторія</footer>
+</main>
+
+</body>
+</html>
