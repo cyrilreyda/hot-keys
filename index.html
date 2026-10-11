@@ -51,7 +51,11 @@
   .titlebar{display:flex; align-items:center; gap:6px; height:38px; flex:none; padding:0 8px 0 12px; background:var(--w-head); color:var(--w-head-ink);
     font-family:'Baloo 2',sans-serif; font-weight:700; font-size:14px; border-bottom:1px solid rgba(27,27,58,.08);}
   .titlebar .t{flex:1; min-width:60px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
-  .titlebar .wbtn{width:26px; height:22px; border-radius:6px; display:flex; align-items:center; justify-content:center; font-size:12px; opacity:.75;}
+  .titlebar .wbtn{width:26px; height:22px; border-radius:6px; display:flex; align-items:center; justify-content:center; font-size:12px; opacity:.75;
+    border:none; background:none; color:inherit; padding:0; font-family:inherit; cursor:pointer;}
+  .titlebar .wbtn:hover{opacity:1; background:rgba(127,127,127,.22);}
+  .appwin{transition:transform .28s ease, opacity .28s ease; transform-origin:8% 112%;}
+  .appwin.min{transform:scale(.06); opacity:0; pointer-events:none;}
   .titlebar .wbtn.x{background:rgba(232,69,60,.85); color:#fff; opacity:1; border:none; padding:0; font:inherit; font-size:12px; cursor:pointer;}
   .titlebar .wbtn.x:hover{background:#E8453C;}
   .tb{min-width:26px; height:24px; padding:0 6px; border-radius:6px; display:flex; align-items:center; justify-content:center; font-family:'Baloo 2',sans-serif; font-size:15px; color:inherit; opacity:.55; border:1.5px solid transparent;}
@@ -78,6 +82,9 @@
     background:rgba(27,27,58,.72); backdrop-filter:blur(6px); color:#fff;}
   .tbi{width:32px; height:32px; border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:18px; opacity:.55;}
   .tbi.on{opacity:1; background:rgba(255,255,255,.16); box-shadow:inset 0 -2px 0 var(--yellow);}
+  button.tbi{border:none; color:inherit; padding:0; font:inherit; font-size:18px; cursor:pointer;}
+  button.tbi:hover{background:rgba(255,255,255,.26);}
+  .tbi.on.min{background:none; box-shadow:inset 0 -2px 0 rgba(255,255,255,.55);}
   .tbi.start{opacity:1;}
   .clock{margin-left:10px; font-family:'Baloo 2',sans-serif; font-weight:600; font-size:14px; opacity:.9;}
   .tb-stats{display:flex; gap:6px; margin-left:auto; min-width:0; overflow:hidden;}
@@ -105,7 +112,8 @@
     .bubble{max-width:62%; bottom:118px; font-size:13px;}
   }
   .start-over{position:absolute; inset:0; z-index:4; display:flex; align-items:center; justify-content:center; background:rgba(27,27,58,.12);}
-  .start-over .btn{box-shadow:0 4px 0 var(--teal-dark), 0 10px 24px rgba(27,27,58,.3);}
+  .start-over{pointer-events:none;}
+  .start-over .btn{pointer-events:auto; box-shadow:0 4px 0 var(--teal-dark), 0 10px 24px rgba(27,27,58,.3);}
   .focus-note{position:absolute; inset:0; z-index:5; display:flex; align-items:center; justify-content:center; background:rgba(251,250,254,.8);
     font-family:'Baloo 2',sans-serif; font-size:20px; font-weight:700; color:var(--teal-dark); cursor:pointer;}
 
@@ -374,13 +382,13 @@
         <span class="tb b" id="tbB" title="Жирний">Ж</span><span class="tb i" id="tbI" title="Курсив">К</span><span class="tb u" id="tbU" title="Підкреслений">П</span>
         <span class="tb caps" id="tbCaps" title="Caps Lock">CAPS</span>
         <span class="clip" id="clip" title="Буфер обміну">📋 <span id="clipText">порожньо</span></span>
-        <span class="wbtn">─</span><button type="button" class="wbtn x" id="winClose" title="До меню">✕</button></div>
+        <button type="button" class="wbtn" id="winMin" title="Згорнути">─</button><button type="button" class="wbtn x" id="winClose" title="До меню">✕</button></div>
       <div class="doc" id="doc"></div>
       <div class="statusbar"><span id="stPos">Рядок 1, символ 1</span><span id="stChars"></span></div>
       <div class="saved-toast" id="savedToast">💾 Збережено</div>
     </div>
     <div class="taskbar">
-      <span class="tbi start" title="Меню">🤖</span><span class="tbi on">📄</span><span class="tbi">📁</span><span class="tbi">🌐</span>
+      <span class="tbi start" title="Меню">🤖</span><button type="button" class="tbi on" id="tbDoc" title="Документ">📄</button><span class="tbi">📁</span><span class="tbi">🌐</span>
       <div class="tb-stats" id="stats"></div><span class="clock" id="clock"></span>
     </div>
     <div class="bubble" id="bubble"></div>
@@ -855,18 +863,18 @@ function wallSVG(id){
   if(id === 'sea'){
     let b = '';
     [[90,260,6],[130,200,4],[600,240,7],[640,180,4],[420,300,5]].forEach(([x,y,r])=>b += `<circle cx="${x}" cy="${y}" r="${r}" fill="none" stroke="#fff" stroke-width="2" opacity=".7"/>`);
-    const fish = (x, y, c, f) => `<g transform="translate(${x} ${y}) scale(${f} 1)"><ellipse cx="0" cy="0" rx="24" ry="13" fill="${c}"/><path d="M20 0 L38 -12 L38 12 Z" fill="${c}"/><circle cx="-12" cy="-3" r="3" fill="#1B1B3A"/></g>`;
-    return W(`<rect width="800" height="400" fill="url(#g)"/>${b}${fish(250,170,'#FFC93C',1)}${fish(540,120,'#FF6B4A',-1)}${fish(700,280,'#FF5D9E',1)}
+    const fish = (x, y, c, f, k=1) => `<g transform="translate(${x} ${y}) scale(${f * k} ${k})"><ellipse cx="0" cy="0" rx="24" ry="13" fill="${c}"/><path d="M20 0 L38 -12 L38 12 Z" fill="${c}"/><circle cx="-12" cy="-3" r="3" fill="#1B1B3A"/></g>`;
+    return W(`<rect width="800" height="400" fill="url(#g)"/>${b}${fish(250,170,'#FFC93C',1)}${fish(540,120,'#FF6B4A',-1)}${fish(705,95,'#FF6B4A',-1,1.1)}${fish(745,165,'#FFC93C',1,1.3)}${fish(650,62,'#FF5D9E',1,.8)}
       <path d="M0 360 Q100 340 200 360 T400 360 T600 360 T800 360 V400 H0 Z" fill="#F2D8A0"/>
       <path d="M60 360 Q50 320 70 290 Q60 330 80 360 Z M720 360 Q740 310 720 270 Q760 310 740 360 Z" fill="#3FA66B"/>`, grad('g', '#5FB4DF', '#1E6FA8'));
   }
   if(id === 'space'){
     let s = '';
     for(let i = 0; i < 70; i++){ const x = (i * 137) % 800, y = (i * 61) % 400, r = (i % 3) * .6 + .8; s += `<circle cx="${x}" cy="${y}" r="${r}" fill="#fff" opacity="${.5 + (i % 4) * .12}"/>`; }
-    return W(`<rect width="800" height="400" fill="url(#g)"/>${s}<circle cx="640" cy="110" r="50" fill="#FF6B4A"/><ellipse cx="640" cy="110" rx="86" ry="16" fill="none" stroke="#FFC93C" stroke-width="6" transform="rotate(-18 640 110)"/>
+    return W(`<rect width="800" height="400" fill="url(#g)"/>${s}<circle cx="705" cy="115" r="42" fill="#FF6B4A"/><ellipse cx="705" cy="115" rx="72" ry="14" fill="none" stroke="#FFC93C" stroke-width="6" transform="rotate(-18 705 115)"/>
       <circle cx="150" cy="300" r="26" fill="#B79CE0"/><circle cx="142" cy="292" r="6" fill="#9A7FD0"/>`, grad('g', '#1B1B3A', '#3B2D7A'));
   }
-  return W(`<rect width="800" height="400" fill="url(#g)"/><circle cx="400" cy="300" r="90" fill="#FFE27A" opacity=".95"/>
+  return W(`<rect width="800" height="400" fill="url(#g)"/><circle cx="705" cy="195" r="56" fill="#FFE27A" opacity=".95"/>
     <path d="M0 320 L130 220 L230 290 L360 190 L480 300 L600 210 L800 330 V400 H0 Z" fill="#6C4A8C"/><path d="M0 360 L160 290 L300 350 L460 280 L620 350 L800 300 V400 H0 Z" fill="#4A3168"/>`, grad('g', '#FF9A5A', '#FF5D9E'));
 }
 
@@ -1315,6 +1323,7 @@ function startRound(mode, mission){
   round = { mode, mission, stage, tasks, i:0, start:performance.now(), pause:0, errors:0, hints:0, gained:0, streak:0, bestStreak:0,
             times:[], ups:[], before:profile.neurons, taskErrors:0, taskHint:false, taskStart:0 };
   doc = null;
+  setMin(false);
   document.body.classList.add('playing');
   setupEl.hidden = true;
   playEl.hidden = false;
@@ -1541,6 +1550,18 @@ document.getElementById('toSetupBtn').addEventListener('click', toSetup);
 document.getElementById('startBtn').addEventListener('click', ()=>startRound(settings.mode));
 document.getElementById('exitBtn').addEventListener('click', exitRound);
 document.getElementById('winClose').addEventListener('click', ()=>{ if(round) exitRound(); });
+// Згортання вікна в панель задач, як у Windows; повернути — клік по значку 📄
+let minimized = false;
+function setMin(on){
+  minimized = on;
+  document.getElementById('appwin').classList.toggle('min', on);
+  document.getElementById('tbDoc').classList.toggle('min', on);
+}
+document.getElementById('winMin').addEventListener('click', ()=>{
+  setMin(true);
+  say('Щоб повернути вікно, клацни 📄 на панелі задач.', '', 'happy', 4000);
+});
+document.getElementById('tbDoc').addEventListener('click', ()=>setMin(!minimized));
 // Назва гри вгорі — завжди шлях до меню: з гри, з вікна результату або зі сторінки за посиланням
 document.getElementById('homeLink').addEventListener('click', e=>{
   e.preventDefault();
@@ -1563,6 +1584,7 @@ document.addEventListener('keydown', e=>{
   if(code === 'F12' || code === 'F11') return;
   e.preventDefault();
   if(code === 'Escape'){ exitRound(); return; }
+  if(minimized) setMin(false);   // під час завдання документ має бути видно
   if(e.repeat || MOD_CODES.has(code)) return;
   onCombo(comboOf(e));
 }, true);
