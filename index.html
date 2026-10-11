@@ -56,6 +56,21 @@
   .titlebar .wbtn:hover{opacity:1; background:rgba(127,127,127,.22);}
   .appwin{transition:transform .28s ease, opacity .28s ease; transform-origin:8% 112%;}
   .appwin.min{transform:scale(.06); opacity:0; pointer-events:none;}
+  .appwin.closed{transform:scale(.9); opacity:0; pointer-events:none;}
+  .tbi.start{cursor:pointer;}
+  .start-menu{position:absolute; left:8px; bottom:48px; z-index:5; width:min(320px, 70%); background:rgba(27,27,58,.95); color:#fff; border-radius:12px; padding:12px;
+    display:grid; grid-template-columns:repeat(2, 1fr); gap:8px; box-shadow:0 10px 30px rgba(0,0,0,.3);}
+  .start-menu .sm-title, .start-menu .sm-foot{grid-column:1 / -1; font-family:'Baloo 2',sans-serif; font-weight:700; font-size:13px; opacity:.8;}
+  .start-menu .sm-foot{padding-top:6px; border-top:1px solid rgba(255,255,255,.15);}
+  .start-menu button{display:flex; align-items:center; gap:8px; border:none; border-radius:10px; padding:8px 10px; background:rgba(255,255,255,.1); color:#fff;
+    font-family:'Baloo 2',sans-serif; font-weight:700; font-size:14px; cursor:pointer; text-align:left;}
+  .start-menu button span{font-size:20px;}
+  .start-menu button:hover{background:rgba(255,255,255,.2);}
+  .start-menu button.on{outline:2px solid var(--yellow);}
+  .wctl{cursor:pointer; border-radius:4px; padding:0 3px;}
+  .wctl:hover{background:rgba(127,127,127,.25);}
+  .os .wctl{pointer-events:auto;}
+  .oswin .ttl .ctls{display:flex; gap:4px;}
   .titlebar .wbtn.x{background:rgba(232,69,60,.85); color:#fff; opacity:1; border:none; padding:0; font:inherit; font-size:12px; cursor:pointer;}
   .titlebar .wbtn.x:hover{background:#E8453C;}
   .tb{min-width:26px; height:24px; padding:0 6px; border-radius:6px; display:flex; align-items:center; justify-content:center; font-family:'Baloo 2',sans-serif; font-size:15px; color:inherit; opacity:.55; border:1.5px solid transparent;}
@@ -488,7 +503,7 @@
         <span id="docTools"><span class="tb b" id="tbB" title="Жирний">Ж</span><span class="tb i" id="tbI" title="Курсив">К</span><span class="tb u" id="tbU" title="Підкреслений">П</span>
         <span class="tb caps" id="tbCaps" title="Caps Lock">CAPS</span>
         <span class="clip" id="clip" title="Буфер обміну">📋 <span id="clipText">порожньо</span></span></span>
-        <button type="button" class="wbtn" id="winMin" title="Згорнути">─</button><button type="button" class="wbtn x" id="winClose" title="До меню">✕</button></div>
+        <button type="button" class="wbtn" id="winMin" title="Згорнути">─</button><button type="button" class="wbtn x" id="winClose" title="Закрити">✕</button></div>
       <div class="doc" id="doc"></div>
       <div class="statusbar"><span id="stPos">Рядок 1, символ 1</span><span id="stChars"></span></div>
       <div class="fx" id="filesView"></div>
@@ -503,6 +518,7 @@
     <div class="bubble" id="bubble"></div>
     <div class="robot" id="robot"></div>
     <div class="start-over" id="startBar"><button class="btn btn-primary btn-big" id="startBtn" type="button">▶ Почати!</button></div>
+    <div class="start-menu" id="startMenu" hidden></div>
     <div class="focus-note" id="focusNote" hidden>Клацни тут, щоб продовжити</div>
   </section>
 
@@ -1806,9 +1822,9 @@ function webRender(s){
   const loading = Date.now() - s.reloadAt < 600;
   const addr = s.addr ? (s.addr.fresh && s.addr.text ? `<span class="hl">${esc(s.addr.text)}</span>` : esc(s.addr.fresh ? '' : s.addr.text)) + '<span class="caret"></span>'
     : (p.url ? esc(p.url) : '<span style="opacity:.5">Пошук або адреса сайту</span>');
-  el.innerHTML = `<div class="bw-tabs">${s.tabs.map((t, i)=>`<div class="bw-tab${i === s.active ? ' on' : ''}${s.flash === i ? ' new' : ''}"><span class="t">${esc(t.err ? PAGES[t.page].url : PAGES[t.page].title)}</span>✕</div>`).join('')}<div class="bw-tab" style="flex:none">＋</div></div>
-    <div class="bw-bar"><span class="bw-nav${tab.hist.length ? ' on' : ''}">←</span><span class="bw-nav${tab.fwd.length ? ' on' : ''}">→</span><span class="bw-nav on${loading ? ' spin' : ''}">⟳</span>
-      <span class="bw-addr${s.addr ? ' focus' : ''}">${addr}</span>${s.zoom !== 100 ? `<span class="bw-zoom">${s.zoom}%</span>` : ''}<span class="bw-star" title="Закладка">${s.marks.includes(tab.page) ? '⭐' : '☆'}</span></div>
+  el.innerHTML = `<div class="bw-tabs">${s.tabs.map((t, i)=>`<div class="bw-tab${i === s.active ? ' on' : ''}${s.flash === i ? ' new' : ''}"><span class="t">${esc(t.err ? PAGES[t.page].url : PAGES[t.page].title)}</span><span class="wctl" data-hint="tabclose">✕</span></div>`).join('')}<div class="bw-tab wctl" data-hint="newtab" style="flex:none">＋</div></div>
+    <div class="bw-bar"><span class="bw-nav wctl${tab.hist.length ? ' on' : ''}" data-hint="back">←</span><span class="bw-nav wctl${tab.fwd.length ? ' on' : ''}" data-hint="forward">→</span><span class="bw-nav wctl on${loading ? ' spin' : ''}" data-hint="reload">⟳</span>
+      <span class="bw-addr${s.addr ? ' focus' : ''}">${addr}</span>${s.zoom !== 100 ? `<span class="bw-zoom">${s.zoom}%</span>` : ''}<span class="bw-star wctl" data-hint="mark" title="Закладка">${s.marks.includes(tab.page) ? '⭐' : '☆'}</span></div>
     <div class="bw-page" style="font-size:${(s.zoom / 100 * 15).toFixed(1)}px">${loading ? '' : webPageHTML(s, tab)}</div>
     ${s.find ? `<div class="bw-find" style="top:74px">🔍 <span class="q">${esc(s.find.q)}<span class="caret"></span></span><span class="cnt"></span></div>` : ''}`;
   const page = el.querySelector('.bw-page');
@@ -1888,7 +1904,7 @@ function osRender(s){
     task:`<div class="row"><span>🌐 Браузер</span><span>перезапущено</span></div><div class="row"><span>📄 Документ</span><span>1%</span></div><div class="row"><span>📁 Провідник</span><span>0%</span></div>`
   }[id]);
   const wins = s.order.filter(id=>s.wins[id] && !s.wins[id].min).map((id, z)=>`<div class="oswin${id === s.active ? ' act' : ''}${s.hang === id ? ' hang' : ''}" style="${pos(id, s.wins[id])}; z-index:${z + 1}">
-      <div class="ttl"><span>${OS_APPS[id].ico}</span><span class="t">${OS_APPS[id].title}</span><span>─ ▢ ✕</span></div>
+      <div class="ttl"><span>${OS_APPS[id].ico}</span><span class="t">${OS_APPS[id].title}</span><span class="ctls"><span class="wctl" data-hint="min">─</span><span class="wctl" data-hint="max">▢</span><span class="wctl" data-hint="close">✕</span></span></div>
       ${s.hang === id ? '<div class="hangnote">⏳ Програма не відповідає</div>' : ''}<div class="bd">${body(id)}</div></div>`).join('');
   const switching = Date.now() - s.switchAt < 900;
   const START = [['📄','Документ'],['📁','Провідник'],['🌐','Браузер'],['🎨','Малюнок'],['🧮','Калькулятор'],['⚙️','Параметри'],['🎵','Музика'],['📷','Камера']];
@@ -1931,6 +1947,7 @@ function setApp(id){
   document.getElementById('winIco').textContent = { doc:'📄', files:'📁', web:'🌐', os:'' }[id];
   if(id === 'doc') document.getElementById('docTitle').textContent = 'Документ';
   if(minimized) setMin(false);
+  if(closedApp) setClosed(false);
 }
 function renderTaskbar(){
   const os = appId === 'os' && st;
@@ -1938,10 +1955,10 @@ function renderTaskbar(){
   document.getElementById('tbApps').innerHTML = ids.map(id=>{
     let cls = '';
     if(os){ if(st.wins[id]) cls = id === st.active ? ' act' : ' open'; }
-    else if(id === appId) cls = ' on' + (minimized ? ' min' : '');
+    else if(id === appId && !closedApp) cls = ' on' + (minimized ? ' min' : '');
     return `<button type="button" class="tbi${cls}" data-tb="${id}" title="${OS_APPS[id].title}">${OS_APPS[id].ico}</button>`;
   }).join('');
-  document.getElementById('tbStart').classList.toggle('act', !!(os && st.start));
+  document.getElementById('tbStart').classList.toggle('act', !!(os && st.start) || !document.getElementById('startMenu').hidden);
 }
 
 /* ================= Робочий стіл, робот, вигляд ================= */
@@ -2219,6 +2236,7 @@ function pickTraining(topic, stage){
 function startRound(mode, mission){
   if(!player){ openNameModal(true); return; }
   document.activeElement?.blur();
+  if(!startMenu.hidden) toggleStartMenu(false);
   const topic = mission ? mission.topic : settings.topic;
   const stage = mission ? mission.stage : settings.stage;
   const tasks = mode === 'mission' ? mission.steps.map(s=>({ card:cardById(s.card), task:s }))
@@ -2467,7 +2485,18 @@ const againBtn = document.getElementById('againBtn');
 document.getElementById('toSetupBtn').addEventListener('click', toSetup);
 document.getElementById('startBtn').addEventListener('click', ()=>startRound(settings.mode));
 document.getElementById('exitBtn').addEventListener('click', exitRound);
-document.getElementById('winClose').addEventListener('click', ()=>{ if(round) exitRound(); });
+// Хрестик: під час завдання — до меню (закрити програму = завершити завдання), у меню — закрити вікно програми
+document.getElementById('winClose').addEventListener('click', ()=>{
+  if(round){ exitRound(); return; }
+  setClosed(true);
+  say(`Програму закрито. Щоб відкрити знову, клацни ${OS_APPS[appId]?.ico || '📄'} унизу. До речі, клавішами це Alt + F4.`, '', 'idle', 6000);
+});
+let closedApp = false;
+function setClosed(on){
+  closedApp = on;
+  document.getElementById('appwin').classList.toggle('closed', on);
+  renderTaskbar();
+}
 // Згортання вікна в панель задач, як у Windows; повернути — клік по значку 📄
 let minimized = false;
 function setMin(on){
@@ -2477,7 +2506,7 @@ function setMin(on){
 }
 document.getElementById('winMin').addEventListener('click', ()=>{
   setMin(true);
-  say(`Щоб повернути вікно, клацни ${OS_APPS[appId]?.ico || '📄'} на панелі задач.`, '', 'happy', 4000);
+  say(`Щоб повернути вікно, клацни ${OS_APPS[appId]?.ico || '📄'} на панелі задач. А клавішами згортають так: Win + ↓.`, '', 'happy', 5000);
 });
 // Значки панелі задач: поточна програма згортається й розгортається; в меню інші значки відкривають свою тему;
 // під час завдання — лише підказка, бо тут усе робиться клавішами
@@ -2486,10 +2515,51 @@ document.getElementById('tbApps').addEventListener('click', e=>{
   const b = e.target.closest('[data-tb]');
   if(!b) return;
   const id = b.dataset.tb;
-  if(appId !== 'os' && id === appId){ setMin(!minimized); return; }
+  if(appId !== 'os' && id === appId){
+    if(closedApp){ setClosed(false); say('Програму відкрито!', 'ok', 'happy', 2500); }
+    else setMin(!minimized);
+    return;
+  }
   if(!round && TB_TOPIC[id]){ selectTopic(TB_TOPIC[id]); showTab('paneTrain'); say(`Тема «${topicOf(TB_TOPIC[id]).label.slice(3)}». Обери етап і натисни «Почати».`, '', 'happy', 3500); return; }
   if(!round) return;
   say(appId === 'os' ? 'Тут вікна перемикаємо клавішами — наприклад, Alt + Tab 🙂' : 'Під час завдання працюємо клавіатурою 🙂 Інші теми — в меню.', '', 'idle', 3000);
+});
+// Кнопка 🤖 унизу зліва — меню «Пуск» із темами гри
+const startMenu = document.getElementById('startMenu');
+function toggleStartMenu(show = startMenu.hidden){
+  startMenu.hidden = !show;
+  if(show) startMenu.innerHTML = `<div class="sm-title">Обери тему</div>` +
+    TOPICS.map(t=>{ const i = t.label.indexOf(' ');
+      return `<button type="button" data-topic="${t.id}" class="${settings.topic === t.id ? 'on' : ''}"><span>${t.label.slice(0, i)}</span>${t.label.slice(i + 1)}</button>`; }).join('') +
+    `<div class="sm-foot">👤 ${esc(player || 'Гравець')}</div>`;
+  renderTaskbar();
+}
+document.getElementById('tbStart').addEventListener('click', e=>{
+  e.stopPropagation();
+  if(round){
+    say(appId === 'os' ? 'Меню «Пуск» відкриває клавіша Win — збери її на екранній клавіатурі 🙂' : 'Під час завдання працюємо клавіатурою 🙂 Теми — в меню.', '', 'idle', 3500);
+    return;
+  }
+  toggleStartMenu();
+});
+startMenu.addEventListener('click', e=>{
+  e.stopPropagation();
+  const b = e.target.closest('[data-topic]');
+  if(!b) return;
+  toggleStartMenu(false);
+  selectTopic(b.dataset.topic);
+  showTab('paneTrain');
+  const t = topicOf(b.dataset.topic);
+  say(`Тема «${t.label.slice(t.label.indexOf(' ') + 1)}». Обери етап і натисни «Почати».`, '', 'happy', 3500);
+});
+document.addEventListener('click', ()=>{ if(!startMenu.hidden) toggleStartMenu(false); });
+// Намальовані кнопки вікон і браузера: мишкою тут нічого не робимо, але робот підказує клавіші
+const CTL_HINT = { min:'Згорнути вікно: Win + ↓', max:'Розгорнути на весь екран: Win + ↑', close:'Закрити вікно: Alt + F4',
+  tabclose:'Закрити вкладку: Ctrl + W', newtab:'Нова вкладка: Ctrl + T', back:'Назад: Alt + ←', forward:'Вперед: Alt + →',
+  reload:'Оновити сторінку: F5', mark:'Додати в закладки: Ctrl + D' };
+deskEl.addEventListener('click', e=>{
+  const c = e.target.closest('.wctl');
+  if(c && CTL_HINT[c.dataset.hint]) say(`Тут працюємо клавіатурою 🙂 ${CTL_HINT[c.dataset.hint]}`, '', 'idle', 3500);
 });
 // Назва гри вгорі — завжди шлях до меню: з гри, з вікна результату або зі сторінки за посиланням
 document.getElementById('homeLink').addEventListener('click', e=>{
