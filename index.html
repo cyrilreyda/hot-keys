@@ -197,7 +197,8 @@
   .kb{--k:min(44px, calc((min(100vw, 980px) - 150px) / 18.5)); --g:4px; display:flex; gap:calc(var(--k) * .5); justify-content:center; user-select:none;}
   .kb-block{display:flex; flex-direction:column; gap:var(--g);}
   .kb-row{display:flex; gap:var(--g);}
-  .kb-row.fn{display:none;}   /* F-клавіші знадобляться в темах «Файли» й «Браузер» */
+  body:not(.fkeys) .kb-row.fn{display:none;}   /* F-клавіші потрібні лише в темах «Файли», «Браузер», «Windows» */
+  .kb-row.fn{margin-bottom:calc(var(--k) * .1);}
   .key, .gap{flex:none; width:calc(var(--k) * var(--w, 1) + var(--g) * (var(--w, 1) - 1)); height:calc(var(--k) * .8);}
   .kb-row.fn .key, .kb-row.fn .gap{height:calc(var(--k) * .62);}
   .key{position:relative; border-radius:7px; display:flex; align-items:center; justify-content:center; padding:0 3px;
@@ -360,6 +361,111 @@
     box-shadow:0 8px 20px rgba(27,27,58,.25); transition:opacity .2s ease, transform .2s ease;}
   .toast.show{opacity:1; transform:translate(-50%, 0);}
   @media (max-width:600px){ .panel{padding:16px 14px;} }
+
+  /* ---------- Програми на робочому столі: провідник, браузер, Windows ---------- */
+  .appwin .fx, .appwin .bw{display:none;}
+  .appwin[data-app="files"] .fx, .appwin[data-app="web"] .bw{display:flex;}
+  .appwin:not([data-app="doc"]) .doc, .appwin:not([data-app="doc"]) .statusbar, .appwin:not([data-app="doc"]) #docTools{display:none;}
+  .appwin.off{display:none;}
+  #docTools{display:contents;}
+
+  .fx{flex:1; flex-direction:column; min-height:0; position:relative; font-size:clamp(14px, min(1.7vw, 2.6vh), 17px); font-weight:700;}
+  .fx-addr{display:flex; align-items:center; gap:6px; padding:6px 12px; border-bottom:1px solid rgba(127,127,127,.2); font-size:.88em; white-space:nowrap; overflow:hidden; flex:none;}
+  .fx-addr span{opacity:.6;}
+  .fx-list{flex:1; overflow:auto; padding:4px 6px;}
+  .fx-row{display:grid; grid-template-columns:30px 1fr auto; align-items:center; gap:8px; padding:2px 8px; border-radius:6px; border:1.5px solid transparent;}
+  .fx-row .ic{font-size:1.25em; line-height:1.3;}
+  .fx-row .ty{font-size:.78em; opacity:.6; font-weight:600;}
+  .fx-row.sel{background:var(--w-sel);}
+  .fx-row.focus{border-color:var(--w-caret);}
+  .fx-row.cut{opacity:.45;}
+  .fx-row.new{animation:flash .6s ease;}
+  .ren{background:var(--w-bg); outline:2px solid var(--w-caret); padding:0 4px; border-radius:3px;}
+  .ren .hl{background:var(--w-sel);}
+  .fx-empty{padding:14px 10px; opacity:.55; font-weight:600;}
+  .fx-status{display:flex; gap:12px; padding:3px 12px; font-size:12px; opacity:.75; border-top:1px solid rgba(127,127,127,.2); background:var(--w-bar); flex:none;}
+  .pop{position:absolute; inset:0; z-index:3; display:flex; align-items:center; justify-content:center; background:rgba(27,27,58,.4);}
+  .pop .pc{background:var(--w-bg); color:var(--w-ink); border-radius:12px; padding:12px 20px; text-align:center; font-size:14px; font-weight:700; box-shadow:0 10px 30px rgba(0,0,0,.3);}
+  .pop .big{font-size:52px; line-height:1.1;}
+  .pop small{display:block; opacity:.6; font-weight:600;}
+  .spin{display:inline-block; animation:spin .7s linear;}
+  @keyframes spin{to{transform:rotate(360deg);}}
+
+  .bw{flex:1; flex-direction:column; min-height:0; position:relative;}
+  .bw-tabs{display:flex; gap:4px; padding:6px 8px 0; background:var(--w-bar); flex:none; overflow:hidden;}
+  .bw-tab{display:flex; align-items:center; gap:6px; flex:0 1 170px; min-width:0; padding:4px 10px; border-radius:8px 8px 0 0; font-size:12.5px; font-weight:700; opacity:.6; white-space:nowrap; background:rgba(127,127,127,.14);}
+  .bw-tab .t{flex:1; overflow:hidden; text-overflow:ellipsis;}
+  .bw-tab.on{opacity:1; background:var(--w-bg);}
+  .bw-tab.new{animation:flash .6s ease;}
+  .bw-bar{display:flex; align-items:center; gap:8px; padding:5px 10px; border-bottom:1px solid rgba(127,127,127,.2); font-size:13px; flex:none;}
+  .bw-nav{opacity:.35; font-size:15px; font-weight:800;}
+  .bw-nav.on{opacity:1;}
+  .bw-addr{flex:1; min-width:0; padding:2px 12px; border-radius:999px; background:rgba(127,127,127,.14); font-weight:700; white-space:nowrap; overflow:hidden;}
+  .bw-addr.focus{outline:2px solid var(--w-caret); background:var(--w-bg);}
+  .bw-addr .hl{background:var(--w-sel);}
+  .bw-star{font-size:17px; line-height:1;}
+  .bw-zoom{font-size:12px; padding:0 8px; border-radius:999px; background:var(--yellow); color:var(--ink); font-weight:800;}
+  .bw-page{flex:1; overflow:hidden; padding:8px 18px; line-height:1.45; position:relative; scroll-behavior:smooth;}
+  .bw-page h2{font-size:1.35em; color:inherit; margin:0 0 4px;}
+  .bw-page p{margin:0 0 8px; font-weight:600;}
+  .bw-page table{border-collapse:collapse; margin:4px 0 10px;}
+  .bw-page td{border:1px solid rgba(127,127,127,.35); padding:1px 10px; font-weight:600;}
+  .bw-page mark{background:#FFE27A; color:#1B1B3A; border-radius:3px;}
+  .bw-page mark.cur{background:#FF9A5A;}
+  .bw-find{position:absolute; top:4px; right:10px; z-index:2; display:flex; align-items:center; gap:8px; padding:4px 10px; border-radius:8px; background:var(--w-bg); box-shadow:0 4px 14px rgba(27,27,58,.25); font-size:13px; font-weight:700;}
+  .bw-find .q{min-width:80px; border-bottom:2px solid var(--w-caret);}
+  .bw-center{text-align:center; padding-top:14px;}
+  .bw-center .big{font-size:46px; line-height:1.1;}
+  .bw-tiles{display:flex; gap:10px; flex-wrap:wrap; justify-content:center; margin-top:12px;}
+  .bw-tiles span{padding:6px 12px; border-radius:10px; background:rgba(127,127,127,.14); font-weight:700; font-size:13px;}
+
+  .os{position:absolute; inset:0; pointer-events:none;}
+  .os-area{position:absolute; left:0; right:0; top:0; bottom:42px;}
+  .oswin{position:absolute; display:flex; flex-direction:column; background:var(--w-bg); color:var(--w-ink); border-radius:10px; overflow:hidden; opacity:.96;
+    box-shadow:0 8px 22px rgba(27,27,58,.25); transition:left .25s ease, top .25s ease, width .25s ease, height .25s ease, opacity .2s ease, transform .2s ease;}
+  .oswin .ttl{flex:none; height:28px; display:flex; align-items:center; gap:6px; padding:0 10px; font-family:'Baloo 2',sans-serif; font-weight:700; font-size:13px; background:var(--w-bar);}
+  .oswin .ttl .t{flex:1;}
+  .oswin.act{opacity:1; box-shadow:0 14px 34px rgba(27,27,58,.35), 0 0 0 2px var(--w-caret);}
+  .oswin.act .ttl{background:var(--w-head); color:var(--w-head-ink);}
+  .oswin .bd{flex:1; padding:8px 12px; font-size:13px; font-weight:700; overflow:hidden;}
+  .oswin .ln{height:7px; border-radius:4px; background:rgba(127,127,127,.25); margin:7px 0;}
+  .oswin .row{display:flex; justify-content:space-between; gap:8px; padding:2px 0; border-bottom:1px solid rgba(127,127,127,.18);}
+  .oswin.hang .bd{filter:grayscale(1) opacity(.6);}
+  .oswin .hangnote{flex:none; padding:2px 10px; font-size:12px; font-weight:800; background:#FFE9E2; color:#C2410C;}
+  .os-start{position:absolute; left:8px; bottom:48px; z-index:2; width:min(300px, 60%); background:rgba(27,27,58,.94); color:#fff; border-radius:12px; padding:12px;
+    display:grid; grid-template-columns:repeat(4, 1fr); gap:8px; font-size:11.5px; font-weight:700; text-align:center;}
+  .os-start div{display:flex; flex-direction:column; align-items:center; gap:2px;}
+  .os-start div span{font-size:22px;}
+  .os-start .foot{grid-column:1 / -1; flex-direction:row; justify-content:space-between; padding-top:6px; border-top:1px solid rgba(255,255,255,.15);}
+  .os-lock{position:absolute; inset:0; z-index:2; background:linear-gradient(160deg, #2D2A6E, #16A3A0); color:#fff; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; font-family:'Baloo 2',sans-serif;}
+  .os-lock .clk{font-size:64px; font-weight:800; line-height:1;}
+  .os-lock .msg{font-size:15px; opacity:.9; margin-top:8px;}
+  .os-snip{position:absolute; inset:0 0 42px 0; z-index:2; background:rgba(27,27,58,.5); display:flex; justify-content:center;}
+  .os-snip .bar{margin-top:10px; height:max-content; background:#fff; color:var(--ink); border-radius:10px; padding:5px 14px; font-weight:800; font-size:13px; box-shadow:0 6px 18px rgba(0,0,0,.25);}
+  .os-snip .sel{position:absolute; left:30%; top:30%; width:26%; height:30%; border:2px dashed #fff; background:rgba(255,255,255,.15);}
+  .os-panel{position:absolute; right:22%; bottom:48px; z-index:2; width:min(240px, 46%); background:rgba(255,255,255,.97); color:var(--ink); border-radius:12px; padding:10px 12px; font-size:12.5px; font-weight:700; box-shadow:0 10px 30px rgba(0,0,0,.25);}
+  .os-panel h5{margin:0 0 6px; font-family:'Baloo 2',sans-serif; font-size:14px;}
+  .os-panel .it{padding:4px 8px; border-radius:8px; background:var(--bg); margin-top:4px;}
+  .os-panel .emo{display:grid; grid-template-columns:repeat(6, 1fr); gap:4px; font-size:20px; text-align:center;}
+  .os-switch{position:absolute; left:12%; right:22%; top:28%; z-index:3; display:flex; gap:12px; justify-content:center; padding:14px; background:rgba(27,27,58,.8); border-radius:14px; color:#fff; font-size:12px; font-weight:700;}
+  .os-switch div{width:90px; text-align:center; padding:8px 4px; border-radius:10px; background:rgba(255,255,255,.1);}
+  .os-switch div span{display:block; font-size:28px;}
+  .os-switch div.on{outline:3px solid var(--yellow);}
+  .os-shut{position:absolute; left:28%; top:28%; z-index:2; background:#fff; color:var(--ink); border-radius:12px; padding:12px 18px; font-weight:800; font-size:14px; box-shadow:0 10px 30px rgba(0,0,0,.3);}
+  .tb-lang{font-family:'Baloo 2',sans-serif; font-weight:800; font-size:12px; margin-left:10px; padding:0 6px; border-radius:6px; background:rgba(255,255,255,.14);}
+  .tb-lang.flash{animation:flash .6s ease;}
+  .tbi.act{opacity:1; background:rgba(255,255,255,.22); box-shadow:inset 0 -2px 0 var(--yellow);}
+  .tbi.open{opacity:1; box-shadow:inset 0 -2px 0 rgba(255,255,255,.55);}
+
+  /* Збирання комбінації мишкою на екранній клавіатурі */
+  .kb.clickable .key{cursor:pointer;}
+  .kb.clickable .key:hover{border-color:var(--teal); box-shadow:0 0 0 2px #9FE0DE;}
+  .key.latch{background:var(--purple); color:#fff; border-color:var(--purple-dark);}
+  .screen-note{background:#EEF0FF; color:#3D2FA8; border-radius:var(--radius-s); padding:5px 12px; font-size:13.5px; font-weight:700;}
+  body.playing.fkeys .desk{height:clamp(220px, calc(100vh - 424px), 410px);}
+  body.fkeys .key, body.fkeys .kb .gap{height:calc(var(--k) * .72);}
+  body.fkeys .kb-row.fn .key, body.fkeys .kb-row.fn .gap{height:calc(var(--k) * .52);}
+  @media (max-height:760px){ body.playing .fx-status{display:none;} }
 </style>
 </head>
 <body>
@@ -377,19 +483,22 @@
 <main class="container">
   <!-- Робочий стіл -->
   <section class="desk" id="desk" aria-label="Робочий стіл">
-    <div class="appwin" id="appwin">
-      <div class="titlebar"><span>📄</span><span class="t" id="docTitle">Документ</span>
-        <span class="tb b" id="tbB" title="Жирний">Ж</span><span class="tb i" id="tbI" title="Курсив">К</span><span class="tb u" id="tbU" title="Підкреслений">П</span>
+    <div class="appwin" id="appwin" data-app="doc">
+      <div class="titlebar"><span id="winIco">📄</span><span class="t" id="docTitle">Документ</span>
+        <span id="docTools"><span class="tb b" id="tbB" title="Жирний">Ж</span><span class="tb i" id="tbI" title="Курсив">К</span><span class="tb u" id="tbU" title="Підкреслений">П</span>
         <span class="tb caps" id="tbCaps" title="Caps Lock">CAPS</span>
-        <span class="clip" id="clip" title="Буфер обміну">📋 <span id="clipText">порожньо</span></span>
+        <span class="clip" id="clip" title="Буфер обміну">📋 <span id="clipText">порожньо</span></span></span>
         <button type="button" class="wbtn" id="winMin" title="Згорнути">─</button><button type="button" class="wbtn x" id="winClose" title="До меню">✕</button></div>
       <div class="doc" id="doc"></div>
       <div class="statusbar"><span id="stPos">Рядок 1, символ 1</span><span id="stChars"></span></div>
+      <div class="fx" id="filesView"></div>
+      <div class="bw" id="webView"></div>
       <div class="saved-toast" id="savedToast">💾 Збережено</div>
     </div>
+    <div class="os" id="osLayer" hidden></div>
     <div class="taskbar">
-      <span class="tbi start" title="Меню">🤖</span><button type="button" class="tbi on" id="tbDoc" title="Документ">📄</button><span class="tbi">📁</span><span class="tbi">🌐</span>
-      <div class="tb-stats" id="stats"></div><span class="clock" id="clock"></span>
+      <span class="tbi start" id="tbStart" title="Меню">🤖</span><span id="tbApps" style="display:contents"></span>
+      <div class="tb-stats" id="stats"></div><span class="tb-lang" id="tbLang" hidden>УКР</span><span class="clock" id="clock"></span>
     </div>
     <div class="bubble" id="bubble"></div>
     <div class="robot" id="robot"></div>
@@ -411,8 +520,8 @@
       <div class="opt"><h3>Етап</h3><div class="seg" id="segStage"></div></div>
       <div class="opt"><h3>Режим</h3><div class="modes" id="segMode"></div></div>
     </div>
-    <div class="pane" id="paneMissions" hidden><div class="comps" id="missionList"></div></div>
-    <div class="pane" id="paneCards" hidden><div id="cardList"></div></div>
+    <div class="pane" id="paneMissions" hidden><div class="seg topic-seg" id="segTopicM" style="margin-bottom:14px"></div><div class="comps" id="missionList"></div></div>
+    <div class="pane" id="paneCards" hidden><div class="seg topic-seg" id="segTopicC" style="margin-bottom:14px"></div><div id="cardList"></div></div>
     <div class="pane" id="paneDesk" hidden>
       <div class="opt"><h3>Шпалери</h3><div class="cards" id="wallCards"></div></div>
       <div class="opt"><h3>Робот-помічник</h3><div class="cards" id="accCards"></div><div class="swatches" id="swatches"></div></div>
@@ -422,7 +531,7 @@
 
   <!-- Гра -->
   <section class="panel play-panel" id="play" hidden>
-    <button class="exit-btn" id="exitBtn" type="button" title="Вийти до меню (Esc)">← До меню</button>
+    <button class="exit-btn" id="exitBtn" type="button" title="Вийти до меню">← До меню</button>
     <div class="task"><span class="task-num" id="taskNum"></span><div class="task-body"><div class="play-info" id="playInfo"></div><div class="task-text" id="taskText"></div></div></div>
     <div class="hint" id="hint"></div>
     <div class="kb" id="kb" aria-hidden="true"></div>
@@ -496,6 +605,7 @@
       <li>Кнопка «💡 Підказка» показує клавіші, але нейрончиків тоді менше.</li>
       <li>Кожна комбінація — картка. Вона росте від бронзи до золота, якщо виконувати її правильно кілька днів поспіль.</li>
       <li>Місії — ланцюжок завдань на час. Медаль залежить від помилок, підказок і швидкості.</li>
+      <li>Фіолетова примітка 🖱️ означає, що комбінацію забирає браузер або Windows. Тоді збирай її мишкою: клацай клавіші на екранній клавіатурі по черзі.</li>
     </ol>
     <p>Модифікатори (Ctrl, Shift, Alt) треба тримати, поки натискаєш другу клавішу. Розкладка клавіатури значення не має.</p>
     <h3>Для вчителя</h3>
@@ -519,7 +629,8 @@ const LEFT_HAND = new Set(['KeyQ','KeyW','KeyE','KeyR','KeyT','KeyA','KeyS','Key
 const MOD_CODES = new Set(['ControlLeft','ControlRight','ShiftLeft','ShiftRight','AltLeft','AltRight','MetaLeft','MetaRight']);
 
 const KEY_LABEL = { Enter:'Enter', Space:'пробіл', Backspace:'Backspace', Delete:'Delete', Escape:'Esc', Tab:'Tab', CapsLock:'Caps Lock',
-  ArrowLeft:'←', ArrowRight:'→', ArrowUp:'↑', ArrowDown:'↓', Home:'Home', End:'End', PageUp:'Page Up', PageDown:'Page Down', Insert:'Insert' };
+  ArrowLeft:'←', ArrowRight:'→', ArrowUp:'↑', ArrowDown:'↓', Home:'Home', End:'End', PageUp:'Page Up', PageDown:'Page Down', Insert:'Insert',
+  Equal:'+', Minus:'-', Period:'.', Win:'Win', Ctrl:'Ctrl', Alt:'Alt', Shift:'Shift' };
 function keyLabel(code, ukr){
   if(KEY_LABEL[code]) return KEY_LABEL[code];
   if(/^Key[A-Z]$/.test(code)) return ukr ? UK[code].toUpperCase() : code.slice(3);
@@ -534,7 +645,8 @@ const comboOf = e => [e.ctrlKey && 'Ctrl', e.altKey && 'Alt', e.shiftKey && 'Shi
 const UK_CODE = Object.fromEntries(Object.entries(UK).map(([c, l])=>[l, c]));
 const KEY_CODE = { ' ':'Space', Enter:'Enter', Backspace:'Backspace', Delete:'Delete', Escape:'Escape', Tab:'Tab', CapsLock:'CapsLock',
   ArrowLeft:'ArrowLeft', ArrowRight:'ArrowRight', ArrowUp:'ArrowUp', ArrowDown:'ArrowDown', Home:'Home', End:'End',
-  Control:'ControlLeft', Shift:'ShiftLeft', Alt:'AltLeft', Meta:'MetaLeft', AltGraph:'AltRight' };
+  Control:'ControlLeft', Shift:'ShiftLeft', Alt:'AltLeft', Meta:'MetaLeft', AltGraph:'AltRight',
+  "'":'Quote', ';':'Semicolon', ',':'Comma', '.':'Period', '/':'Slash', '[':'BracketLeft', ']':'BracketRight', '-':'Minus', '=':'Equal', '`':'Backquote' };
 function codeOf(e){
   if(e.code) return e.code;
   const k = e.key || '';
@@ -550,6 +662,22 @@ function comboLabels(combo){
   const ukr = p.length === 2 && p[0] === 'Shift' && (UK[code] && !/^Arrow/.test(code));
   return p.map((x, i)=> i < p.length-1 ? x : keyLabel(x, ukr));
 }
+// Символ, який друкує клавіша: українська розкладка або латиниця (для рядка адреси)
+function typedChar(combo, latin){
+  const m = combo.match(/^(Shift\+)?(\w+)$/);
+  if(!m) return null;
+  const shift = !!m[1], code = m[2];
+  if(code === 'Space') return ' ';
+  if(latin){
+    if(/^Key[A-Z]$/.test(code)) return shift ? code.slice(3) : code.slice(3).toLowerCase();
+    if(/^Digit\d$/.test(code)) return code.slice(5);
+    return { Period:'.', Slash:'/', Minus:'-' }[code] ?? null;
+  }
+  if(UK[code]) return shift ? UK[code].toUpperCase() : UK[code];
+  if(/^Digit\d$/.test(code)) return shift ? DIGIT_SHIFT[code] : code.slice(5);
+  return { Minus:shift ? '_' : '-', Slash:shift ? ',' : '.' }[code] ?? null;
+}
+const isTypingCombo = c => /^(Shift\+)?(Key[A-Z]|Digit\d|Space|Backspace|Minus|Equal|Comma|Period|Slash|Semicolon|Quote|BracketLeft|BracketRight|Backquote|Backslash)$/.test(c);
 const kbdHTML = (labels, sep='+') => labels.map(l=>`<span class="kbd${MOD_ORDER.includes(l) ? ' mod' : ''}">${l}</span>`).join(`<span class="plus">${sep}</span>`);
 
 /* ================= Картки (тема «Текст») ================= */
@@ -633,16 +761,35 @@ const CARDS = [
     tasks:[ { say:'Увімкни режим великих літер', text:'Заголовок великими: |' },
             { say:'Ой, усе друкується великими! Вимкни цей режим', text:'ПРИВІТ|', caps:true } ] }
 ];
-const SOON_CARDS = [
-  ['Ctrl','←'], ['Ctrl','Home'], ['Ctrl','Backspace'], ['Ctrl','P'], ['Tab']
-];
+CARDS.forEach(c=>c.topic ||= 'text');
 const cardById = id => CARDS.find(c=>c.id===id);
-const STAGES = [
-  { n:1, name:'Перші кроки', desc:'Enter, стрілки, копіювати й вставити' },
-  { n:2, name:'Майстер тексту', desc:'вирізати, зберегти, оформлення' },
-  { n:3, name:'Профі', desc:'скоро', soon:true }
+// Теми: кожна відкриває на робочому столі свою програму (app)
+const TOPICS = [
+  { id:'text', label:'📝 Текст', app:'doc', stages:[
+      { n:1, name:'Перші кроки', desc:'Enter, стрілки, копіювати й вставити' },
+      { n:2, name:'Майстер тексту', desc:'вирізати, зберегти, оформлення' },
+      { n:3, name:'Профі', soon:true } ],
+    soon:[ ['Ctrl','←'], ['Ctrl','Home'], ['Ctrl','Backspace'], ['Ctrl','P'], ['Tab'] ] },
+  { id:'files', label:'📁 Файли', app:'files', stages:[
+      { n:1, name:'Перші кроки', desc:'вибрати, відкрити, назад, видалити' },
+      { n:2, name:'Порядок у папках', desc:'перейменувати, копіювати, нова папка' },
+      { n:3, name:'Профі', soon:true } ],
+    soon:[ ['Alt','Enter'], ['Ctrl','F'], ['Alt','↑'], ['Ctrl','N'] ] },
+  { id:'browser', label:'🌐 Браузер', app:'web', stages:[
+      { n:1, name:'Перші кроки', desc:'оновити, масштаб, пошук на сторінці' },
+      { n:2, name:'Вкладки й адреси', desc:'нова вкладка, закладка, назад' },
+      { n:3, name:'Профі', soon:true } ],
+    soon:[ ['Ctrl','H'], ['Ctrl','J'], ['Ctrl','Shift','Delete'], ['F11'] ] },
+  { id:'win', label:'🖥️ Windows', app:'os', stages:[
+      { n:1, name:'Перші кроки', desc:'Пуск, робочий стіл, перемкнути вікно' },
+      { n:2, name:'Профі Windows', desc:'знімок екрана, диспетчер, вікна поруч' },
+      { n:3, name:'Профі', soon:true } ],
+    soon:[ ['Win','I'], ['Win','Tab'], ['Win','R'], ['Win','Ctrl','D'] ] }
 ];
-const THEMES_SOON = [ ['text','📝 Текст', false], ['files','📁 Файли', true], ['browser','🌐 Браузер', true], ['win','🖥️ Windows', true] ];
+const topicOf = id => TOPICS.find(t=>t.id===id) || TOPICS[0];
+const cardsOf = (topic, stage) => CARDS.filter(c=>c.topic === topic && (!stage || c.stage === stage));
+// Комбінації, які забирає браузер або Windows: їх збирають мишкою на екранній клавіатурі
+const isScreen = t => t.task.screen ?? !!t.card.screen;
 
 /* ================= Місії ================= */
 // Крок без text продовжує документ попереднього кроку; place ставить курсор або виділення в поточному тексті
@@ -716,6 +863,299 @@ const MISSIONS = [
       { card:'save', say:'Збережи список' }
     ] }
 ];
+MISSIONS.forEach(m=>m.topic ||= 'text');
+
+/* ================= Тема «Файли» ================= */
+// Завдання: path — відкрита папка, focus — вибраний елемент, sel — виділення, clip — буфер, pre — дії до початку завдання
+CARDS.push(
+  // ----- Етап 1 -----
+  { id:'f-nav', topic:'files', stage:1, keys:['↑','↓'], or:true, name:'Вибрати файл', what:'Стрілки переходять до сусіднього файлу чи папки.', tip:'Стрілка вниз — наступний елемент, вгору — попередній.', expect:['ArrowDown'],
+    tasks:[ { say:'Вибери файл, що нижче', path:'Документи/Уроки', focus:'вірш.txt', expect:['ArrowDown'] },
+            { say:'Вибери папку, що вище', path:'Документи', focus:'Уроки', expect:['ArrowUp'] },
+            { say:'Вибери «гімн.mp3»', path:'Музика', focus:'пісня.mp3', expect:['ArrowUp'] } ] },
+  { id:'f-open', topic:'files', stage:1, keys:['Enter'], name:'Відкрити', what:'Відкриває вибрану папку або файл.', tip:'Те саме, що подвійний клік мишею.', expect:['Enter'],
+    tasks:[ { say:'Відкрий папку «Уроки»', path:'Документи', focus:'Уроки' },
+            { say:'Відкрий папку «Музика»', path:'', focus:'Музика' },
+            { say:'Відкрий малюнок', path:'Документи/Уроки', focus:'малюнок.png' } ] },
+  { id:'f-back', topic:'files', stage:1, keys:['Backspace'], name:'Назад', what:'Повертає до попередньої папки.', tip:'У Провіднику Backspace — це «назад». Ще можна Alt + ↑.', expect:['Backspace','Alt+ArrowUp'],
+    tasks:[ { say:'Повернись до попередньої папки', path:'Документи/Уроки', focus:'вірш.txt' },
+            { say:'Вийди з папки «Канікули»', path:'Документи/Канікули', focus:'гори.jpg' } ] },
+  { id:'f-del', topic:'files', stage:1, keys:['Delete'], name:'Видалити', what:'Переносить вибраний файл у кошик.', tip:'Файл не зникає назавжди: його можна повернути.', expect:['Delete'],
+    tasks:[ { say:'Видали «план.txt»', path:'Документи', focus:'план.txt' },
+            { say:'Видали пісню «гімн.mp3»', path:'Музика', focus:'гімн.mp3' } ] },
+  { id:'f-undo', topic:'files', stage:1, keys:['Ctrl','Z'], name:'Повернути видалене', what:'Скасовує останню дію з файлами.', tip:'Той самий Ctrl + Z, що й у тексті.', expect:['Ctrl+KeyZ'],
+    tasks:[ { say:'Ой! Файл видалився. Поверни його', path:'Документи', focus:'план.txt', pre:['Delete'] },
+            { say:'Поверни видалену пісню', path:'Музика', focus:'пісня.mp3', pre:['Delete'] } ] },
+  { id:'f-esc', topic:'files', stage:1, keys:['Esc'], name:'Скасувати', what:'Знімає виділення, закриває перегляд або скасовує перейменування.', tip:'Esc — «escape», втекти. Ліва верхня клавіша.', expect:['Escape'],
+    tasks:[ { say:'Зніми виділення', path:'Документи/Уроки', focus:'задача.docx', sel:['вірш.txt','задача.docx'] },
+            { say:'Закрий перегляд фото', path:'Зображення', focus:'кіт.png', pre:['Enter'] } ] },
+  // ----- Етап 2 -----
+  { id:'f-rename', topic:'files', stage:2, keys:['F2'], name:'Перейменувати', what:'Вмикає зміну назви вибраного файлу.', tip:'F2 у верхньому ряду. Надрукуй нову назву й натисни Enter.', expect:['F2'],
+    tasks:[ { say:'Почни перейменування файлу', path:'Документи', focus:'план.txt' },
+            { say:'Перейменуй папку «Уроки»', path:'Документи', focus:'Уроки' } ] },
+  { id:'f-all', topic:'files', stage:2, keys:['Ctrl','A'], name:'Виділити всі', what:'Виділяє всі файли й папки.', tip:'A — All, усе.', expect:['Ctrl+KeyA'],
+    tasks:[ { say:'Виділи всі файли в папці', path:'Документи/Уроки', focus:'вірш.txt' },
+            { say:'Виділи всі фото', path:'Документи/Канікули', focus:'гори.jpg' } ] },
+  { id:'f-copy', topic:'files', stage:2, keys:['Ctrl','C'], name:'Копіювати файл', what:'Кладе копію вибраних файлів у буфер обміну.', tip:'C — Copy. Файл лишається на місці.', expect:['Ctrl+KeyC'],
+    tasks:[ { say:'Скопіюй вибраний файл', path:'Документи/Уроки', focus:'вірш.txt' },
+            { say:'Скопіюй обидва фото', path:'Документи/Канікули', focus:'море.jpg', sel:['гори.jpg','море.jpg'] } ] },
+  { id:'f-paste', topic:'files', stage:2, keys:['Ctrl','V'], name:'Вставити файл', what:'Вставляє файли з буфера в цю папку.', tip:'Спершу Ctrl + C або Ctrl + X, потім Ctrl + V.', expect:['Ctrl+KeyV'],
+    tasks:[ { say:'Встав файл із буфера обміну', path:'Документи', focus:'план.txt', clip:{ mode:'copy', from:'Документи/Уроки', names:['вірш.txt'] } },
+            { say:'Встав фото сюди', path:'Зображення', focus:'кіт.png', clip:{ mode:'copy', from:'Документи/Канікули', names:['море.jpg'] } } ] },
+  { id:'f-cut', topic:'files', stage:2, keys:['Ctrl','X'], name:'Вирізати файл', what:'Готує файл до перенесення: після вставки він зникне зі старого місця.', tip:'X — ножиці.', expect:['Ctrl+KeyX'],
+    tasks:[ { say:'Виріж файл, щоб перенести його', path:'Документи', focus:'план.txt' },
+            { say:'Виріж пісню', path:'Музика', focus:'гімн.mp3' } ] },
+  { id:'f-multi', topic:'files', stage:2, keys:['Shift','↑','↓'], name:'Виділити кілька', what:'Shift зі стрілкою додає до виділення сусідній файл.', tip:'Тримай Shift і натискай стрілку.', expect:['Shift+ArrowDown'],
+    tasks:[ { say:'Виділи ще й наступний файл', path:'Документи/Уроки', focus:'вірш.txt', expect:['Shift+ArrowDown'] },
+            { say:'Додай до виділення файл вище', path:'Документи/Уроки', focus:'малюнок.png', expect:['Shift+ArrowUp'] } ] },
+  { id:'f-homeend', topic:'files', stage:2, keys:['Home','End'], or:true, name:'Перший і останній', what:'Home — до першого елемента, End — до останнього.', tip:'Як у тексті: Home — початок, End — кінець.', expect:['Home'],
+    tasks:[ { say:'Перейди до першого елемента', path:'Документи', focus:'план.txt', expect:['Home'] },
+            { say:'Перейди до останнього файлу', path:'Документи/Уроки', focus:'вірш.txt', expect:['End'] } ] },
+  { id:'f-refresh', topic:'files', stage:2, keys:['F5'], name:'Оновити', what:'Перечитує вміст папки.', tip:'F5 оновлює і папку, і сторінку в браузері.', expect:['F5'],
+    tasks:[ { say:'Онови вміст папки', path:'Документи', focus:'Уроки' },
+            { say:'Онови папку з музикою', path:'Музика', focus:'гімн.mp3' } ] },
+  { id:'f-newdir', topic:'files', stage:2, keys:['Ctrl','Shift','N'], name:'Нова папка', what:'Створює нову папку й одразу пропонує її назвати.', tip:'N — New, нова. У браузері ця комбінація зайнята, тож збирай її мишкою.', expect:['Ctrl+Shift+KeyN'], screen:true,
+    tasks:[ { say:'Створи нову папку', path:'Документи', focus:'план.txt' },
+            { say:'Створи папку для фото', path:'Зображення', focus:'кіт.png' } ] }
+);
+MISSIONS.push(
+  { id:'f-clean', topic:'files', stage:1, at:0, badge:'broom', name:'Прибирання в папці', limit:120, par:45, minAcc:70,
+    desc:'Наведи лад у шкільних файлах і нічого не загуби.',
+    steps:[
+      { card:'f-nav', say:'Вибери «задача.docx»', expect:['ArrowDown'], path:'Документи/Уроки', focus:'вірш.txt' },
+      { card:'f-del', say:'Видали «задача.docx» — вона зайва' },
+      { card:'f-undo', say:'Ой, вона ще знадобиться! Поверни її' },
+      { card:'f-back', say:'Повернись до папки «Документи»' },
+      { card:'f-nav', say:'Вибери папку «Канікули»', expect:['ArrowUp'] },
+      { card:'f-open', say:'Відкрий її' },
+      { card:'f-esc', say:'Зніми виділення' }
+    ] },
+  { id:'f-photos', topic:'files', stage:1, at:50, badge:'photo', name:'Де мої фото?', limit:120, par:45, minAcc:70,
+    desc:'Знайди фото з канікул і повернись на початок.',
+    steps:[
+      { card:'f-open', say:'Відкрий папку «Документи»', path:'', focus:'Документи' },
+      { card:'f-open', say:'Відкрий папку «Канікули»' },
+      { card:'f-nav', say:'Вибери «море.jpg»', expect:['ArrowDown'] },
+      { card:'f-open', say:'Подивись фото' },
+      { card:'f-esc', say:'Закрий перегляд' },
+      { card:'f-back', say:'Повернись назад' },
+      { card:'f-back', say:'І ще раз — до «Цей ПК»' }
+    ] },
+  { id:'f-project', topic:'files', stage:2, at:150, badge:'folderStar', name:'Шкільний проєкт', limit:150, par:70, minAcc:75,
+    desc:'Створи папку для проєкту й збери в неї потрібні файли.',
+    steps:[
+      { card:'f-newdir', say:'Створи нову папку для проєкту', path:'Документи', focus:'план.txt' },
+      { card:'f-rename', say:'Назви її «Проєкт» і натисни Enter', hint:'Надрукуй П-р-о-є-к-т (першу літеру з Shift), потім Enter',
+        goal:s=>!s.renaming && 'Проєкт' in fxFolder(s) },
+      { card:'f-nav', say:'Вибери папку «Уроки»', expect:['ArrowDown'] },
+      { card:'f-open', say:'Відкрий її' },
+      { card:'f-all', say:'Виділи всі файли' },
+      { card:'f-copy', say:'Скопіюй їх' },
+      { card:'f-back', say:'Повернись у «Документи»' },
+      { card:'f-nav', say:'Вибери папку «Проєкт»', expect:['ArrowUp'] },
+      { card:'f-open', say:'Відкрий її' },
+      { card:'f-paste', say:'Встав файли' }
+    ] },
+  { id:'f-backup', topic:'files', stage:2, at:280, badge:'floppy', name:'Переносимо файли', limit:120, par:55, minAcc:75,
+    desc:'Перенеси файли в іншу папку й наведи там лад.',
+    steps:[
+      { card:'f-multi', say:'Виділи «вірш.txt» і «задача.docx» разом', expect:['Shift+ArrowDown'], path:'Документи/Уроки', focus:'вірш.txt' },
+      { card:'f-cut', say:'Виріж їх' },
+      { card:'f-back', say:'Повернись у «Документи»' },
+      { card:'f-nav', say:'Вибери папку «Канікули»', expect:['ArrowUp'] },
+      { card:'f-open', say:'Відкрий її' },
+      { card:'f-paste', say:'Перенеси файли сюди' },
+      { card:'f-homeend', say:'Перейди до останнього файлу', expect:['End'] },
+      { card:'f-rename', say:'Почни перейменування' },
+      { card:'f-esc', say:'Передумали — скасуй перейменування' },
+      { card:'f-refresh', say:'Онови папку' }
+    ] }
+);
+
+/* ================= Тема «Браузер» ================= */
+// Завдання: tabs — вкладки ('сторінка' або 'попередня>поточна'), active, zoom, err — сторінка не завантажилась, scroll
+CARDS.push(
+  // ----- Етап 1 -----
+  { id:'b-reload', topic:'browser', stage:1, keys:['F5'], name:'Оновити сторінку', what:'Завантажує сторінку заново.', tip:'Сторінка «зависла» чи не відкрилась — тисни F5.', expect:['F5','Ctrl+KeyR'],
+    tasks:[ { say:'Сторінка не завантажилась — онови її', tabs:['school'], err:true },
+            { say:'Онови сторінку з погодою', tabs:['weather'] } ] },
+  { id:'b-zoomin', topic:'browser', stage:1, keys:['Ctrl','+'], name:'Збільшити масштаб', what:'Робить текст і картинки на сторінці більшими.', tip:'Плюс — більше. Клавіша «=», там, де знак +.', expect:['Ctrl+Equal','Ctrl+Shift+Equal','Ctrl+NumpadAdd'],
+    tasks:[ { say:'Текст задрібний — збільш масштаб', tabs:['wiki'], zoom:80 },
+            { say:'Збільш сторінку', tabs:['school'] } ] },
+  { id:'b-zoomout', topic:'browser', stage:1, keys:['Ctrl','-'], name:'Зменшити масштаб', what:'Робить сторінку дрібнішою, щоб більше вмістилося.', tip:'Мінус — менше.', expect:['Ctrl+Minus','Ctrl+NumpadSubtract'],
+    tasks:[ { say:'Зменш масштаб, щоб усе вмістилося', tabs:['school'], zoom:130 },
+            { say:'Зроби сторінку дрібнішою', tabs:['wiki'], zoom:120 } ] },
+  { id:'b-zoom0', topic:'browser', stage:1, keys:['Ctrl','0'], name:'Звичайний масштаб', what:'Повертає масштаб 100%.', tip:'Нуль — почати з нуля.', expect:['Ctrl+Digit0','Ctrl+Numpad0'],
+    tasks:[ { say:'Поверни звичайний масштаб', tabs:['wiki'], zoom:150 },
+            { say:'Сторінка задрібна. Поверни 100%', tabs:['school'], zoom:70 } ] },
+  { id:'b-find', topic:'browser', stage:1, keys:['Ctrl','F'], name:'Пошук на сторінці', what:'Відкриває рядок пошуку слова на сторінці.', tip:'F — Find, знайти.', expect:['Ctrl+KeyF'],
+    tasks:[ { say:'Відкрий пошук на сторінці', tabs:['wiki'] },
+            { say:'Шукаєш слово в розкладі? Відкрий пошук', tabs:['school'] } ] },
+  { id:'b-scroll', topic:'browser', stage:1, keys:['Page Down','Page Up'], or:true, name:'Прокрутити сторінку', what:'Page Down — на екран нижче, Page Up — вище.', tip:'Клавіші над стрілками. Ще можна пробілом.', expect:['PageDown','Space'],
+    tasks:[ { say:'Прокрути сторінку вниз', tabs:['wiki'], expect:['PageDown','Space'] },
+            { say:'Повернись угору сторінки', tabs:['wiki'], scroll:1, expect:['PageUp','Shift+Space'] } ] },
+  { id:'b-esc', topic:'browser', stage:1, keys:['Esc'], name:'Закрити', what:'Закриває пошук або скасовує набір адреси.', tip:'Esc — ліва верхня клавіша.', expect:['Escape'],
+    tasks:[ { say:'Закрий рядок пошуку', tabs:['wiki'], pre:['Ctrl+KeyF'] },
+            { say:'Передумав вводити адресу — скасуй', tabs:['school'], pre:['Ctrl+KeyL'] } ] },
+  // ----- Етап 2 -----
+  { id:'b-newtab', topic:'browser', stage:2, keys:['Ctrl','T'], name:'Нова вкладка', what:'Відкриває нову порожню вкладку.', tip:'T — Tab, вкладка.', expect:['Ctrl+KeyT'], screen:true,
+    tasks:[ { say:'Відкрий нову вкладку', tabs:['school'] },
+            { say:'Потрібна ще одна вкладка', tabs:['wiki','weather'], active:1 } ] },
+  { id:'b-close', topic:'browser', stage:2, keys:['Ctrl','W'], name:'Закрити вкладку', what:'Закриває вкладку, яку ти зараз дивишся.', tip:'W стоїть поруч із Q (quit, вийти).', expect:['Ctrl+KeyW'], screen:true,
+    tasks:[ { say:'Закрий цю вкладку', tabs:['school','video'], active:1 },
+            { say:'Закрий вкладку з погодою', tabs:['weather','wiki'] } ] },
+  { id:'b-reopen', topic:'browser', stage:2, keys:['Ctrl','Shift','T'], name:'Повернути вкладку', what:'Відкриває знову щойно закриту вкладку.', tip:'Той самий Ctrl + T, але з Shift.', expect:['Ctrl+Shift+KeyT'], screen:true,
+    tasks:[ { say:'Ой! Вкладка закрилась. Поверни її', tabs:['school','wiki'], active:1, pre:['Ctrl+KeyW'] },
+            { say:'Поверни закриту вкладку з відео', tabs:['school','video'], active:1, pre:['Ctrl+KeyW'] } ] },
+  { id:'b-next', topic:'browser', stage:2, keys:['Ctrl','Tab'], name:'Наступна вкладка', what:'Перемикає на вкладку праворуч.', tip:'З Shift — на вкладку ліворуч.', expect:['Ctrl+Tab'], screen:true,
+    tasks:[ { say:'Перейди на наступну вкладку', tabs:['school','wiki','weather'] },
+            { say:'Перемкнися на вкладку праворуч', tabs:['video','school'] } ] },
+  { id:'b-address', topic:'browser', stage:2, keys:['Ctrl','L'], name:'Рядок адреси', what:'Виділяє адресу сайту, щоб надрукувати нову.', tip:'L — Location, адреса. Ще можна F6.', expect:['Ctrl+KeyL','F6','Alt+KeyD'],
+    tasks:[ { say:'Перейди в рядок адреси', tabs:['school'] },
+            { say:'Хочеш відкрити інший сайт? Виділи адресу', tabs:['wiki'] } ] },
+  { id:'b-mark', topic:'browser', stage:2, keys:['Ctrl','D'], name:'Закладка', what:'Додає сторінку в закладки — зірочка стане жовтою.', tip:'D — як «додати».', expect:['Ctrl+KeyD'],
+    tasks:[ { say:'Додай сторінку в закладки', tabs:['wiki'] },
+            { say:'Збережи сайт школи в закладки', tabs:['school'] } ] },
+  { id:'b-back', topic:'browser', stage:2, keys:['Alt','←'], name:'Назад', what:'Повертає на попередню сторінку.', tip:'Стрілка вліво — назад. Браузер забирає цю комбінацію, тож збирай її мишкою.', expect:['Alt+ArrowLeft'], screen:true,
+    tasks:[ { say:'Повернись на попередню сторінку', tabs:['school>wiki'] },
+            { say:'Повернись до енциклопедії', tabs:['wiki>video'] } ] }
+);
+MISSIONS.push(
+  { id:'b-wiki', topic:'browser', stage:1, at:0, badge:'book', name:'Енциклопедія', limit:120, par:50, minAcc:70,
+    desc:'Збільш дрібний текст і знайди на сторінці потрібне слово.',
+    steps:[
+      { card:'b-zoomin', say:'Текст задрібний — збільш масштаб', tabs:['wiki'], zoom:70 },
+      { card:'b-zoomin', say:'Ще трохи більше' },
+      { card:'b-find', say:'Знайди на сторінці слово «кит»: відкрий пошук' },
+      { card:'b-find', say:'Надрукуй «кит»', hint:'Надрукуй літери К, И, Т', goal:s=>s.find && s.find.q.toLowerCase() === 'кит' },
+      { card:'b-esc', say:'Закрий пошук' },
+      { card:'b-scroll', say:'Прокрути сторінку вниз', expect:['PageDown','Space'] },
+      { card:'b-zoom0', say:'Поверни звичайний масштаб' }
+    ] },
+  { id:'b-school', topic:'browser', stage:1, at:60, badge:'bell', name:'Сайт школи', limit:120, par:55, minAcc:70,
+    desc:'Відкрий сайт школи й знайди в розкладі потрібний день.',
+    steps:[
+      { card:'b-reload', say:'Сайт не завантажився — онови сторінку', tabs:['school'], err:true },
+      { card:'b-scroll', say:'Прокрути до розкладу', expect:['PageDown','Space'] },
+      { card:'b-zoomout', say:'Таблиця не вміщується — зменш масштаб' },
+      { card:'b-find', say:'Знайди в розкладі «середа»: відкрий пошук' },
+      { card:'b-find', say:'Надрукуй «середа»', hint:'Надрукуй літери С, Е, Р, Е, Д, А', goal:s=>s.find && s.find.q.toLowerCase() === 'середа' },
+      { card:'b-esc', say:'Закрий пошук' },
+      { card:'b-scroll', say:'Повернись на початок сторінки', expect:['PageUp','Shift+Space'] }
+    ] },
+  { id:'b-tabs', topic:'browser', stage:2, at:170, badge:'tabs', name:'Дослідник вкладок', limit:150, par:70, minAcc:75,
+    desc:'Відкрий новий сайт у вкладці, збережи його й не загуби старий.',
+    steps:[
+      { card:'b-newtab', say:'Відкрий нову вкладку', tabs:['school'] },
+      { card:'b-address', say:'Перейди в рядок адреси' },
+      { card:'b-address', say:'Надрукуй pogoda і натисни Enter', hint:'Латинські літери p, o, g, o, d, a, потім Enter', goal:s=>webTab(s).page === 'weather' && !s.addr },
+      { card:'b-mark', say:'Додай погоду в закладки' },
+      { card:'b-next', say:'Перейди на сусідню вкладку' },
+      { card:'b-close', say:'Закрий сайт школи' },
+      { card:'b-reopen', say:'Ой, він ще потрібен! Поверни закриту вкладку' }
+    ] },
+  { id:'b-order', topic:'browser', stage:2, at:300, badge:'globe', name:'Порядок у вкладках', limit:120, par:55, minAcc:75,
+    desc:'Пройдись вкладками, поверни потрібну сторінку й закрий зайве.',
+    steps:[
+      { card:'b-next', say:'Перейди на наступну вкладку', tabs:['school','wiki>video','weather'] },
+      { card:'b-back', say:'Повернись на попередню сторінку' },
+      { card:'b-mark', say:'Додай енциклопедію в закладки' },
+      { card:'b-next', say:'Перейди на вкладку з погодою' },
+      { card:'b-close', say:'Закрий її' },
+      { card:'b-reload', say:'Онови сторінку' },
+      { card:'b-zoomin', say:'Збільш масштаб' }
+    ] }
+);
+
+/* ================= Тема «Windows» ================= */
+// Завдання: wins — відкриті вікна ('doc,files,web', останнє — активне), active, min, locked, hang
+CARDS.push(
+  // ----- Етап 1 -----
+  { id:'w-start', topic:'win', stage:1, keys:['Win'], name:'Меню «Пуск»', what:'Відкриває меню «Пуск» з програмами.', tip:'Клавіша з віконцем між Ctrl і Alt.', expect:['Win'], screen:true,
+    tasks:[ { say:'Відкрий меню «Пуск»', wins:'doc' },
+            { say:'Шукаєш програму? Відкрий «Пуск»', wins:'doc,web' } ] },
+  { id:'w-desk', topic:'win', stage:1, keys:['Win','D'], name:'Робочий стіл', what:'Згортає всі вікна. Ще раз — повертає їх.', tip:'D — Desktop, робочий стіл.', expect:['Win+KeyD'], screen:true,
+    tasks:[ { say:'Згорни всі вікна й покажи робочий стіл', wins:'doc,files,web' },
+            { say:'Поверни всі вікна назад', wins:'doc,web', pre:['Win+KeyD'] } ] },
+  { id:'w-exp', topic:'win', stage:1, keys:['Win','E'], name:'Провідник', what:'Відкриває Провідник із файлами.', tip:'E — Explorer, провідник.', expect:['Win+KeyE'], screen:true,
+    tasks:[ { say:'Відкрий Провідник', wins:'doc' },
+            { say:'Потрібні файли — відкрий Провідник', wins:'web' } ] },
+  { id:'w-close', topic:'win', stage:1, keys:['Alt','F4'], name:'Закрити вікно', what:'Закриває активне вікно.', tip:'Обережно: незбережене може загубитися.', expect:['Alt+F4'], screen:true,
+    tasks:[ { say:'Закрий активне вікно', wins:'doc,web' },
+            { say:'Закрий Провідник', wins:'web,files' } ] },
+  { id:'w-switch', topic:'win', stage:1, keys:['Alt','Tab'], name:'Перемкнути вікно', what:'Переходить до попереднього вікна.', tip:'Тримай Alt і натискай Tab, щоб вибрати вікно.', expect:['Alt+Tab'], screen:true,
+    tasks:[ { say:'Перемкнися на інше вікно', wins:'doc,web' },
+            { say:'Повернись до документа', wins:'doc,files' } ] },
+  { id:'w-lock', topic:'win', stage:1, keys:['Win','L'], name:'Заблокувати', what:'Блокує комп\'ютер, поки тебе немає.', tip:'L — Lock, замок. Відходиш — блокуй!', expect:['Win+KeyL'], screen:true,
+    tasks:[ { say:'Ти відходиш від комп\'ютера — заблокуй його', wins:'doc' },
+            { say:'Перерва! Заблокуй комп\'ютер', wins:'web,doc' } ] },
+  // ----- Етап 2 -----
+  { id:'w-snip', topic:'win', stage:2, keys:['Win','Shift','S'], name:'Знімок екрана', what:'Дає виділити частину екрана й скопіювати як картинку.', tip:'S — Screenshot, знімок.', expect:['Win+Shift+KeyS'], screen:true,
+    tasks:[ { say:'Зроби знімок частини екрана', wins:'web' },
+            { say:'Сфотографуй схему з документа', wins:'doc' } ] },
+  { id:'w-task', topic:'win', stage:2, keys:['Ctrl','Shift','Esc'], name:'Диспетчер завдань', what:'Показує всі програми — зависла можна закрити.', tip:'Програма не відповідає? Ctrl + Shift + Esc.', expect:['Ctrl+Shift+Escape'], screen:true,
+    tasks:[ { say:'Браузер завис! Відкрий диспетчер завдань', wins:'doc,web', hang:'web' },
+            { say:'Подивись, які програми запущені', wins:'doc,files' } ] },
+  { id:'w-max', topic:'win', stage:2, keys:['Win','↑','↓'], name:'Розгорнути й згорнути', what:'Win + ↑ розгортає вікно на весь екран, Win + ↓ згортає.', tip:'Стрілка вгору — більше, вниз — менше.', expect:['Win+ArrowUp'], screen:true,
+    tasks:[ { say:'Розгорни вікно на весь екран', wins:'doc', expect:['Win+ArrowUp'] },
+            { say:'Зроби вікно звичайним', wins:'web', max:true, expect:['Win+ArrowDown'] } ] },
+  { id:'w-snap', topic:'win', stage:2, keys:['Win','←','→'], name:'Вікна поруч', what:'Прикріплює вікно до лівої чи правої половини екрана.', tip:'Два вікна поруч — зручно переписувати.', expect:['Win+ArrowLeft'], screen:true,
+    tasks:[ { say:'Прикріпи вікно до лівої половини', wins:'web,doc', expect:['Win+ArrowLeft'] },
+            { say:'Прикріпи браузер праворуч', wins:'doc,web', expect:['Win+ArrowRight'] } ] },
+  { id:'w-clip', topic:'win', stage:2, keys:['Win','V'], name:'Журнал буфера', what:'Показує кілька останніх скопійованих фрагментів.', tip:'Як Ctrl + V, але з Win — і з вибором.', expect:['Win+KeyV'], screen:true,
+    tasks:[ { say:'Відкрий журнал буфера обміну', wins:'doc' },
+            { say:'Знайди, що копіював раніше', wins:'web' } ] },
+  { id:'w-lang', topic:'win', stage:2, keys:['Win','пробіл'], name:'Мова введення', what:'Перемикає розкладку: українська чи англійська.', tip:'Видно біля годинника: УКР або ENG.', expect:['Win+Space'], screen:true,
+    tasks:[ { say:'Перемкни мову на англійську', wins:'doc' },
+            { say:'Зміни мову введення', wins:'web' } ] },
+  { id:'w-emoji', topic:'win', stage:2, keys:['Win','.'], name:'Смайлики', what:'Відкриває панель емодзі.', tip:'Крапка — маленька, як смайлик.', expect:['Win+Period'], screen:true,
+    tasks:[ { say:'Відкрий панель смайликів', wins:'doc' },
+            { say:'Додай емодзі: відкрий панель', wins:'web' } ] }
+);
+MISSIONS.push(
+  { id:'w-lesson', topic:'win', stage:1, at:0, badge:'sunrise', name:'Початок уроку', limit:120, par:50, minAcc:70,
+    desc:'Увійди в систему, відкрий потрібне й заблокуй комп\'ютер наприкінці.',
+    steps:[
+      { card:'w-lock', say:'Комп\'ютер заблоковано. Натисни Enter, щоб увійти', expect:['Enter','Space'], screen:false, wins:'doc', locked:true },
+      { card:'w-start', say:'Відкрий меню «Пуск»' },
+      { card:'w-exp', say:'Відкрий Провідник' },
+      { card:'w-switch', say:'Перемкнися назад на документ' },
+      { card:'w-desk', say:'Покажи робочий стіл' },
+      { card:'w-desk', say:'Поверни вікна назад' },
+      { card:'w-lock', say:'Урок закінчився — заблокуй комп\'ютер' }
+    ] },
+  { id:'w-tidy', topic:'win', stage:1, at:90, badge:'windows', name:'Прибираємо вікна', limit:110, par:45, minAcc:70,
+    desc:'Закрий зайві вікна й відкрий потрібне.',
+    steps:[
+      { card:'w-close', say:'Закрий браузер', wins:'doc,files,web' },
+      { card:'w-switch', say:'Перемкнися на інше вікно' },
+      { card:'w-close', say:'Закрий і це вікно' },
+      { card:'w-close', say:'Закрий останнє вікно' },
+      { card:'w-exp', say:'Відкрий Провідник знову' },
+      { card:'w-start', say:'Відкрий меню «Пуск»' }
+    ] },
+  { id:'w-research', topic:'win', stage:2, at:200, badge:'scissors', name:'Дослідження', limit:120, par:55, minAcc:75,
+    desc:'Постав вікна поруч, зроби знімок і додай смайлик.',
+    steps:[
+      { card:'w-snap', say:'Прикріпи документ ліворуч', expect:['Win+ArrowLeft'], wins:'web,doc' },
+      { card:'w-switch', say:'Перемкнися на браузер' },
+      { card:'w-snap', say:'Прикріпи браузер праворуч', expect:['Win+ArrowRight'] },
+      { card:'w-snip', say:'Зроби знімок схеми з сайту' },
+      { card:'w-clip', say:'Відкрий журнал буфера, щоб знайти знімок' },
+      { card:'w-emoji', say:'Додай смайлик у документ' }
+    ] },
+  { id:'w-rescue', topic:'win', stage:2, at:330, badge:'medkit', name:'Рятувальник', limit:120, par:55, minAcc:75,
+    desc:'Програма зависла — врятуй ситуацію й підготуй документ.',
+    steps:[
+      { card:'w-task', say:'Браузер завис! Відкрий диспетчер завдань', wins:'doc,web', hang:'web' },
+      { card:'w-close', say:'Готово, браузер перезапущено. Закрий диспетчер' },
+      { card:'w-switch', say:'Перемкнися на документ' },
+      { card:'w-max', say:'Розгорни його на весь екран', expect:['Win+ArrowUp'] },
+      { card:'w-lang', say:'Перемкни мову на англійську' },
+      { card:'w-max', say:'Поверни звичайний розмір', expect:['Win+ArrowDown'] },
+      { card:'w-lock', say:'Заблокуй комп\'ютер' }
+    ] }
+);
 const missionById = id => MISSIONS.find(m=>m.id===id);
 const MEDALS = { gold:['🥇','Золото'], silver:['🥈','Срібло'], bronze:['🥉','Бронза'] };
 const MEDAL_RANK = { bronze:1, silver:2, gold:3 };
@@ -803,6 +1243,31 @@ const BADGES = {
   trophy:`<path d="M11 6 H29 V15 C29 21 25 25 20 25 C15 25 11 21 11 15 Z" fill="#FFC93C" ${OUT}/><path d="M11 9 H6 C6 15 8 18 12 18 M29 9 H34 C34 15 32 18 28 18" fill="none" stroke="#E8A33D" stroke-width="2.6"/>
     <rect x="17" y="24" width="6" height="6" fill="#E8A33D"/><rect x="11" y="29" width="18" height="6" rx="2" fill="#6C5CE7" ${OUT}/><path d="M20 10 L21.3 13 L24.4 13.2 L22 15.2 L22.8 18.3 L20 16.6 L17.2 18.3 L18 15.2 L15.6 13.2 L18.7 13 Z" fill="#fff"/>`
 };
+Object.assign(BADGES, {
+  broom:`<path d="M29 4 L19 22" stroke="#B9783B" stroke-width="4" stroke-linecap="round" fill="none" ${OUT}/><path d="M14 20 L25 25 L20 36 Q12 36 7 31 Z" fill="#FFC93C" ${OUT}/>
+    <path d="M11 30 L15 25 M15 33 L19 27" stroke="#E8A33D" stroke-width="2" stroke-linecap="round"/>`,
+  photo:`<rect x="4" y="8" width="32" height="25" rx="4" fill="#2D9CDB" ${OUT}/><path d="M7 30 L16 19 L22 26 L26 22 L33 30 Z" fill="#3FA66B"/><circle cx="28" cy="15" r="3.5" fill="#FFC93C"/>`,
+  folderStar:`<path d="M4 11 Q4 8 7 8 H16 L19 11 H33 Q36 11 36 14 V31 Q36 34 33 34 H7 Q4 34 4 31 Z" fill="#FFC93C" ${OUT}/>
+    <path d="M20 15 L22 20 L27.5 20.3 L23.3 23.7 L24.7 29 L20 26 L15.3 29 L16.7 23.7 L12.5 20.3 L18 20 Z" fill="#fff"/>`,
+  floppy:`<path d="M5 8 Q5 5 8 5 H28 L35 12 V32 Q35 35 32 35 H8 Q5 35 5 32 Z" fill="#6C5CE7" ${OUT}/><rect x="11" y="5" width="16" height="10" rx="1.5" fill="#E6E2FF"/><rect x="10" y="21" width="20" height="14" rx="2" fill="#fff"/>
+    <rect x="21" y="7" width="4" height="6" rx="1" fill="#6C5CE7"/>`,
+  book:`<path d="M20 9 Q12 5 4 8 V33 Q12 30 20 34 Z" fill="#16A3A0" ${OUT}/><path d="M20 9 Q28 5 36 8 V33 Q28 30 20 34 Z" fill="#2D9CDB" ${OUT}/>
+    <path d="M8 14 Q12 13 16 14.5 M8 19 Q12 18 16 19.5 M24 14.5 Q28 13 32 14 M24 19.5 Q28 18 32 19" stroke="#fff" stroke-width="1.8" fill="none" stroke-linecap="round"/>`,
+  bell:`<path d="M20 5 Q31 6 31 20 V27 L35 31 H5 L9 27 V20 Q9 6 20 5 Z" fill="#FFC93C" ${OUT}/><circle cx="20" cy="34" r="3.6" fill="#E8A33D" ${OUT}/><path d="M14 13 Q15 10 18 9.5" stroke="#fff" stroke-width="2" fill="none" stroke-linecap="round"/>`,
+  tabs:`<rect x="3" y="9" width="34" height="26" rx="4" fill="#fff" stroke="#fff" stroke-width="3.5"/><rect x="3" y="9" width="34" height="26" rx="4" fill="#E6E2FF"/>
+    <rect x="5" y="5" width="12" height="8" rx="2.5" fill="#6C5CE7"/><rect x="18" y="5" width="12" height="8" rx="2.5" fill="#B5ABF2"/><rect x="3" y="12" width="34" height="5" fill="#6C5CE7"/>
+    <rect x="8" y="22" width="18" height="3" rx="1.5" fill="#6C5CE7" opacity=".5"/><rect x="8" y="27" width="12" height="3" rx="1.5" fill="#6C5CE7" opacity=".5"/>`,
+  globe:`<circle cx="20" cy="20" r="16" fill="#2D9CDB" ${OUT}/><ellipse cx="20" cy="20" rx="7" ry="16" fill="none" stroke="#fff" stroke-width="2"/>
+    <path d="M4 20 H36 M7 12 H33 M7 28 H33" stroke="#fff" stroke-width="2" fill="none"/>`,
+  sunrise:`<circle cx="20" cy="24" r="10" fill="#FFC93C" ${OUT}/><g stroke="#FF6B4A" stroke-width="2.6" stroke-linecap="round"><path d="M20 4 V9 M7 10 L10.5 13.5 M33 10 L29.5 13.5 M3 22 H8 M37 22 H32"/></g>
+    <rect x="3" y="26" width="34" height="9" rx="3" fill="#16A3A0" ${OUT}/>`,
+  windows:`<rect x="4" y="11" width="22" height="18" rx="3" fill="#B5ABF2" ${OUT}/><rect x="14" y="17" width="22" height="18" rx="3" fill="#6C5CE7" ${OUT}/>
+    <rect x="14" y="17" width="22" height="5" rx="2" fill="#5340c9"/><circle cx="32" cy="19.5" r="1.4" fill="#fff"/>`,
+  scissors:`<circle cx="12" cy="29" r="6" fill="none" stroke="#FF5D9E" stroke-width="4" ${OUT}/><circle cx="28" cy="29" r="6" fill="none" stroke="#FF5D9E" stroke-width="4" ${OUT}/>
+    <path d="M15 24 L29 4 M25 24 L11 4" stroke="#8E9AC8" stroke-width="4" stroke-linecap="round" ${OUT}/>`,
+  medkit:`<rect x="4" y="10" width="32" height="24" rx="5" fill="#E8453C" ${OUT}/><path d="M15 10 V7 Q15 5 17 5 H23 Q25 5 25 7 V10" fill="none" stroke="#E8453C" stroke-width="3"/>
+    <path d="M20 15 V29 M13 22 H27" stroke="#fff" stroke-width="5" stroke-linecap="round"/>`
+});
 const badgeHTML = (id, title='') => BADGES[id] ? `<span class="badge-ico"${title ? ` title="${esc(title)}"` : ''}><svg viewBox="-2 -2 44 44" aria-hidden="true">${BADGES[id]}</svg></span>` : '';
 
 /* ================= Робот-помічник ================= */
@@ -885,7 +1350,7 @@ const fmtTime = ms => { const s = Math.round(ms / 1000); return `${Math.floor(s 
 const esc = s => String(s).replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 
 const STORE_KEY = 'hot-keys-v1';
-const DEFAULT_SETTINGS = { stage:1, mode:'train', wall:'sky', acc:'none', color:COLORS[0], theme:'classic', badge:'' };
+const DEFAULT_SETTINGS = { topic:'text', stage:1, mode:'train', wall:'sky', acc:'none', color:COLORS[0], theme:'classic', badge:'' };
 const newProfile = () => ({ neurons:0, tasks:0, rounds:0, cards:{}, missions:{}, since:today(), settings:{ ...DEFAULT_SETTINGS } });
 let store = { current:null, players:{} };
 try{ const s = JSON.parse(localStorage.getItem(STORE_KEY)); if(s && s.players) store = s; }catch(e){}
@@ -936,7 +1401,7 @@ const buzz = ()=>tone(180, .18, 'square', .04);
 
 /* ================= Документ (міні-редактор) ================= */
 // Документ — масив символів з оформленням; курсор cur і початок виділення anc
-let doc = null;
+let st = null;   // стан програми поточної теми (документ, провідник, браузер чи Windows)
 const cloneChars = cs => cs.map(c=>({ ...c }));
 const snap = d => ({ chars:cloneChars(d.chars), cur:d.cur, anc:d.anc });
 const cloneDoc = d => ({ ...snap(d), clip:d.clip, undo:d.undo.map(s=>({ ...s, chars:cloneChars(s.chars) })), redo:d.redo.map(s=>({ ...s, chars:cloneChars(s.chars) })), modified:d.modified, caps:d.caps });
@@ -1049,7 +1514,7 @@ function applyCombo(d, combo, e){
 
 const docEl = document.getElementById('doc');
 function renderDoc(){
-  const d = doc;
+  const d = st;
   if(!d){ docEl.innerHTML = ''; return; }
   const [a, b] = selRange(d);
   let html = '';
@@ -1081,6 +1546,398 @@ function renderDoc(){
 function flashClip(){ const c = document.getElementById('clip'); c.classList.remove('flash'); void c.offsetWidth; c.classList.add('flash'); }
 let savedTimer = null;
 function showSaved(){ const t = document.getElementById('savedToast'); t.classList.add('show'); clearTimeout(savedTimer); savedTimer = setTimeout(()=>t.classList.remove('show'), 1100); }
+// Прокрутити список так, щоб елемент було видно (без прокручування всієї сторінки)
+function keepVisible(box, item){
+  if(!box || !item) return;
+  const top = item.offsetTop - box.offsetTop, h = item.offsetHeight;
+  if(top < box.scrollTop) box.scrollTop = top - 6;
+  else if(top + h > box.scrollTop + box.clientHeight) box.scrollTop = top + h - box.clientHeight + 6;
+}
+const escRe = x => x.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
+/* ================= Провідник ================= */
+// Папка — об'єкт, файл — 0. Шлях — масив назв від «Цей ПК»
+const FS = { 'Документи':{ 'Канікули':{ 'гори.jpg':0, 'море.jpg':0 }, 'Уроки':{ 'вірш.txt':0, 'задача.docx':0, 'малюнок.png':0 }, 'план.txt':0 },
+  'Зображення':{ 'кіт.png':0, 'школа.jpg':0 }, 'Музика':{ 'гімн.mp3':0, 'пісня.mp3':0 }, 'Відео':{ 'мультик.mp4':0 } };
+const FX_TYPES = { txt:['📄','Текст'], docx:['📝','Документ'], png:['🖼️','Зображення'], jpg:['🖼️','Зображення'], mp3:['🎵','Музика'], mp4:['🎬','Відео'] };
+const isDir = n => !!n && typeof n === 'object';
+const splitPath = p => p ? p.split('/') : [];
+function fxNode(s, path = s.path){ let n = s.fs; for(const p of path) n = n[p]; return n; }
+const fxFolder = s => fxNode(s);
+function fxItems(s){
+  const f = fxFolder(s);
+  return Object.keys(f).sort((a, b)=>(isDir(f[b]) - isDir(f[a])) || a.localeCompare(b, 'uk'));
+}
+const fxSnap = s => JSON.parse(JSON.stringify({ fs:s.fs, path:s.path, focus:s.focus, anchor:s.anchor, sel:s.sel }));
+function fxSelect(s, i){
+  const it = fxItems(s);
+  s.focus = Math.max(0, Math.min(it.length - 1, i));
+  s.anchor = s.focus;
+  s.sel = it.length ? [it[s.focus]] : [];
+}
+function fxAdjust(s, t){
+  if(t.focus !== undefined){ const i = fxItems(s).indexOf(t.focus); fxSelect(s, i < 0 ? 0 : i); }
+  if(t.sel) s.sel = [...t.sel];
+}
+function fxMake(t){
+  const s = { fs:JSON.parse(JSON.stringify(FS)), path:splitPath(t.path), focus:0, anchor:0, sel:[], clip:null, undo:[], renaming:null, preview:null, props:null, flash:null, refreshAt:0 };
+  fxSelect(s, 0);
+  fxAdjust(s, t);
+  if(t.clip) s.clip = { mode:t.clip.mode, from:splitPath(t.clip.from), names:[...t.clip.names] };
+  return s;
+}
+const fxClone = s => JSON.parse(JSON.stringify(s));
+function fxApply(s, combo){
+  s.flash = null;
+  const it = fxItems(s), cur = it[s.focus];
+  if(s.preview){ if(combo === 'Escape' || combo === 'Enter'){ s.preview = null; return 'закрити перегляд'; } return null; }
+  if(s.props){ if(combo === 'Escape' || combo === 'Enter'){ s.props = null; return 'закрити властивості'; } return null; }
+  if(s.renaming){
+    const r = s.renaming;
+    if(combo === 'Escape'){ s.renaming = null; return 'скасувати перейменування'; }
+    if(combo === 'Enter'){
+      const base = r.fresh ? r.base : r.text.trim();
+      s.renaming = null;
+      if(!base || base + r.ext === r.orig) return 'перейменувати';
+      const f = fxFolder(s);
+      s.undo.push(fxSnap(s));
+      let n = base + r.ext;
+      if(n in f) n = base + ' (2)' + r.ext;
+      f[n] = f[r.orig]; delete f[r.orig];
+      fxSelect(s, fxItems(s).indexOf(n));
+      s.flash = n;
+      return 'перейменувати';
+    }
+    if(combo === 'Backspace'){ r.text = r.fresh ? '' : r.text.slice(0, -1); r.fresh = false; return 'стерти'; }
+    const ch = typedChar(combo);
+    if(ch !== null){ r.text = (r.fresh ? '' : r.text) + ch; r.fresh = false; return `літера «${ch}»`; }
+    return null;
+  }
+  switch(combo){
+    case 'ArrowDown': case 'ArrowUp': fxSelect(s, s.focus + (combo === 'ArrowDown' ? 1 : -1)); return combo === 'ArrowDown' ? 'наступний файл' : 'попередній файл';
+    case 'Shift+ArrowDown': case 'Shift+ArrowUp': {
+      s.focus = Math.max(0, Math.min(it.length - 1, s.focus + (combo === 'Shift+ArrowDown' ? 1 : -1)));
+      s.sel = it.slice(Math.min(s.anchor, s.focus), Math.max(s.anchor, s.focus) + 1);
+      return 'виділити кілька';
+    }
+    case 'Home': fxSelect(s, 0); return 'перший елемент';
+    case 'End': fxSelect(s, it.length - 1); return 'останній елемент';
+    case 'Enter':
+      if(!cur) return 'відкрити';
+      if(isDir(fxFolder(s)[cur])){ s.path = [...s.path, cur]; fxSelect(s, 0); return 'відкрити'; }
+      s.preview = cur;
+      return 'відкрити файл';
+    case 'Backspace': case 'Alt+ArrowUp': {
+      if(!s.path.length) return 'назад';
+      const left = s.path[s.path.length - 1];
+      s.path = s.path.slice(0, -1);
+      fxSelect(s, fxItems(s).indexOf(left));
+      return 'назад';
+    }
+    case 'Delete': {
+      if(!s.sel.length) return 'видалити';
+      s.undo.push(fxSnap(s));
+      const f = fxFolder(s);
+      s.sel.forEach(n=>delete f[n]);
+      fxSelect(s, Math.min(s.focus, fxItems(s).length - 1));
+      return 'видалити';
+    }
+    case 'Ctrl+KeyZ': if(s.undo.length) Object.assign(s, s.undo.pop()); return 'скасувати';
+    case 'Ctrl+KeyA': s.sel = [...it]; return 'виділити всі';
+    case 'Ctrl+KeyC': case 'Ctrl+KeyX':
+      if(s.sel.length) s.clip = { mode:combo === 'Ctrl+KeyC' ? 'copy' : 'cut', from:[...s.path], names:[...s.sel] };
+      return combo === 'Ctrl+KeyC' ? 'копіювати' : 'вирізати';
+    case 'Ctrl+KeyV': {
+      if(!s.clip) return 'вставити';
+      s.undo.push(fxSnap(s));
+      const src = fxNode(s, s.clip.from), dst = fxFolder(s), same = s.clip.from.join('/') === s.path.join('/');
+      const pasted = [];
+      for(const n of s.clip.names){
+        if(!(n in src)) continue;
+        if(s.clip.mode === 'cut'){ if(!same){ dst[n] = src[n]; delete src[n]; } pasted.push(n); continue; }
+        let m = n;
+        if(m in dst){ const dot = n.lastIndexOf('.'); m = dot > 0 ? n.slice(0, dot) + ' — копія' + n.slice(dot) : n + ' — копія'; }
+        dst[m] = JSON.parse(JSON.stringify(src[n]));
+        pasted.push(m);
+      }
+      if(s.clip.mode === 'cut') s.clip = null;
+      s.sel = pasted;
+      s.focus = s.anchor = Math.max(0, fxItems(s).indexOf(pasted[0]));
+      s.flash = pasted;
+      return 'вставити';
+    }
+    case 'F2':
+      if(cur){ const dot = isDir(fxFolder(s)[cur]) ? -1 : cur.lastIndexOf('.');
+        s.renaming = { orig:cur, base:dot > 0 ? cur.slice(0, dot) : cur, ext:dot > 0 ? cur.slice(dot) : '', text:'', fresh:true }; }
+      return 'перейменувати';
+    case 'Escape': s.sel = []; return 'зняти виділення';
+    case 'F5': s.refreshAt = Date.now(); return 'оновити';
+    case 'Ctrl+Shift+KeyN': {
+      s.undo.push(fxSnap(s));
+      const f = fxFolder(s);
+      let n = 'Нова папка', k = 2;
+      while(n in f) n = `Нова папка (${k++})`;
+      f[n] = {};
+      fxSelect(s, fxItems(s).indexOf(n));
+      s.flash = n;
+      s.renaming = { orig:n, base:n, ext:'', text:'', fresh:true };
+      return 'нова папка';
+    }
+    case 'Alt+Enter': if(cur) s.props = cur; return 'властивості';
+  }
+  return null;
+}
+const fxType = (s, n) => isDir(fxFolder(s)[n]) ? ['📁', 'Папка'] : (FX_TYPES[n.split('.').pop()] || ['📄', 'Файл']);
+function fxRender(s){
+  const el = document.getElementById('filesView');
+  const it = fxItems(s);
+  const cut = s.clip && s.clip.mode === 'cut' && s.clip.from.join('/') === s.path.join('/') ? s.clip.names : [];
+  const flash = [].concat(s.flash || []);
+  const rows = it.map((n, i)=>{
+    const [ic, ty] = fxType(s, n);
+    let nm = esc(n);
+    if(s.renaming && s.renaming.orig === n){
+      const r = s.renaming;
+      nm = `<span class="ren">${r.fresh ? `<span class="hl">${esc(r.base)}</span>` : esc(r.text)}<span class="caret"></span>${esc(r.ext)}</span>`;
+    }
+    const cls = [s.sel.includes(n) && 'sel', i === s.focus && 'focus', cut.includes(n) && 'cut', flash.includes(n) && 'new'].filter(Boolean).join(' ');
+    return `<div class="fx-row ${cls}"><span class="ic">${ic}</span><span class="nm">${nm}</span><span class="ty">${ty}</span></div>`;
+  }).join('');
+  const refreshing = Date.now() - s.refreshAt < 800;
+  const clip = s.clip ? `📋 ${s.clip.mode === 'cut' ? 'вирізано' : 'скопійовано'}: ${s.clip.names.length}` : '';
+  el.innerHTML = `<div class="fx-addr">🖥️ <span>Цей ПК</span>${s.path.map(p=>` › ${esc(p)}`).join('')}${refreshing ? ' <span class="spin">⟳</span>' : ''}</div>
+    <div class="fx-list">${rows || '<div class="fx-empty">Папка порожня</div>'}</div>
+    <div class="fx-status"><span>Елементів: ${it.length}</span>${s.sel.length ? `<span>Виділено: ${s.sel.length}</span>` : ''}${clip ? `<span>${clip}</span>` : ''}</div>
+    ${s.preview ? `<div class="pop"><div class="pc"><div class="big">${fxType(s, s.preview)[0]}</div>${esc(s.preview)}<small>Перегляд · Esc — закрити</small></div></div>` : ''}
+    ${s.props ? `<div class="pop"><div class="pc" style="text-align:left">⚙️ Властивості<br>${esc(s.props)}<small>Тип: ${fxType(s, s.props)[1]}</small><small>Розташування: Цей ПК${s.path.map(p=>' › ' + esc(p)).join('')}</small><small>Esc — закрити</small></div></div>` : ''}`;
+  keepVisible(el.querySelector('.fx-list'), el.querySelector('.fx-row.focus'));
+  document.getElementById('docTitle').textContent = 'Провідник — ' + (s.path[s.path.length - 1] || 'Цей ПК');
+}
+
+/* ================= Браузер ================= */
+const PAGES = {
+  start:{ title:'Нова вкладка', url:'', start:true },
+  school:{ title:'Школа №5', url:'school5.ua', h:'Школа №5 · Новини',
+    ps:['Вітаємо на сайті нашої школи! Тут новини, розклад уроків і оголошення.', 'Цього тижня — конкурс малюнків «Моя улюблена книжка». Роботи несіть до бібліотеки.',
+        'У п\'ятницю — екскурсія до планетарію для 4 класів.', 'Шкільна їдальня оновила меню: тепер щодня є фрукти.', 'Розклад перших уроків:'],
+    table:[['День','Перший урок'],['Понеділок','Математика'],['Вівторок','Українська мова'],['Середа','Інформатика'],['Четвер','Природознавство'],['П\'ятниця','Фізкультура']],
+    after:['Гуртки: робототехніка — у середу, шахи — у четвер.'] },
+  wiki:{ title:'Енциклопедія: Кит', url:'wiki.ua/kyt', h:'Синій кит',
+    ps:['Синій кит — найбільша тварина на Землі. Він завдовжки як три автобуси.', 'Хоч кит живе в морі, це не риба, а ссавець: кит дихає повітрям і випливає, щоб вдихнути.',
+        'Їсть кит дрібних рачків — криль. За день він з\'їдає кілька тонн їжі.', 'Кити спілкуються піснями, які чути за сотні кілометрів.', 'Синій кит живе до 90 років.'] },
+  weather:{ title:'Погода', url:'pogoda.ua', h:'Погода в Києві', ps:['Сьогодні: +18°, сонячно ☀️', 'Завтра: +15°, невеликий дощ 🌧️', 'Післязавтра: +20°, хмарно ⛅'] },
+  video:{ title:'Відео: Космос', url:'video.ua/kosmos', h:'▶ Подорож до Сатурна', ps:['🪐 Відео про кільця Сатурна, 12 хвилин.', 'Наступне: «Як живуть космонавти на МКС».'] }
+};
+const webTabFrom = spec => { const h = spec.split('>'); return { page:h.pop(), hist:h, fwd:[], err:false }; };
+function webMake(t){
+  const s = { tabs:(t.tabs || ['school']).map(webTabFrom), active:t.active ?? 0, closed:[], zoom:t.zoom || 100, find:null, addr:null, marks:[], scroll:t.scroll || 0, reloadAt:0, flash:null };
+  if(t.err) s.tabs[s.active].err = true;
+  return s;
+}
+const webTab = s => s.tabs[s.active];
+const webClone = s => JSON.parse(JSON.stringify(s));
+const newTab = () => ({ page:'start', hist:[], fwd:[], err:false });
+function webApply(s, combo){
+  s.flash = null;
+  const tab = webTab(s);
+  if(s.addr){
+    if(combo === 'Escape'){ s.addr = null; return 'скасувати'; }
+    if(combo === 'Enter'){
+      const q = (s.addr.fresh ? '' : s.addr.text).trim().toLowerCase();
+      s.addr = null;
+      const id = q && Object.keys(PAGES).find(k=>PAGES[k].url && PAGES[k].url.includes(q));
+      if(id){ tab.hist.push(tab.page); tab.page = id; tab.fwd = []; tab.err = false; s.scroll = 0; }
+      return 'перейти за адресою';
+    }
+    if(combo === 'Backspace'){ s.addr.text = s.addr.fresh ? '' : s.addr.text.slice(0, -1); s.addr.fresh = false; return 'стерти'; }
+    const ch = typedChar(combo, true);
+    if(ch !== null){ s.addr.text = (s.addr.fresh ? '' : s.addr.text) + ch; s.addr.fresh = false; return `літера «${ch}»`; }
+  }
+  if(s.find && combo !== 'Ctrl+KeyF'){
+    if(combo === 'Escape'){ s.find = null; return 'закрити пошук'; }
+    if(combo === 'Enter'){ s.find.i++; return 'наступний збіг'; }
+    if(combo === 'Backspace'){ s.find.q = s.find.q.slice(0, -1); s.find.i = 0; return 'стерти'; }
+    const ch = typedChar(combo);
+    if(ch !== null){ s.find.q += ch; s.find.i = 0; return `літера «${ch}»`; }
+  }
+  switch(combo){
+    case 'F5': case 'Ctrl+KeyR': tab.err = false; s.reloadAt = Date.now(); return 'оновити';
+    case 'Ctrl+Equal': case 'Ctrl+Shift+Equal': case 'Ctrl+NumpadAdd': s.zoom = Math.min(200, s.zoom + 10); return 'збільшити масштаб';
+    case 'Ctrl+Minus': case 'Ctrl+NumpadSubtract': s.zoom = Math.max(50, s.zoom - 10); return 'зменшити масштаб';
+    case 'Ctrl+Digit0': case 'Ctrl+Numpad0': s.zoom = 100; return 'звичайний масштаб';
+    case 'Ctrl+KeyF': s.find = { q:'', i:0 }; return 'пошук на сторінці';
+    case 'PageDown': case 'Space': s.scroll = Math.min(3, s.scroll + 1); return 'прокрутити вниз';
+    case 'PageUp': case 'Shift+Space': s.scroll = Math.max(0, s.scroll - 1); return 'прокрутити вгору';
+    case 'Ctrl+KeyT': s.tabs.push(newTab()); s.active = s.tabs.length - 1; s.scroll = 0; s.flash = s.active; return 'нова вкладка';
+    case 'Ctrl+KeyW':
+      s.closed.push(s.tabs.splice(s.active, 1)[0]);
+      if(!s.tabs.length) s.tabs.push(newTab());
+      s.active = Math.min(s.active, s.tabs.length - 1); s.scroll = 0; s.find = null;
+      return 'закрити вкладку';
+    case 'Ctrl+Shift+KeyT': if(s.closed.length){ s.tabs.splice(s.active + 1, 0, s.closed.pop()); s.active++; s.flash = s.active; s.scroll = 0; } return 'повернути закриту вкладку';
+    case 'Ctrl+Tab': s.active = (s.active + 1) % s.tabs.length; s.scroll = 0; s.find = null; return 'наступна вкладка';
+    case 'Ctrl+Shift+Tab': s.active = (s.active + s.tabs.length - 1) % s.tabs.length; s.scroll = 0; s.find = null; return 'попередня вкладка';
+    case 'Ctrl+KeyL': case 'F6': case 'Alt+KeyD': s.addr = { text:PAGES[tab.page].url, fresh:true }; return 'рядок адреси';
+    case 'Ctrl+KeyD': { const i = s.marks.indexOf(tab.page); i < 0 ? s.marks.push(tab.page) : s.marks.splice(i, 1); return 'закладка'; }
+    case 'Alt+ArrowLeft': if(tab.hist.length){ tab.fwd.push(tab.page); tab.page = tab.hist.pop(); s.scroll = 0; } return 'назад';
+    case 'Alt+ArrowRight': if(tab.fwd.length){ tab.hist.push(tab.page); tab.page = tab.fwd.pop(); s.scroll = 0; } return 'вперед';
+    case 'Escape': return 'Esc';
+  }
+  return null;
+}
+function webPageHTML(s, tab){
+  const p = PAGES[tab.page];
+  if(tab.err) return `<div class="bw-center"><div class="big">🦖</div><p>Немає з'єднання. Сторінку не вдалося завантажити.</p><p style="opacity:.6">Спробуй оновити сторінку</p></div>`;
+  if(p.start) return `<div class="bw-center"><div class="big">🔎</div><p>Нова вкладка</p><div class="bw-tiles"><span>🏫 school5.ua</span><span>📚 wiki.ua</span><span>☀️ pogoda.ua</span><span>▶ video.ua</span></div></div>`;
+  const q = s.find && s.find.q;
+  const re = q ? new RegExp(escRe(esc(q)), 'gi') : null;
+  const hl = t => re ? esc(t).replace(re, m=>`<mark>${m}</mark>`) : esc(t);
+  return `<h2>${hl(p.h)}</h2>${p.ps.map(x=>`<p>${hl(x)}</p>`).join('')}` +
+    (p.table ? `<table>${p.table.map(r=>`<tr>${r.map(c=>`<td>${hl(c)}</td>`).join('')}</tr>`).join('')}</table>` : '') +
+    (p.after || []).map(x=>`<p>${hl(x)}</p>`).join('');
+}
+function webRender(s){
+  const el = document.getElementById('webView'), tab = webTab(s), p = PAGES[tab.page];
+  const loading = Date.now() - s.reloadAt < 600;
+  const addr = s.addr ? (s.addr.fresh && s.addr.text ? `<span class="hl">${esc(s.addr.text)}</span>` : esc(s.addr.fresh ? '' : s.addr.text)) + '<span class="caret"></span>'
+    : (p.url ? esc(p.url) : '<span style="opacity:.5">Пошук або адреса сайту</span>');
+  el.innerHTML = `<div class="bw-tabs">${s.tabs.map((t, i)=>`<div class="bw-tab${i === s.active ? ' on' : ''}${s.flash === i ? ' new' : ''}"><span class="t">${esc(t.err ? PAGES[t.page].url : PAGES[t.page].title)}</span>✕</div>`).join('')}<div class="bw-tab" style="flex:none">＋</div></div>
+    <div class="bw-bar"><span class="bw-nav${tab.hist.length ? ' on' : ''}">←</span><span class="bw-nav${tab.fwd.length ? ' on' : ''}">→</span><span class="bw-nav on${loading ? ' spin' : ''}">⟳</span>
+      <span class="bw-addr${s.addr ? ' focus' : ''}">${addr}</span>${s.zoom !== 100 ? `<span class="bw-zoom">${s.zoom}%</span>` : ''}<span class="bw-star" title="Закладка">${s.marks.includes(tab.page) ? '⭐' : '☆'}</span></div>
+    <div class="bw-page" style="font-size:${(s.zoom / 100 * 15).toFixed(1)}px">${loading ? '' : webPageHTML(s, tab)}</div>
+    ${s.find ? `<div class="bw-find" style="top:74px">🔍 <span class="q">${esc(s.find.q)}<span class="caret"></span></span><span class="cnt"></span></div>` : ''}`;
+  const page = el.querySelector('.bw-page');
+  page.scrollTop = s.scroll * page.clientHeight * .75;
+  if(s.find){
+    const ms = page.querySelectorAll('mark');
+    if(ms.length){ const m = ms[s.find.i % ms.length]; m.classList.add('cur'); keepVisible(page, m); }
+    el.querySelector('.bw-find .cnt').textContent = s.find.q ? `${ms.length ? s.find.i % ms.length + 1 : 0}/${ms.length}` : '';
+  }
+  if(loading) setTimeout(()=>{ if(st === s) webRender(s); }, 650);
+  document.getElementById('docTitle').textContent = 'Браузер — ' + (tab.err ? 'немає з\'єднання' : p.title);
+}
+
+/* ================= Windows ================= */
+const OS_APPS = { doc:{ ico:'📄', title:'Документ' }, files:{ ico:'📁', title:'Провідник' }, web:{ ico:'🌐', title:'Браузер' }, task:{ ico:'📊', title:'Диспетчер завдань' } };
+const OS_POS = { doc:[3, 5, 46, 62], files:[18, 14, 44, 58], web:[32, 7, 46, 62], task:[24, 16, 38, 56] };   // ліворуч, згори, ширина, висота у %
+function osMake(t){
+  const open = (t.wins || '').split(',').filter(Boolean);
+  const s = { wins:{}, order:[...open], active:open[open.length - 1] || null, start:false, locked:!!t.locked, snip:false, panel:null, lang:'УКР', langAt:0, switchAt:0, shown:null, shut:false, hang:t.hang || null };
+  for(const id of open) s.wins[id] = { min:false, max:!!t.max && id === s.active, snap:null };
+  return s;
+}
+const osClone = s => JSON.parse(JSON.stringify(s));
+const osVisible = s => s.order.filter(id=>s.wins[id] && !s.wins[id].min);
+function osFocus(s, id){ s.order = [...s.order.filter(x=>x !== id), id]; s.active = id; s.wins[id].min = false; }
+function osOpen(s, id){ if(!s.wins[id]) s.wins[id] = { min:false, max:false, snap:null }; osFocus(s, id); s.shown = null; }
+function osClose(s, id){ delete s.wins[id]; s.order = s.order.filter(x=>x !== id); const v = osVisible(s); s.active = v[v.length - 1] || null; }
+function osApply(s, combo){
+  const off = ()=>{ s.start = false; s.snip = false; s.panel = null; s.shut = false; };
+  if(s.locked){ if(combo === 'Enter' || combo === 'Space'){ s.locked = false; return 'увійти'; } return null; }
+  const w = s.active && s.wins[s.active];
+  switch(combo){
+    case 'Win': { const was = s.start; off(); s.start = !was; return 'меню «Пуск»'; }
+    case 'Escape': off(); return 'закрити меню';
+    case 'Win+KeyD':
+      off();
+      if(s.shown){ s.shown.forEach(id=>{ if(s.wins[id]) s.wins[id].min = false; }); const v = osVisible(s); s.active = v[v.length - 1] || null; s.shown = null; }
+      else{ s.shown = osVisible(s); s.shown.forEach(id=>s.wins[id].min = true); s.active = null; }
+      return 'показати робочий стіл';
+    case 'Win+KeyE': off(); osOpen(s, 'files'); return 'відкрити Провідник';
+    case 'Alt+F4': off(); if(s.active) osClose(s, s.active); else s.shut = true; return 'закрити вікно';
+    case 'Alt+Tab': {
+      off();
+      const all = s.order.filter(id=>s.wins[id]);
+      if(all.length) osFocus(s, all.length > 1 ? all[all.length - 2] : all[0]);
+      s.switchAt = Date.now();
+      return 'перемкнути вікно';
+    }
+    case 'Win+KeyL': off(); s.locked = true; return 'заблокувати';
+    case 'Win+Shift+KeyS': off(); s.snip = true; return 'знімок екрана';
+    case 'Ctrl+Shift+Escape': off(); osOpen(s, 'task'); s.hang = null; return 'диспетчер завдань';
+    case 'Win+ArrowUp': off(); if(w){ w.max = true; w.snap = null; } return 'розгорнути вікно';
+    case 'Win+ArrowDown':
+      off();
+      if(w){ if(w.max || w.snap){ w.max = false; w.snap = null; } else{ w.min = true; const v = osVisible(s); s.active = v[v.length - 1] || null; } }
+      return 'згорнути вікно';
+    case 'Win+ArrowLeft': case 'Win+ArrowRight':
+      off();
+      if(w){ w.snap = combo === 'Win+ArrowLeft' ? 'left' : 'right'; w.max = false; }
+      return combo === 'Win+ArrowLeft' ? 'прикріпити ліворуч' : 'прикріпити праворуч';
+    case 'Win+KeyV': { const was = s.panel === 'clip'; off(); s.panel = was ? null : 'clip'; return 'журнал буфера обміну'; }
+    case 'Win+Period': { const was = s.panel === 'emoji'; off(); s.panel = was ? null : 'emoji'; return 'панель смайликів'; }
+    case 'Win+Space': s.lang = s.lang === 'УКР' ? 'ENG' : 'УКР'; s.langAt = Date.now(); return 'змінити мову';
+  }
+  return null;
+}
+function osRender(s){
+  const el = document.getElementById('osLayer');
+  const pos = (id, w) => w.max ? 'left:1%; top:1.5%; width:98%; height:97%'
+    : w.snap === 'left' ? 'left:0; top:0; width:50%; height:100%'
+    : w.snap === 'right' ? 'left:50%; top:0; width:50%; height:100%'
+    : (([l, t, ww, h])=>`left:${l}%; top:${t}%; width:${ww}%; height:${h}%`)(OS_POS[id]);
+  const body = id => ({
+    doc:'<div class="ln" style="width:70%"></div><div class="ln"></div><div class="ln" style="width:85%"></div><div class="ln" style="width:55%"></div>',
+    files:'📁 Документи<br>📁 Зображення<br>📁 Музика<br>📁 Відео',
+    web:'🏫 school5.ua<div class="ln" style="width:45%; height:11px"></div><div class="ln"></div><div class="ln" style="width:75%"></div>',
+    task:`<div class="row"><span>🌐 Браузер</span><span>перезапущено</span></div><div class="row"><span>📄 Документ</span><span>1%</span></div><div class="row"><span>📁 Провідник</span><span>0%</span></div>`
+  }[id]);
+  const wins = s.order.filter(id=>s.wins[id] && !s.wins[id].min).map((id, z)=>`<div class="oswin${id === s.active ? ' act' : ''}${s.hang === id ? ' hang' : ''}" style="${pos(id, s.wins[id])}; z-index:${z + 1}">
+      <div class="ttl"><span>${OS_APPS[id].ico}</span><span class="t">${OS_APPS[id].title}</span><span>─ ▢ ✕</span></div>
+      ${s.hang === id ? '<div class="hangnote">⏳ Програма не відповідає</div>' : ''}<div class="bd">${body(id)}</div></div>`).join('');
+  const switching = Date.now() - s.switchAt < 900;
+  const START = [['📄','Документ'],['📁','Провідник'],['🌐','Браузер'],['🎨','Малюнок'],['🧮','Калькулятор'],['⚙️','Параметри'],['🎵','Музика'],['📷','Камера']];
+  el.innerHTML = `<div class="os-area">${wins}</div>
+    ${s.start ? `<div class="os-start">${START.map(([i, t])=>`<div><span>${i}</span>${t}</div>`).join('')}<div class="foot"><span>👤 ${esc(player || 'Учень')}</span><span>⏻</span></div></div>` : ''}
+    ${s.snip ? '<div class="os-snip"><div class="bar">✂️ Виділи область для знімка</div><div class="sel"></div></div>' : ''}
+    ${s.panel === 'clip' ? '<div class="os-panel"><h5>📋 Буфер обміну</h5><div class="it">🖼️ Знімок екрана</div><div class="it">Синій кит — найбільша тварина</div><div class="it">school5.ua</div></div>' : ''}
+    ${s.panel === 'emoji' ? `<div class="os-panel"><h5>😀 Емодзі</h5><div class="emo">${'😀 😂 😍 🤔 👍 🎉 ❤️ ⭐ 🐱 🐶 🍎 🚀'.split(' ').map(e=>`<span>${e}</span>`).join('')}</div></div>` : ''}
+    ${switching ? `<div class="os-switch">${s.order.filter(id=>s.wins[id]).reverse().map(id=>`<div class="${id === s.active ? 'on' : ''}"><span>${OS_APPS[id].ico}</span>${OS_APPS[id].title}</div>`).join('')}</div>` : ''}
+    ${s.shut ? '<div class="os-shut">⏻ Завершення роботи<br><small style="font-weight:600">Вікон не лишилось — тепер Alt + F4 пропонує вимкнути комп\'ютер</small></div>' : ''}
+    ${s.locked ? `<div class="os-lock"><div class="clk">${clockText()}</div><div class="msg">🔒 Заблоковано. Натисни Enter, щоб увійти</div></div>` : ''}`;
+  if(switching) setTimeout(()=>{ if(st === s) osRender(s); }, 950);
+  const lang = document.getElementById('tbLang');
+  lang.textContent = s.lang;
+  if(Date.now() - s.langAt < 300){ lang.classList.remove('flash'); void lang.offsetWidth; lang.classList.add('flash'); }
+  renderTaskbar();
+}
+
+/* ================= Програми й панель задач ================= */
+// Кожна тема має свою програму: fresh — чи задає завдання новий стан, make — створити, adjust — дрібні правки, apply — комбінація, render — малювання
+const APPS = {
+  doc:{ fresh:t=>t.text !== undefined, make:(t, prev)=>docFromTask(t.text !== undefined ? t : { text:'|' }, prev),
+        adjust:(s, t)=>{ if(t.place) placeIn(s, t.place); if(t.clip !== undefined) s.clip = t.clip; },
+        apply:applyCombo, render:()=>renderDoc(), clone:cloneDoc,
+        idle:()=>{ const d = docFromTask({ text: player ? `Привіт, ${player.replace(/[|\[\]]/g, '')}!\nОбери етап і натисни «Почати».|` : 'Привіт!|' }); d.modified = false; return d; } },
+  files:{ fresh:t=>t.path !== undefined, make:fxMake, adjust:(s, t)=>{ if(t.path === undefined) fxAdjust(s, t); }, apply:fxApply, render:fxRender, clone:fxClone,
+          idle:()=>fxMake({ path:'', focus:'Документи' }) },
+  web:{ fresh:t=>t.tabs !== undefined, make:webMake, adjust:()=>{}, apply:webApply, render:webRender, clone:webClone, idle:()=>webMake({ tabs:['school','wiki'] }) },
+  os:{ fresh:t=>t.wins !== undefined, make:osMake, adjust:()=>{}, apply:osApply, render:osRender, clone:osClone, idle:()=>osMake({ wins:'doc,web' }) }
+};
+let appId = 'doc';
+const renderApp = () => { APPS[appId].render(st); if(appId !== 'os') renderTaskbar(); };
+function setApp(id){
+  appId = id;
+  const w = document.getElementById('appwin');
+  w.dataset.app = id;
+  w.classList.toggle('off', id === 'os');
+  document.getElementById('osLayer').hidden = id !== 'os';
+  document.getElementById('tbLang').hidden = id !== 'os';
+  document.getElementById('winIco').textContent = { doc:'📄', files:'📁', web:'🌐', os:'' }[id];
+  if(id === 'doc') document.getElementById('docTitle').textContent = 'Документ';
+  if(minimized) setMin(false);
+}
+function renderTaskbar(){
+  const os = appId === 'os' && st;
+  const ids = ['doc', 'files', 'web'].concat(os && st.wins.task ? ['task'] : []);
+  document.getElementById('tbApps').innerHTML = ids.map(id=>{
+    let cls = '';
+    if(os){ if(st.wins[id]) cls = id === st.active ? ' act' : ' open'; }
+    else if(id === appId) cls = ' on' + (minimized ? ' min' : '');
+    return `<button type="button" class="tbi${cls}" data-tb="${id}" title="${OS_APPS[id].title}">${OS_APPS[id].ico}</button>`;
+  }).join('');
+  document.getElementById('tbStart').classList.toggle('act', !!(os && st.start));
+}
 
 /* ================= Робочий стіл, робот, вигляд ================= */
 const deskEl = document.getElementById('desk');
@@ -1107,7 +1964,8 @@ function say(text, kind='', mood='idle', ms=0){
   clearTimeout(sayTimer);
   if(ms) sayTimer = setTimeout(()=>{ bubbleEl.textContent = ''; setRobot('idle'); }, ms);
 }
-function tickClock(){ const d = new Date(); document.getElementById('clock').textContent = `${d.getHours()}:${String(d.getMinutes()).padStart(2, '0')}`; }
+const clockText = () => { const d = new Date(); return `${d.getHours()}:${String(d.getMinutes()).padStart(2, '0')}`; };
+function tickClock(){ document.getElementById('clock').textContent = clockText(); }
 tickClock(); setInterval(tickClock, 15000);
 
 /* ================= Екранна клавіатура ================= */
@@ -1143,6 +2001,7 @@ function buildKeyboard(){
         el.style.setProperty('--w', k.w);
         if(k.gap){ el.className = 'gap'; rowEl.appendChild(el); return; }
         el.className = 'key ' + (k.cls || '');
+        el.dataset.code = k.code;
         if(k.cls && k.cls.includes('letter') && /^Key/.test(k.code)) el.innerHTML = `${k.code.slice(3)}<span class="uk">${UK[k.code]}</span>`;
         else if(k.cls && k.cls.includes('letter')) el.innerHTML = `${k.label}<span class="uk">${UK[k.code] || ''}</span>`;
         else el.textContent = k.label;
@@ -1159,17 +2018,34 @@ buildKeyboard();
 function highlightCombo(combo){
   kbEl.querySelectorAll('.next').forEach(k=>k.classList.remove('next'));
   if(!combo) return;
-  const p = comboParts(combo), code = p[p.length-1];
-  const codes = [code];
-  p.slice(0, -1).forEach(m=>{
-    if(m === 'Ctrl') codes.push('ControlLeft');
-    if(m === 'Alt') codes.push('AltLeft');
-    if(m === 'Win') codes.push('MetaLeft');
-    if(m === 'Shift') codes.push(LEFT_HAND.has(code) ? 'ShiftRight' : 'ShiftLeft');
+  const p = comboParts(combo), last = p[p.length-1];
+  const MODK = { Ctrl:'ControlLeft', Alt:'AltLeft', Win:'MetaLeft' };
+  p.forEach(x=>{
+    const c = x === 'Shift' ? (LEFT_HAND.has(last) ? 'ShiftRight' : 'ShiftLeft') : (MODK[x] || x);
+    keyEls[c]?.classList.add('next');
   });
-  codes.forEach(c=>keyEls[c]?.classList.add('next'));
 }
 const pressKey = (code, on) => keyEls[code]?.classList.toggle('press', on);
+// Збирання комбінації мишкою: модифікатори «залипають», друга клавіша виконує комбінацію
+const MOD_OF_CODE = { ControlLeft:'Ctrl', ControlRight:'Ctrl', AltLeft:'Alt', AltRight:'Alt', ShiftLeft:'Shift', ShiftRight:'Shift', MetaLeft:'Win', MetaRight:'Win' };
+const latch = new Set();
+function renderLatch(){ Object.entries(MOD_OF_CODE).forEach(([c, m])=>keyEls[c]?.classList.toggle('latch', latch.has(m))); }
+kbEl.addEventListener('click', e=>{
+  const k = e.target.closest('.key');
+  if(!k || !round || busy || !kbEl.classList.contains('clickable')) return;
+  const code = k.dataset.code, mod = MOD_OF_CODE[code];
+  pressKey(code, true); setTimeout(()=>pressKey(code, false), 150);
+  if(mod){
+    latch.has(mod) ? latch.delete(mod) : latch.add(mod);
+    renderLatch();
+    const only = MOD_ORDER.filter(m=>latch.has(m)).join('+');
+    if(only && expectOf(round.tasks[round.i]).includes(only)){ latch.clear(); renderLatch(); onCombo(only); }
+    return;
+  }
+  const combo = [...MOD_ORDER.filter(m=>latch.has(m)), code].join('+');
+  latch.clear(); renderLatch();
+  onCombo(combo);
+});
 const clearPress = () => kbEl.querySelectorAll('.press').forEach(k=>k.classList.remove('press'));
 
 /* ================= Меню ================= */
@@ -1188,13 +2064,31 @@ function showTab(id){
 document.querySelectorAll('.tab').forEach(t=>t.addEventListener('click', ()=>showTab(t.dataset.tab)));
 const activeTab = () => document.querySelector('.tab.on')?.dataset.tab || 'paneTrain';
 
+// Перемикач тем — однаковий на вкладках «Тренування», «Місії» й «Картки»
+function topicSegHTML(){
+  return TOPICS.map(t=>`<button type="button" data-topic="${t.id}" class="${settings.topic === t.id ? 'on' : ''}">${t.label}<small>${cardsOf(t.id).length} карток · ${MISSIONS.filter(m=>m.topic === t.id).length} місії</small></button>`).join('');
+}
+function selectTopic(id){
+  settings.topic = id;
+  const sg = topicOf(id).stages[settings.stage - 1];
+  if(!sg || sg.soon) settings.stage = 1;
+  saveStore();
+  setApp(topicOf(id).app);
+  st = APPS[appId].idle();
+  renderApp();
+  renderSetup();
+}
 function renderSetup(){
   // Теми й етапи
-  const segTheme = document.getElementById('segTheme');
-  segTheme.innerHTML = THEMES_SOON.map(([id, label, soon])=>`<button type="button" class="${id === 'text' ? 'on' : ''}" ${soon ? 'disabled' : ''}>${label}${soon ? '<small>скоро</small>' : `<small>${CARDS.length} карток</small>`}</button>`).join('');
+  for(const sid of ['segTheme', 'segTopicM', 'segTopicC']){
+    const seg = document.getElementById(sid);
+    seg.innerHTML = topicSegHTML();
+    seg.querySelectorAll('[data-topic]').forEach(b=>b.addEventListener('click', ()=>selectTopic(b.dataset.topic)));
+  }
+  const topic = topicOf(settings.topic);
   const segStage = document.getElementById('segStage');
-  segStage.innerHTML = STAGES.map(s=>{
-    const cs = CARDS.filter(c=>c.stage === s.n);
+  segStage.innerHTML = topic.stages.map(s=>{
+    const cs = cardsOf(topic.id, s.n);
     const gold = cs.filter(c=>cardLevel(profile.cards[c.id]) === 3).length;
     return `<button type="button" data-stage="${s.n}" class="${settings.stage === s.n ? 'on' : ''}" ${s.soon ? 'disabled' : ''}>Етап ${s.n} · ${s.name}<small>${s.soon ? 'скоро' : `${s.desc} · 🥇 ${gold}/${cs.length}`}</small></button>`;
   }).join('');
@@ -1217,10 +2111,11 @@ function renderSetup(){
 function renderMissions(){
   const list = document.getElementById('missionList');
   list.innerHTML = MISSIONS.map((m, i)=>{
+    if(m.topic !== settings.topic) return '';
     const r = profile.missions[m.id];
     const open = isOpenAt(m.at) || linkOpen.has(m.id);
     return `<div class="comp${r ? ' got' : ''}${highlightMission === m.id ? ' hl' : ''}" id="ms-${m.id}">
-      <div class="comp-head">${badgeHTML(m.badge)}<div><div class="comp-num">Місія ${i+1} · етап ${m.stage}</div><h4>${m.name}</h4></div>
+      <div class="comp-head">${badgeHTML(m.badge)}<div><div class="comp-num">Місія ${i+1} · ${topicOf(m.topic).label} · етап ${m.stage}</div><h4>${m.name}</h4></div>
         ${r ? `<span class="comp-best" title="${MEDALS[r.medal][1]}">${MEDALS[r.medal][0]}</span>` : ''}</div>
       <p class="comp-desc">${m.desc}</p>
       <div class="comp-rules"><span class="stage-chip">${m.steps.length} кроків</span><span class="stage-chip">⏱ до ${fmtTime(m.limit * 1000)}</span><span class="stage-chip">🥇 швидше за ${fmtTime(m.par * 1000)}</span></div>
@@ -1247,11 +2142,12 @@ function renderCards(){
       <div class="prog"><div class="bar"><i style="width:${pct}%"></i></div>${need}</div>
     </div>`;
   };
-  el.innerHTML = STAGES.map(s=>{
+  const topic = topicOf(settings.topic);
+  el.innerHTML = topic.stages.map(s=>{
     if(s.soon) return `<div class="stage-title">Етап ${s.n} · ${s.name} <small>скоро</small></div>
-      <div class="hk-cards">${SOON_CARDS.map(k=>`<div class="hk soon"><div class="keys">${kbdHTML(k)}</div><h4>?</h4><p>Відкриється згодом</p></div>`).join('')}</div>`;
+      <div class="hk-cards">${topic.soon.map(k=>`<div class="hk soon"><div class="keys">${kbdHTML(k)}</div><h4>?</h4><p>Відкриється згодом</p></div>`).join('')}</div>`;
     return `<div class="stage-title">Етап ${s.n} · ${s.name} <small>бронза — 3 правильні відповіді без підказки, срібло — 8 за 2 дні, золото — 15 за 3 дні</small></div>
-      <div class="hk-cards">${CARDS.filter(c=>c.stage === s.n).map(cardHTML).join('')}</div>`;
+      <div class="hk-cards">${cardsOf(topic.id, s.n).map(cardHTML).join('')}</div>`;
   }).join('');
 }
 
@@ -1277,7 +2173,9 @@ function renderDeskPane(){
 function toSetup(){
   round = null;
   clearInterval(timerId);
-  document.body.classList.remove('playing');
+  document.body.classList.remove('playing', 'fkeys');
+  kbEl.classList.remove('clickable');
+  latch.clear(); renderLatch();
   statsEl.innerHTML = '';
   playEl.hidden = true;
   setupEl.hidden = false;
@@ -1287,9 +2185,9 @@ function toSetup(){
   deskEl.hidden = false;
   overlay.classList.remove('show');
   highlightCombo(null);
-  doc = docFromTask({ text: player ? `Привіт, ${player.replace(/[|\[\]]/g, '')}!\nОбери етап і натисни «Почати».|` : 'Привіт!|' });
-  doc.modified = false;
-  renderDoc();
+  setApp(topicOf(settings.topic).app);
+  st = APPS[appId].idle();
+  renderApp();
   showTab(activeTab());
   say(player ? 'Я твій помічник. Підкажу, якщо що!' : 'Привіт! Як тебе звати?');
 }
@@ -1299,8 +2197,8 @@ let round = null, busy = false, timerId = null;
 const statsEl = document.getElementById('stats');
 const hintEl = document.getElementById('hint');
 
-function pickTraining(stage){
-  const cs = CARDS.filter(c=>c.stage === stage);
+function pickTraining(topic, stage){
+  const cs = cardsOf(topic, stage);
   const out = [];
   let last = null;
   while(out.length < 10){
@@ -1316,41 +2214,49 @@ function pickTraining(stage){
 function startRound(mode, mission){
   if(!player){ openNameModal(true); return; }
   document.activeElement?.blur();
+  const topic = mission ? mission.topic : settings.topic;
   const stage = mission ? mission.stage : settings.stage;
   const tasks = mode === 'mission' ? mission.steps.map(s=>({ card:cardById(s.card), task:s }))
-    : mode === 'learn' ? CARDS.filter(c=>c.stage === stage).map(c=>({ card:c, task:c.tasks[0] }))
-    : pickTraining(stage);
-  round = { mode, mission, stage, tasks, i:0, start:performance.now(), pause:0, errors:0, hints:0, gained:0, streak:0, bestStreak:0,
+    : mode === 'learn' ? cardsOf(topic, stage).map(c=>({ card:c, task:c.tasks[0] }))
+    : pickTraining(topic, stage);
+  round = { mode, mission, topic, stage, tasks, i:0, start:performance.now(), pause:0, errors:0, hints:0, gained:0, streak:0, bestStreak:0,
             times:[], ups:[], before:profile.neurons, taskErrors:0, taskHint:false, taskStart:0 };
-  doc = null;
-  setMin(false);
+  setApp(topicOf(topic).app);
+  st = null;
   document.body.classList.add('playing');
+  document.body.classList.toggle('fkeys', topic !== 'text');
   setupEl.hidden = true;
   playEl.hidden = false;
   startBar.hidden = true;
   overlay.classList.remove('show');
-  const st = STAGES[stage - 1];
+  const tp = topicOf(topic);
   document.getElementById('playInfo').textContent = mode === 'mission'
-    ? `🏆 Місія «${mission.name}» · етап ${stage}` : `${mode === 'learn' ? '👀 Знайомство' : '🎯 Тренування'} · Етап ${stage} · ${st.name}`;
+    ? `🏆 Місія «${mission.name}» · ${tp.label} · етап ${stage}` : `${mode === 'learn' ? '👀 Знайомство' : '🎯 Тренування'} · ${tp.label} · Етап ${stage} · ${tp.stages[stage - 1].name}`;
   clearInterval(timerId);
   timerId = setInterval(tick, 250);
   loadTask();
   window.scrollTo({ top:0, behavior:'smooth' });
 }
 
-function expectOf(t){ return t.task.expect || t.card.expect; }
+// Завдання з goal (надрукувати назву, адресу) зараховуються за станом, а не за однією комбінацією
+function expectOf(t){ return t.task.goal ? [] : (t.task.expect || t.card.expect); }
 
 function loadTask(){
-  const t = round.tasks[round.i];
-  if(t.task.text !== undefined || !doc) doc = docFromTask(t.task.text !== undefined ? t.task : { text:'|' }, doc);
-  if(t.task.place) placeIn(doc, t.task.place);
-  if(t.task.clip !== undefined) doc.clip = t.task.clip;
-  round.snapshot = cloneDoc(doc);
+  const t = round.tasks[round.i], A = APPS[appId];
+  if(!st || A.fresh(t.task)){
+    st = A.make(t.task, st);
+    (t.task.pre || []).forEach(c=>A.apply(st, c));
+  }
+  A.adjust(st, t.task);
+  st.flash = null;
+  round.snapshot = A.clone(st);
+  kbEl.classList.toggle('clickable', isScreen(t));
+  latch.clear(); renderLatch();
   round.taskStart = performance.now();
   round.taskErrors = 0;
   round.taskHint = round.mode === 'learn';
   busy = false;
-  renderDoc();
+  renderApp();
   document.getElementById('taskNum').textContent = `${round.i + 1}/${round.tasks.length}`;
   document.getElementById('taskText').textContent = t.task.say;
   renderHint();
@@ -1361,12 +2267,15 @@ function loadTask(){
 
 function renderHint(){
   const t = round.tasks[round.i];
-  const combo = expectOf(t)[0];
+  const combo = expectOf(t)[0], scr = isScreen(t);
+  // Комбінації, які забирає браузер або Windows, збирають мишкою — нагадуємо про це коротко, в один рядок
+  const note = scr ? `<span class="screen-note">🖱️ Збирай мишкою на екранній клавіатурі: ${t.card.topic === 'win' ? 'Windows' : 'браузер'} не віддає цю комбінацію грі</span>` : '';
   if(round.taskHint){
-    hintEl.innerHTML = `<span>Натисни:</span> ${kbdHTML(comboLabels(combo))}<span class="tipline">💡 ${esc(t.card.tip)}</span>`;
+    const keys = t.task.goal ? `<span>💡 ${esc(t.task.hint || '')}</span>` : `<span>${scr ? 'Клацни по черзі:' : 'Натисни:'}</span> ${kbdHTML(comboLabels(combo), scr ? '→' : '+')}` + (scr ? '' : `<span class="tipline">💡 ${esc(t.card.tip)}</span>`);
+    hintEl.innerHTML = keys + note;
     highlightCombo(combo);
   }else{
-    hintEl.innerHTML = `<button type="button" class="hint-btn" id="hintBtn">💡 Підказка</button><span>не знаєш? Підказка покаже клавіші, але нейрончиків буде менше</span>`;
+    hintEl.innerHTML = `<button type="button" class="hint-btn" id="hintBtn">💡 Підказка</button>` + (note || '<span>не знаєш? Підказка покаже клавіші, але нейрончиків буде менше</span>');
     document.getElementById('hintBtn').addEventListener('click', ()=>{ round.taskHint = true; round.hints++; renderHint(); renderStats(); });
     highlightCombo(null);
   }
@@ -1396,12 +2305,15 @@ const PRAISE = ['Супер!', 'Чудово!', 'Точно!', 'Клас!', 'Т�
 function onCombo(combo){
   if(!round || busy) return;
   const t = round.tasks[round.i];
-  const exp = expectOf(t);
-  const ok = exp.includes(combo);
-  const action = applyCombo(doc, combo);
-  renderDoc();
+  const action = APPS[appId].apply(st, combo);
+  renderApp();
   deskEl.classList.add('typing'); clearTimeout(onCombo.tt); onCombo.tt = setTimeout(()=>deskEl.classList.remove('typing'), 500);
-  if(ok) return success(t);
+  if(t.task.goal){
+    if(t.task.goal(st)) return success(t);
+    if(isTypingCombo(combo)) return;   // друк і виправлення — не помилка
+    return wrong(t, combo, action);
+  }
+  if(expectOf(t).includes(combo)) return success(t);
   wrong(t, combo, action);
 }
 
@@ -1447,13 +2359,13 @@ function wrong(t, combo, action){
   round.taskErrors++;
   round.streak = 0;
   buzz();
-  const win = document.getElementById('appwin');
+  const win = document.getElementById(appId === 'os' ? 'osLayer' : 'appwin');
   win.classList.remove('shake'); void win.offsetWidth; win.classList.add('shake');
   // Пояснення: якщо клавіша правильна, а модифікатора бракує чи забагато — кажемо, якого саме
   const exp = expectOf(t)[0];
-  const ep = comboParts(exp), cp = comboParts(combo);
+  const ep = exp ? comboParts(exp) : [], cp = comboParts(combo);
   let msg;
-  if(ep[ep.length-1] === cp[cp.length-1]){
+  if(exp && ep[ep.length-1] === cp[cp.length-1]){
     const need = ep.slice(0, -1).filter(m=>!cp.includes(m)), extra = cp.slice(0, -1).filter(m=>!ep.includes(m));
     msg = need.length ? `Майже! Клавіша та, але тримай ще ${need.join(' і ')}.` : `Майже! Тільки без ${extra.join(' і ')}.`;
   }else if(action && action.startsWith('літера')){
@@ -1461,13 +2373,14 @@ function wrong(t, combo, action){
   }else if(action){
     msg = `Ой! ${comboLabels(combo).join(' + ')} — це «${action}». Спробуй ще.`;
   }else msg = `${comboLabels(combo).join(' + ')} тут нічого не робить. Спробуй ще.`;
-  if(round.taskErrors >= 2 && !round.taskHint) msg += ' Можна взяти 💡 підказку.';
+  if(t.task.goal && t.task.hint) msg += ' ' + t.task.hint + '.';
+  else if(round.taskErrors >= 2 && !round.taskHint) msg += ' Можна взяти 💡 підказку.';
   say(msg, 'bad', 'oops');
   renderStats();
   setTimeout(()=>{
     if(!round) return;
-    doc = cloneDoc(round.snapshot);
-    renderDoc();
+    st = APPS[appId].clone(round.snapshot);
+    renderApp();
     busy = false;
   }, 900);
 }
@@ -1509,7 +2422,7 @@ function finishRound(completed, why){
 
   document.getElementById('wBig').textContent = failed ? '🔧' : medal ? MEDALS[medal][0] : '🎉';
   document.getElementById('winTitle').textContent = failed ? 'Майже вийшло!' : r.mode === 'mission' ? 'Місію виконано!' : r.mode === 'learn' ? 'Знайомство завершено!' : 'Тренування завершено!';
-  document.getElementById('wSub').textContent = r.mode === 'mission' ? `«${r.mission.name}»` : `Етап ${r.stage} · ${STAGES[r.stage - 1].name}`;
+  document.getElementById('wSub').textContent = r.mode === 'mission' ? `«${r.mission.name}»` : `${topicOf(r.topic).label} · Етап ${r.stage} · ${topicOf(r.topic).stages[r.stage - 1].name}`;
   const stars = failed ? 0 : acc >= 95 && r.hints <= 1 ? 3 : acc >= 80 ? 2 : 1;
   document.getElementById('wStars').innerHTML = r.mode === 'mission' ? '' : [0,1,2].map(i=>`<span class="${i < stars ? '' : 'dim'}">⭐</span>`).join('');
   document.getElementById('wResult').innerHTML =
@@ -1555,13 +2468,16 @@ let minimized = false;
 function setMin(on){
   minimized = on;
   document.getElementById('appwin').classList.toggle('min', on);
-  document.getElementById('tbDoc').classList.toggle('min', on);
+  renderTaskbar();
 }
 document.getElementById('winMin').addEventListener('click', ()=>{
   setMin(true);
-  say('Щоб повернути вікно, клацни 📄 на панелі задач.', '', 'happy', 4000);
+  say(`Щоб повернути вікно, клацни ${OS_APPS[appId]?.ico || '📄'} на панелі задач.`, '', 'happy', 4000);
 });
-document.getElementById('tbDoc').addEventListener('click', ()=>setMin(!minimized));
+document.getElementById('tbApps').addEventListener('click', e=>{
+  const b = e.target.closest('[data-tb]');
+  if(b && b.dataset.tb === appId) setMin(!minimized);
+});
 // Назва гри вгорі — завжди шлях до меню: з гри, з вікна результату або зі сторінки за посиланням
 document.getElementById('homeLink').addEventListener('click', e=>{
   e.preventDefault();
@@ -1583,9 +2499,12 @@ document.addEventListener('keydown', e=>{
   if(!round || modalOpen()) return;
   if(code === 'F12' || code === 'F11') return;
   e.preventDefault();
-  if(code === 'Escape'){ exitRound(); return; }
   if(minimized) setMin(false);   // під час завдання документ має бути видно
   if(e.repeat || MOD_CODES.has(code)) return;
+  if(isScreen(round.tasks[round.i])){
+    if(!busy) say('Цю комбінацію збирай мишкою на екранній клавіатурі 🖱️', '', 'idle', 2500);
+    return;
+  }
   onCombo(comboOf(e));
 }, true);
 document.addEventListener('keyup', e=>{
@@ -1723,8 +2642,9 @@ document.getElementById('resetBtn').addEventListener('click', ()=>{
 const guideOverlay = document.getElementById('guideOverlay');
 document.getElementById('guideBtn').addEventListener('click', ()=>{
   if(round) toSetup();
-  const rows = [ ...STAGES.filter(s=>!s.soon).map(s=>[`Етап ${s.n} · ${s.name}`, `#e=${s.n}`]),
-                 ...MISSIONS.map((m, i)=>[`Місія ${i+1} · ${m.name}`, `#m=${i+1}`]) ];
+  const rows = TOPICS.flatMap(t=>[
+    ...t.stages.filter(s=>!s.soon).map(s=>[`${t.label} · Етап ${s.n} · ${s.name}`, `#e=${t.id}:${s.n}`]),
+    ...MISSIONS.map((m, i)=>[m, i]).filter(([m])=>m.topic === t.id).map(([m, i])=>[`${t.label} · Місія ${i+1} · ${m.name}`, `#m=${i+1}`]) ]);
   const tl = document.getElementById('teacherLinks');
   tl.innerHTML = rows.map(([t, h])=>`<div class="tl-row"><span>${t}</span><button type="button" class="btn btn-ghost btn-small" data-url="${esc(baseURL() + h)}">Копіювати посилання</button></div>`).join('');
   bindLinkButtons(tl);
@@ -1860,8 +2780,8 @@ function showProfile(d){
         return `<div class="medal-item${x ? ' got' : ''}" title="${x ? `${MEDALS[x.medal][1]} · ${fmtDay(x.day)} · ${fmtTime(x.time)}` : 'Ще не пройдено'}">
           ${badgeHTML(m.badge)}${x ? `<span class="m">${MEDALS[x.medal][0]}</span>` : ''}<small>${m.name}</small></div>`; }).join('')}
     </div></div>
-    ${STAGES.filter(s=>!s.soon).map(s=>`<div class="share-sec"><h3>Картки · етап ${s.n}</h3><div class="hk-cards">
-      ${CARDS.filter(c=>c.stage === s.n).map(c=>{ const l = d.cd[c.id] || 0;
+    ${TOPICS.flatMap(t=>t.stages.filter(s=>!s.soon).map(s=>[t, s])).map(([t, s])=>`<div class="share-sec"><h3>Картки · ${t.label} · етап ${s.n}</h3><div class="hk-cards">
+      ${cardsOf(t.id, s.n).map(c=>{ const l = d.cd[c.id] || 0;
         return `<div class="hk l${l}"><span class="lvl${l ? '' : ' none'}">${LEVEL_ICON[l]}</span><div class="keys">${kbdHTML(c.keys, c.or ? '/' : '+')}</div><h4>${c.name}</h4></div>`; }).join('')}
     </div></div>`).join('')}
     <div class="share-actions"><button class="btn btn-ghost" id="ownBtn" type="button">Закрити</button></div>`;
@@ -1883,9 +2803,10 @@ function applyPending(){
   if(!pending) return;
   const p = pending; pending = null;
   history.replaceState(null, '', location.pathname + location.search);
-  if(p.e){ settings.stage = p.e; saveStore(); showTab('paneTrain'); }
+  if(p.e){ settings.stage = p.e; selectTopic(p.t); showTab('paneTrain'); }
   if(p.m){
     const m = MISSIONS[p.m - 1];
+    selectTopic(m.topic);
     linkOpen.add(m.id);
     highlightMission = m.id;
     showTab('paneMissions');
@@ -1894,8 +2815,9 @@ function applyPending(){
 }
 function route(){
   const res = readResultLink(), prof = readProfileLink();
-  const e = location.hash.match(/^#e=(\d)$/), m = location.hash.match(/^#m=(\d+)$/);
-  if(e && STAGES[+e[1] - 1] && !STAGES[+e[1] - 1].soon) pending = { e:+e[1] };
+  const e = location.hash.match(/^#e=(?:([a-z]+):)?(\d)$/), m = location.hash.match(/^#m=(\d+)$/);
+  const et = e && topicOf(e[1] || 'text'), es = e && et.stages[+e[2] - 1];
+  if(es && !es.soon) pending = { t:et.id, e:+e[2] };
   if(m && +m[1] >= 1 && +m[1] <= MISSIONS.length) pending = { m:+m[1] };
   if(res) showResult(res);
   else if(prof) showProfile(prof);
