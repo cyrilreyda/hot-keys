@@ -630,9 +630,11 @@ const MOD_CODES = new Set(['ControlLeft','ControlRight','ShiftLeft','ShiftRight'
 
 const KEY_LABEL = { Enter:'Enter', Space:'пробіл', Backspace:'Backspace', Delete:'Delete', Escape:'Esc', Tab:'Tab', CapsLock:'Caps Lock',
   ArrowLeft:'←', ArrowRight:'→', ArrowUp:'↑', ArrowDown:'↓', Home:'Home', End:'End', PageUp:'Page Up', PageDown:'Page Down', Insert:'Insert',
-  Equal:'+', Minus:'-', Period:'.', Win:'Win', Ctrl:'Ctrl', Alt:'Alt', Shift:'Shift' };
+  Equal:'+', Minus:'-', Period:'.', Win:'Win', Ctrl:'Ctrl', Alt:'Alt', Shift:'Shift',
+  NumpadAdd:'+', NumpadSubtract:'-', NumpadMultiply:'*', NumpadDivide:'/', NumpadDecimal:'.', NumpadEnter:'Enter', ContextMenu:'☰', PrintScreen:'PrtSc' };
 function keyLabel(code, ukr){
   if(KEY_LABEL[code]) return KEY_LABEL[code];
+  if(/^Numpad\d$/.test(code)) return code.slice(6);
   if(/^Key[A-Z]$/.test(code)) return ukr ? UK[code].toUpperCase() : code.slice(3);
   if(/^Digit\d$/.test(code)) return code.slice(5);
   if(/^F\d+$/.test(code)) return code;
@@ -679,6 +681,8 @@ function typedChar(combo, latin){
   return { Minus:shift ? '_' : '-', Slash:shift ? ',' : '.' }[code] ?? null;
 }
 const isTypingCombo = c => /^(Shift\+)?(Key[A-Z]|Digit\d|Space|Backspace|Minus|Equal|Comma|Period|Slash|Semicolon|Quote|BracketLeft|BracketRight|Backquote|Backslash)$/.test(c);
+// Для речень робота: «Ctrl + мінус» читається краще, ніж «Ctrl + -»
+const spokenCombo = combo => comboLabels(combo).map(l=>({ '+':'плюс', '-':'мінус' }[l] || l)).join(' + ');
 const kbdHTML = (labels, sep='+') => labels.map(l=>`<span class="kbd${MOD_ORDER.includes(l) ? ' mod' : ''}">${l}</span>`).join(`<span class="plus">${sep}</span>`);
 
 /* ================= Картки (тема «Текст») ================= */
@@ -2372,8 +2376,8 @@ function wrong(t, combo, action){
   }else if(action && action.startsWith('літера')){
     msg = `Надрукувалась ${action}. Спробуй ще.`;
   }else if(action){
-    msg = `Ой! ${comboLabels(combo).join(' + ')} — це «${action}». Спробуй ще.`;
-  }else msg = `${comboLabels(combo).join(' + ')} тут нічого не робить. Спробуй ще.`;
+    msg = `Ой! ${spokenCombo(combo)} — це «${action}». Спробуй ще.`;
+  }else msg = `${spokenCombo(combo)} тут нічого не робить. Спробуй ще.`;
   if(t.task.goal && t.task.hint) msg += ' ' + t.task.hint + '.';
   else if(round.taskErrors >= 2 && !round.taskHint) msg += ' Можна взяти 💡 підказку.';
   say(msg, 'bad', 'oops');
