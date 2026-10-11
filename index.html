@@ -2382,6 +2382,19 @@ function loadTask(){
   }
   A.adjust(st, t.task);
   st.flash = null;
+  // Caps Lock і Num Lock на справжній клавіатурі можуть бути вже в потрібному стані: підлаштовуємо документ і завдання
+  let sayText = t.task.say;
+  round.autoSkip = null;
+  const lk = LOCKS[t.card.id];
+  if(lk && appId === 'doc' && !t.task.goal && realLock[lk.key] !== null){
+    const target = !st[lk.prop];   // завдання просить перемкнути поточний стан
+    st[lk.prop] = realLock[lk.key];
+    if(st[lk.prop] === target){
+      const now = `${lk.name} уже ${target ? 'увімкнено' : 'вимкнено'}`;
+      if(round.mode === 'mission') round.autoSkip = `${now} ✓ Переходимо далі`;
+      else sayText = `${now}. ${target ? 'Вимкни' : 'Увімкни'} його`;
+    }
+  }
   round.snapshot = A.clone(st);
   kbEl.classList.toggle('clickable', isScreen(t) || isBoth(t));
   latch.clear(); renderLatch();
@@ -2391,11 +2404,19 @@ function loadTask(){
   busy = false;
   renderApp();
   document.getElementById('taskNum').textContent = `${round.i + 1}/${round.tasks.length}`;
-  document.getElementById('taskText').textContent = t.task.say;
+  document.getElementById('taskText').textContent = sayText;
   renderHint();
   renderStats();
   if(round.mode === 'learn') say(`${t.card.name}: ${t.card.what}`, '', 'idle');
   else say('', '', 'idle');
+  // Крок місії, який уже виконано на справжній клавіатурі, пропускаємо без помилки й без нейрончиків
+  if(round.autoSkip){
+    busy = true;
+    say(round.autoSkip, 'ok', 'happy');
+    round.i++;
+    renderStats();
+    setTimeout(()=>{ if(!round) return; round.i >= round.tasks.length ? finishRound(true) : loadTask(); }, 1300);
+  }
 }
 
 function renderHint(){
@@ -2686,6 +2707,15 @@ function exitRound(){
 }
 
 /* ================= Клавіатура: перехоплення ================= */
+// Справжній стан Caps Lock і Num Lock: його знає будь-яка подія клавіатури чи миші
+const LOCKS = { 't-numlock':{ key:'NumLock', prop:'numlock', name:'Num Lock' }, caps:{ key:'CapsLock', prop:'caps', name:'Caps Lock' } };
+const realLock = { CapsLock:null, NumLock:null };
+function readLocks(e){
+  if(!e.isTrusted || !e.getModifierState) return;
+  realLock.CapsLock = e.getModifierState('CapsLock');
+  realLock.NumLock = e.getModifierState('NumLock');
+}
+['keyup', 'mousedown', 'mousemove'].forEach(type=>document.addEventListener(type, readLocks, true));
 const modalOpen = () => document.querySelector('.overlay.show');
 document.addEventListener('keydown', e=>{
   const code = codeOf(e);
