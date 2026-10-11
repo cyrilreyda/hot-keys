@@ -478,6 +478,18 @@
   .key.latch{background:var(--purple); color:#fff; border-color:var(--purple-dark);}
   .screen-note{background:#EEF0FF; color:#3D2FA8; border-radius:var(--radius-s); padding:5px 12px; font-size:13.5px; font-weight:700;}
   body.playing.fkeys .desk{height:clamp(220px, calc(100vh - 424px), 410px);}
+  /* Цифровий блок клавіатури — лише в завданнях про Num Lock */
+  .kb-block.np{display:none;}
+  body.numpad .kb-block.np{display:flex;}
+  body.numpad .kb{--k:min(40px, calc((min(100vw, 980px) - 150px) / 23.5));}
+  #tbNum{display:none;}
+  body.numpad #tbNum{display:flex;}
+  /* Знімок екрана в темі «Windows» */
+  .os-flash{position:absolute; inset:0; z-index:3; background:#fff; animation:osflash .5s ease forwards;}
+  @keyframes osflash{from{opacity:.9;} to{opacity:0;}}
+  .os-shotlabel{position:absolute; left:50%; top:10px; transform:translateX(-50%); z-index:3; background:var(--ink); color:#fff; padding:4px 14px; border-radius:999px; font-family:'Baloo 2',sans-serif; font-weight:700; font-size:13px; white-space:nowrap;}
+  .oswin.shot{animation:winshot .7s ease;}
+  @keyframes winshot{30%{filter:brightness(1.7); box-shadow:0 0 0 5px #fff;}}
   body.fkeys .key, body.fkeys .kb .gap{height:calc(var(--k) * .72);}
   body.fkeys .kb-row.fn .key, body.fkeys .kb-row.fn .gap{height:calc(var(--k) * .52);}
   @media (max-height:760px){ body.playing .fx-status{display:none;} }
@@ -501,7 +513,7 @@
     <div class="appwin" id="appwin" data-app="doc">
       <div class="titlebar"><span id="winIco">📄</span><span class="t" id="docTitle">Документ</span>
         <span id="docTools"><span class="tb b" id="tbB" title="Жирний">Ж</span><span class="tb i" id="tbI" title="Курсив">К</span><span class="tb u" id="tbU" title="Підкреслений">П</span>
-        <span class="tb caps" id="tbCaps" title="Caps Lock">CAPS</span>
+        <span class="tb caps" id="tbCaps" title="Caps Lock">CAPS</span><span class="tb caps" id="tbNum" title="Num Lock">NUM</span>
         <span class="clip" id="clip" title="Буфер обміну">📋 <span id="clipText">порожньо</span></span></span>
         <button type="button" class="wbtn" id="winMin" title="Згорнути">─</button><button type="button" class="wbtn x" id="winClose" title="Закрити">✕</button></div>
       <div class="doc" id="doc"></div>
@@ -647,7 +659,7 @@ const MOD_CODES = new Set(['ControlLeft','ControlRight','ShiftLeft','ShiftRight'
 const KEY_LABEL = { Enter:'Enter', Space:'пробіл', Backspace:'Backspace', Delete:'Delete', Escape:'Esc', Tab:'Tab', CapsLock:'Caps Lock',
   ArrowLeft:'←', ArrowRight:'→', ArrowUp:'↑', ArrowDown:'↓', Home:'Home', End:'End', PageUp:'Page Up', PageDown:'Page Down', Insert:'Insert',
   Equal:'+', Minus:'-', Period:'.', Win:'Win', Ctrl:'Ctrl', Alt:'Alt', Shift:'Shift',
-  NumpadAdd:'+', NumpadSubtract:'-', NumpadMultiply:'*', NumpadDivide:'/', NumpadDecimal:'.', NumpadEnter:'Enter', ContextMenu:'☰', PrintScreen:'PrtSc' };
+  NumpadAdd:'+', NumpadSubtract:'-', NumpadMultiply:'*', NumpadDivide:'/', NumpadDecimal:'.', NumpadEnter:'Enter', ContextMenu:'☰', PrintScreen:'PrtSc', NumLock:'Num Lock', ScrollLock:'Scroll Lock', Pause:'Pause' };
 function keyLabel(code, ukr){
   if(KEY_LABEL[code]) return KEY_LABEL[code];
   if(/^Numpad\d$/.test(code)) return code.slice(6);
@@ -696,7 +708,7 @@ function typedChar(combo, latin){
   if(/^Digit\d$/.test(code)) return shift ? DIGIT_SHIFT[code] : code.slice(5);
   return { Minus:shift ? '_' : '-', Slash:shift ? ',' : '.' }[code] ?? null;
 }
-const isTypingCombo = c => /^(Shift\+)?(Key[A-Z]|Digit\d|Space|Backspace|Minus|Equal|Comma|Period|Slash|Semicolon|Quote|BracketLeft|BracketRight|Backquote|Backslash)$/.test(c);
+const isTypingCombo = c => /^(Shift\+)?(Key[A-Z]|Digit\d|Numpad\d|NumpadDecimal|NumpadAdd|NumpadSubtract|Space|Backspace|Minus|Equal|Comma|Period|Slash|Semicolon|Quote|BracketLeft|BracketRight|Backquote|Backslash)$/.test(c);
 // Для речень робота: «Ctrl + мінус» читається краще, ніж «Ctrl + -»
 const spokenCombo = combo => comboLabels(combo).map(l=>({ '+':'плюс', '-':'мінус' }[l] || l)).join(' + ');
 const kbdHTML = (labels, sep='+') => labels.map(l=>`<span class="kbd${MOD_ORDER.includes(l) ? ' mod' : ''}">${l}</span>`).join(`<span class="plus">${sep}</span>`);
@@ -789,7 +801,7 @@ const TOPICS = [
   { id:'text', label:'📝 Текст', app:'doc', stages:[
       { n:1, name:'Перші кроки', desc:'Enter, стрілки, копіювати й вставити' },
       { n:2, name:'Майстер тексту', desc:'вирізати, зберегти, оформлення' },
-      { n:3, name:'Профі', soon:true } ],
+      { n:3, name:'Профі', desc:'через слово, виділення до краю, Num Lock' } ],
     soon:[ ['Ctrl','←'], ['Ctrl','Home'], ['Ctrl','Backspace'], ['Ctrl','P'], ['Tab'] ] },
   { id:'files', label:'📁 Файли', app:'files', stages:[
       { n:1, name:'Перші кроки', desc:'вибрати, відкрити, назад, видалити' },
@@ -804,13 +816,14 @@ const TOPICS = [
   { id:'win', label:'🖥️ Windows', app:'os', stages:[
       { n:1, name:'Перші кроки', desc:'Пуск, робочий стіл, перемкнути вікно' },
       { n:2, name:'Профі Windows', desc:'знімок екрана, диспетчер, вікна поруч' },
-      { n:3, name:'Профі', soon:true } ],
+      { n:3, name:'Профі', desc:'мова Alt + Shift, знімки PrtSc' } ],
     soon:[ ['Win','I'], ['Win','Tab'], ['Win','R'], ['Win','Ctrl','D'] ] }
 ];
 const topicOf = id => TOPICS.find(t=>t.id===id) || TOPICS[0];
 const cardsOf = (topic, stage) => CARDS.filter(c=>c.topic === topic && (!stage || c.stage === stage));
 // Комбінації, які забирає браузер або Windows: їх збирають мишкою на екранній клавіатурі
 const isScreen = t => t.task.screen ?? !!t.card.screen;
+const isBoth = t => !!(t.task.both ?? t.card.both);
 
 /* ================= Місії ================= */
 // Крок без text продовжує документ попереднього кроку; place ставить курсор або виділення в поточному тексті
@@ -1177,6 +1190,55 @@ MISSIONS.push(
       { card:'w-lock', say:'Заблокуй комп\'ютер' }
     ] }
 );
+/* ================= Етапи 3: «Текст» і «Windows» ================= */
+CARDS.push(
+  { id:'t-word', topic:'text', stage:3, keys:['Ctrl','←','→'], name:'Через слово', what:'Ctrl зі стрілкою переносить курсор одразу на ціле слово.', tip:'Тримай Ctrl і натискай стрілку — курсор стрибає через слова.', expect:['Ctrl+ArrowRight'],
+    tasks:[ { say:'Перескоч курсором на наступне слово', text:'|Наш клас їде на екскурсію.', expect:['Ctrl+ArrowRight'] },
+            { say:'Повернись курсором на слово назад', text:'Наш клас| їде на екскурсію.', expect:['Ctrl+ArrowLeft'] },
+            { say:'Перескоч на початок наступного слова', text:'Сонце| світить яскраво.', expect:['Ctrl+ArrowRight'] } ] },
+  { id:'t-selline', topic:'text', stage:3, keys:['Shift','Home','End'], name:'Виділити до краю', what:'Shift + End виділяє текст до кінця рядка, Shift + Home — до початку.', tip:'Shift виділяє, Home і End показують, докуди.', expect:['Shift+End'],
+    tasks:[ { say:'Виділи текст від курсора до кінця рядка', text:'Привіт|, як справи?', expect:['Shift+End'] },
+            { say:'Виділи текст від курсора до початку рядка', text:'Домашнє завдання| на завтра', expect:['Shift+Home'] } ] },
+  { id:'t-numlock', topic:'text', stage:3, keys:['Num Lock'], name:'Num Lock', what:'Вмикає цифри на цифровому блоці праворуч. Вимкнений — блок працює як стрілки.', tip:'Світиться NUM — цифровий блок друкує цифри.', expect:['NumLock'], numpad:true, both:true,
+    bothNote:'На ноутбуці без цифрового блоку клацни Num Lock мишкою',
+    tasks:[ { say:'Цифровий блок не друкує цифри. Увімкни Num Lock', text:'Номер кабінету: |', numlock:false },
+            { say:'Вимкни Num Lock, щоб цифровий блок працював як стрілки', text:'Сторінка 15|', numlock:true } ] },
+  { id:'w-altshift', topic:'win', stage:3, keys:['Alt','Shift'], name:'Мова: Alt + Shift', what:'Перемикає мову введення — так зазвичай налаштовано в школі.', tip:'Тримай Alt і натисни Shift. Windows справді змінить мову — дивись на УКР / ENG.', expect:['Alt+Shift','Ctrl+Shift'],
+    tasks:[ { say:'Перемкни мову клавіатури на англійську', wins:'doc' },
+            { say:'Поверни українську мову', wins:'web', lang:'ENG' } ] },
+  { id:'w-prtsc', topic:'win', stage:3, keys:['PrtSc'], name:'Знімок усього екрана', what:'Копіює в буфер картинку всього екрана.', tip:'PrtSc — Print Screen, праворуч від F12.', expect:['PrintScreen'], both:true,
+    bothNote:'Якщо замість знімка відкриваються «Ножиці», клацни PrtSc мишкою',
+    tasks:[ { say:'Зроби знімок усього екрана', wins:'doc,web' },
+            { say:'Сфотографуй весь робочий стіл', wins:'files' } ] },
+  { id:'w-altprtsc', topic:'win', stage:3, keys:['Alt','PrtSc'], name:'Знімок вікна', what:'Копіює в буфер картинку лише активного вікна.', tip:'Alt — тільки активне вікно, без решти екрана.', expect:['Alt+PrintScreen'], both:true,
+    bothNote:'Якщо замість знімка відкриваються «Ножиці», збери Alt + PrtSc мишкою',
+    tasks:[ { say:'Зроби знімок лише активного вікна', wins:'doc,web' },
+            { say:'Сфотографуй тільки вікно документа', wins:'web,doc' } ] }
+);
+MISSIONS.push(
+  { id:'t-grades', topic:'text', stage:3, at:380, badge:'chart', name:'Журнал оцінок', limit:120, par:55, minAcc:80,
+    desc:'Впиши оцінку цифровим блоком і швидко виправ її, не торкаючись миші.',
+    steps:[
+      { card:'t-numlock', say:'Цифровий блок не друкує цифри. Увімкни Num Lock', text:'Оцінки за тиждень\nМатематика: |', numlock:false },
+      { card:'t-numlock', say:'Надрукуй оцінку 12', hint:'Надрукуй 1 і 2 на цифровому блоці або у верхньому ряду', goal:s=>plain(s).includes('Математика: 12') },
+      { card:'t-word', say:'Перескоч курсором на слово назад', expect:['Ctrl+ArrowLeft'] },
+      { card:'t-selline', say:'Виділи оцінку до кінця рядка', expect:['Shift+End'] },
+      { card:'t-numlock', say:'Ой, оцінка інша. Надрукуй 11', hint:'Надрукуй 1 і ще раз 1 — виділене зміниться', goal:s=>plain(s).includes('Математика: 11') && !plain(s).includes('12') },
+      { card:'t-selline', say:'Виділи весь рядок: від курсора до початку', expect:['Shift+Home'] },
+      { card:'copy', say:'Скопіюй рядок' },
+      { card:'t-numlock', say:'Готово! Вимкни Num Lock' }
+    ] },
+  { id:'w-shots', topic:'win', stage:3, at:400, badge:'camera', name:'Знімки для звіту', limit:120, par:55, minAcc:80,
+    desc:'Зроби знімки екрана й вікна, не загуби їх і поверни мову.',
+    steps:[
+      { card:'w-altshift', say:'Перемкни мову клавіатури на англійську', wins:'doc,web' },
+      { card:'w-prtsc', say:'Зроби знімок усього екрана' },
+      { card:'w-switch', say:'Перемкнися на документ' },
+      { card:'w-altprtsc', say:'Зроби знімок лише вікна документа' },
+      { card:'w-clip', say:'Відкрий журнал буфера — там обидва знімки' },
+      { card:'w-altshift', say:'Поверни українську мову' }
+    ] }
+);
 const missionById = id => MISSIONS.find(m=>m.id===id);
 const MEDALS = { gold:['🥇','Золото'], silver:['🥈','Срібло'], bronze:['🥉','Бронза'] };
 const MEDAL_RANK = { bronze:1, silver:2, gold:3 };
@@ -1265,6 +1327,10 @@ const BADGES = {
     <rect x="17" y="24" width="6" height="6" fill="#E8A33D"/><rect x="11" y="29" width="18" height="6" rx="2" fill="#6C5CE7" ${OUT}/><path d="M20 10 L21.3 13 L24.4 13.2 L22 15.2 L22.8 18.3 L20 16.6 L17.2 18.3 L18 15.2 L15.6 13.2 L18.7 13 Z" fill="#fff"/>`
 };
 Object.assign(BADGES, {
+  chart:`<rect x="5" y="4" width="30" height="32" rx="4" fill="#FFFFFF" stroke="#fff" stroke-width="3.5"/><rect x="5" y="4" width="30" height="32" rx="4" fill="#E3F7F6"/>
+    <rect x="10" y="22" width="5" height="9" rx="1.5" fill="#16A3A0"/><rect x="17.5" y="15" width="5" height="16" rx="1.5" fill="#FFC93C"/><rect x="25" y="10" width="5" height="21" rx="1.5" fill="#FF6B4A"/>`,
+  camera:`<rect x="4" y="11" width="32" height="22" rx="5" fill="#6C5CE7" ${OUT}/><rect x="13" y="7" width="12" height="6" rx="2" fill="#6C5CE7" ${OUT}/>
+    <circle cx="20" cy="22" r="7" fill="#fff"/><circle cx="20" cy="22" r="4" fill="#2D9CDB"/><circle cx="30" cy="16" r="1.8" fill="#FFC93C"/>`,
   broom:`<path d="M29 4 L19 22" stroke="#B9783B" stroke-width="4" stroke-linecap="round" fill="none" ${OUT}/><path d="M14 20 L25 25 L20 36 Q12 36 7 31 Z" fill="#FFC93C" ${OUT}/>
     <path d="M11 30 L15 25 M15 33 L19 27" stroke="#E8A33D" stroke-width="2" stroke-linecap="round"/>`,
   photo:`<rect x="4" y="8" width="32" height="25" rx="4" fill="#2D9CDB" ${OUT}/><path d="M7 30 L16 19 L22 26 L26 22 L33 30 Z" fill="#3FA66B"/><circle cx="28" cy="15" r="3.5" fill="#FFC93C"/>`,
@@ -1425,7 +1491,7 @@ const buzz = ()=>tone(180, .18, 'square', .04);
 let st = null;   // стан програми поточної теми (документ, провідник, браузер чи Windows)
 const cloneChars = cs => cs.map(c=>({ ...c }));
 const snap = d => ({ chars:cloneChars(d.chars), cur:d.cur, anc:d.anc });
-const cloneDoc = d => ({ ...snap(d), clip:d.clip, undo:d.undo.map(s=>({ ...s, chars:cloneChars(s.chars) })), redo:d.redo.map(s=>({ ...s, chars:cloneChars(s.chars) })), modified:d.modified, caps:d.caps });
+const cloneDoc = d => ({ ...snap(d), clip:d.clip, undo:d.undo.map(s=>({ ...s, chars:cloneChars(s.chars) })), redo:d.redo.map(s=>({ ...s, chars:cloneChars(s.chars) })), modified:d.modified, caps:d.caps, numlock:d.numlock });
 function parseSpec(spec){
   const chars = []; let cur = null, anc = null;
   for(const ch of spec){
@@ -1442,7 +1508,7 @@ function docFromTask(t, keep){
   const p = parseSpec(t.text);
   return { ...p, clip: t.clip !== undefined ? t.clip : (keep ? keep.clip : null),
     undo: t.before ? [parseSpec(t.before)] : [], redo: t.after ? [parseSpec(t.after)] : [],
-    modified: true, caps: !!t.caps };
+    modified: true, caps: !!t.caps, numlock: t.numlock ?? true };
 }
 const plain = d => d.chars.map(c=>c.c).join('');
 const selRange = d => [Math.min(d.cur, d.anc), Math.max(d.cur, d.anc)];
@@ -1456,6 +1522,7 @@ function placeIn(d, pat){
   const i = txt.indexOf(raw);
   if(i >= 0) d.cur = d.anc = i + k;
 }
+const isWordCh = c => !!c && /[\p{L}\p{N}'’]/u.test(c.c);
 const lineStart = (d, i) => { while(i > 0 && d.chars[i-1].c !== '\n') i--; return i; };
 const lineEnd = (d, i) => { while(i < d.chars.length && d.chars[i].c !== '\n') i++; return i; };
 
@@ -1521,6 +1588,30 @@ function applyCombo(d, combo, e){
     case 'Ctrl+KeyU': toggleFmt(d, 'u'); return 'підкреслити';
     case 'Ctrl+KeyS': d.modified = false; showSaved(); return 'зберегти';
     case 'CapsLock': d.caps = !d.caps; return 'Caps Lock';
+    case 'NumLock': d.numlock = !d.numlock; return 'Num Lock';
+    case 'Ctrl+ArrowRight': {
+      let i = d.cur;
+      while(i < len && isWordCh(d.chars[i])) i++;
+      while(i < len && !isWordCh(d.chars[i]) && d.chars[i].c !== '\n') i++;
+      if(i === d.cur && i < len) i++;
+      d.cur = d.anc = i; return 'на слово праворуч';
+    }
+    case 'Ctrl+ArrowLeft': {
+      let i = d.cur;
+      while(i > 0 && !isWordCh(d.chars[i-1])) i--;
+      while(i > 0 && isWordCh(d.chars[i-1])) i--;
+      d.cur = d.anc = i; return 'на слово ліворуч';
+    }
+    case 'NumpadEnter': return applyCombo(d, 'Enter');
+  }
+  // Цифровий блок: з Num Lock — цифри, без нього — стрілки, Home, End і Delete
+  const np = combo.match(/^Numpad(\d|Decimal|Add|Subtract|Multiply|Divide)$/);
+  if(np){
+    const k = np[1], NAV = { 4:'ArrowLeft', 6:'ArrowRight', 8:'ArrowUp', 2:'ArrowDown', 7:'Home', 1:'End', Decimal:'Delete' };
+    const ch = /\d/.test(k) ? k : { Decimal:',', Add:'+', Subtract:'-', Multiply:'*', Divide:'/' }[k];
+    if(!d.numlock && /^\d$|Decimal/.test(k)) return NAV[k] ? applyCombo(d, NAV[k]) : null;
+    pushUndo(d); insertText(d, ch);
+    return `символ «${ch}»`;
   }
   // Друк символів: літери — українською, великі при Shift або Caps Lock
   const m = combo.match(/^(Shift\+)?(.+)$/), shift = !!m[1], code = m[2];
@@ -1558,6 +1649,7 @@ function renderDoc(){
   const before = d.chars[d.cur - 1];
   [['tbB','b'],['tbI','i'],['tbU','u']].forEach(([id, k])=>document.getElementById(id).classList.toggle('on', a !== b ? fmtOn(k) : !!(before && before[k])));
   document.getElementById('tbCaps').classList.toggle('on', d.caps);
+  document.getElementById('tbNum').classList.toggle('on', d.numlock !== false);
   document.getElementById('clipText').textContent = d.clip ? (d.clip.length > 22 ? d.clip.slice(0, 21) + '…' : d.clip) : 'порожньо';
   const ls = lineStart(d, d.cur);
   const line = d.chars.slice(0, d.cur).filter(c=>c.c === '\n').length + 1;
@@ -1843,7 +1935,7 @@ const OS_APPS = { doc:{ ico:'📄', title:'Документ' }, files:{ ico:'�
 const OS_POS = { doc:[3, 5, 46, 62], files:[18, 14, 44, 58], web:[32, 7, 46, 62], task:[24, 16, 38, 56] };   // ліворуч, згори, ширина, висота у %
 function osMake(t){
   const open = (t.wins || '').split(',').filter(Boolean);
-  const s = { wins:{}, order:[...open], active:open[open.length - 1] || null, start:false, locked:!!t.locked, snip:false, panel:null, lang:'УКР', langAt:0, switchAt:0, shown:null, shut:false, hang:t.hang || null };
+  const s = { wins:{}, order:[...open], active:open[open.length - 1] || null, start:false, locked:!!t.locked, snip:false, panel:null, lang:t.lang || 'УКР', langAt:0, switchAt:0, shown:null, shut:false, hang:t.hang || null, shots:[], shotAt:0, shotWin:null };
   for(const id of open) s.wins[id] = { min:false, max:!!t.max && id === s.active, snap:null };
   return s;
 }
@@ -1887,7 +1979,13 @@ function osApply(s, combo){
       return combo === 'Win+ArrowLeft' ? 'прикріпити ліворуч' : 'прикріпити праворуч';
     case 'Win+KeyV': { const was = s.panel === 'clip'; off(); s.panel = was ? null : 'clip'; return 'журнал буфера обміну'; }
     case 'Win+Period': { const was = s.panel === 'emoji'; off(); s.panel = was ? null : 'emoji'; return 'панель смайликів'; }
-    case 'Win+Space': s.lang = s.lang === 'УКР' ? 'ENG' : 'УКР'; s.langAt = Date.now(); return 'змінити мову';
+    case 'Win+Space': case 'Alt+Shift': case 'Ctrl+Shift': s.lang = s.lang === 'УКР' ? 'ENG' : 'УКР'; s.langAt = Date.now(); return 'змінити мову';
+    case 'PrintScreen': off(); s.shots = [...s.shots, 'Знімок екрана']; s.shotAt = Date.now(); s.shotWin = null; return 'знімок усього екрана';
+    case 'Alt+PrintScreen':
+      off();
+      s.shots = [...s.shots, s.active ? `Знімок вікна «${OS_APPS[s.active].title}»` : 'Знімок екрана'];
+      s.shotAt = Date.now(); s.shotWin = s.active;
+      return 'знімок активного вікна';
   }
   return null;
 }
@@ -1903,20 +2001,23 @@ function osRender(s){
     web:'<span class="sub">🔗 school131.kyiv.ua</span><br>Гімназія №131 · Новини<br><span class="sub">Розклад, гуртки, оголошення</span>',
     task:`<div class="row"><span>🌐 Браузер</span><span>перезапущено</span></div><div class="row"><span>📄 Документ</span><span>1%</span></div><div class="row"><span>📁 Провідник</span><span>0%</span></div>`
   }[id]);
-  const wins = s.order.filter(id=>s.wins[id] && !s.wins[id].min).map((id, z)=>`<div class="oswin${id === s.active ? ' act' : ''}${s.hang === id ? ' hang' : ''}" style="${pos(id, s.wins[id])}; z-index:${z + 1}">
+  const wins = s.order.filter(id=>s.wins[id] && !s.wins[id].min).map((id, z)=>`<div class="oswin${id === s.active ? ' act' : ''}${s.hang === id ? ' hang' : ''}${Date.now() - s.shotAt < 1300 && s.shotWin === id ? ' shot' : ''}" style="${pos(id, s.wins[id])}; z-index:${z + 1}">
       <div class="ttl"><span>${OS_APPS[id].ico}</span><span class="t">${OS_APPS[id].title}</span><span class="ctls"><span class="wctl" data-hint="min">─</span><span class="wctl" data-hint="max">▢</span><span class="wctl" data-hint="close">✕</span></span></div>
       ${s.hang === id ? '<div class="hangnote">⏳ Програма не відповідає</div>' : ''}<div class="bd">${body(id)}</div></div>`).join('');
   const switching = Date.now() - s.switchAt < 900;
+  const shooting = Date.now() - s.shotAt < 1300;
   const START = [['📄','Документ'],['📁','Провідник'],['🌐','Браузер'],['🎨','Малюнок'],['🧮','Калькулятор'],['⚙️','Параметри'],['🎵','Музика'],['📷','Камера']];
   el.innerHTML = `<div class="os-area">${wins}</div>
     ${s.start ? `<div class="os-start">${START.map(([i, t])=>`<div><span>${i}</span>${t}</div>`).join('')}<div class="foot"><span>👤 ${esc(player || 'Учень')}</span><span>⏻</span></div></div>` : ''}
     ${s.snip ? '<div class="os-snip"><div class="sbar">✂️ Виділи область для знімка</div><div class="sel"></div></div>' : ''}
-    ${s.panel === 'clip' ? '<div class="os-panel"><h5>📋 Буфер обміну</h5><div class="it">🖼️ Знімок екрана</div><div class="it">Синій кит — найбільша тварина</div><div class="it">school131.kyiv.ua</div></div>' : ''}
+    ${s.panel === 'clip' ? `<div class="os-panel"><h5>📋 Буфер обміну</h5>${(s.shots.length ? [...s.shots].reverse() : ['Знімок екрана']).map(x=>`<div class="it">🖼️ ${esc(x)}</div>`).join('')}<div class="it">Синій кит — найбільша тварина</div></div>` : ''}
+    ${shooting && !s.shotWin ? '<div class="os-flash"></div>' : ''}${shooting ? `<div class="os-shotlabel">📸 ${esc(s.shots[s.shots.length - 1])} — у буфері обміну</div>` : ''}
     ${s.panel === 'emoji' ? `<div class="os-panel"><h5>😀 Емодзі</h5><div class="emo">${'😀 😂 😍 🤔 👍 🎉 ❤️ ⭐ 🐱 🐶 🍎 🚀'.split(' ').map(e=>`<span>${e}</span>`).join('')}</div></div>` : ''}
     ${switching ? `<div class="os-switch">${s.order.filter(id=>s.wins[id]).reverse().map(id=>`<div class="${id === s.active ? 'on' : ''}"><span>${OS_APPS[id].ico}</span>${OS_APPS[id].title}</div>`).join('')}</div>` : ''}
     ${s.shut ? '<div class="os-shut">⏻ Завершення роботи<br><small style="font-weight:600">Вікон не лишилось — тепер Alt + F4 пропонує вимкнути комп\'ютер</small></div>' : ''}
     ${s.locked ? `<div class="os-lock"><div class="clk">${clockText()}</div><div class="msg">🔒 Заблоковано. Натисни Enter, щоб увійти</div></div>` : ''}`;
   if(switching) setTimeout(()=>{ if(st === s) osRender(s); }, 950);
+  if(shooting) setTimeout(()=>{ if(st === s) osRender(s); }, 1350);
   const lang = document.getElementById('tbLang');
   lang.textContent = s.lang;
   if(Date.now() - s.langAt < 300){ lang.classList.remove('flash'); void lang.offsetWidth; lang.classList.add('flash'); }
@@ -2003,19 +2104,27 @@ const KB_MAIN = [
   [K('ControlLeft','Ctrl',1.25,'mod small'), K('MetaLeft','Win',1.25,'mod small'), K('AltLeft','Alt',1.25,'mod small'), K('Space','',6.25), K('AltRight','Alt',1.25,'mod small'), K('MetaRight','Win',1.25,'mod small'), K('ContextMenu','☰',1.25,'small'), K('ControlRight','Ctrl',1.25,'mod small')]
 ];
 const KB_NAV = [
-  [G(3)],
+  [K('PrintScreen','PrtSc',1,'small'), K('ScrollLock','ScrLk',1,'small'), K('Pause','Pause',1,'small')],
   [K('Insert','Ins',1,'small'), K('Home','Home',1,'small'), K('PageUp','PgUp',1,'small')],
   [K('Delete','Del',1,'small'), K('End','End',1,'small'), K('PageDown','PgDn',1,'small')],
   [G(3)],
   [G(1), K('ArrowUp','↑',1), G(1)],
   [K('ArrowLeft','←',1), K('ArrowDown','↓',1), K('ArrowRight','→',1)]
 ];
+const KB_NUM = [
+  [G(4)],
+  [K('NumLock','Num',1,'small'), K('NumpadDivide','/',1), K('NumpadMultiply','*',1), K('NumpadSubtract','-',1)],
+  [K('Numpad7','7',1), K('Numpad8','8',1), K('Numpad9','9',1), K('NumpadAdd','+',1)],
+  [K('Numpad4','4',1), K('Numpad5','5',1), K('Numpad6','6',1), G(1)],
+  [K('Numpad1','1',1), K('Numpad2','2',1), K('Numpad3','3',1), K('NumpadEnter','Ent',1,'small')],
+  [K('Numpad0','0',2), K('NumpadDecimal','.',1), G(1)]
+];
 const kbEl = document.getElementById('kb');
 const keyEls = {};
 function buildKeyboard(){
   kbEl.innerHTML = '';
-  for(const block of [KB_MAIN, KB_NAV]){
-    const bl = document.createElement('div'); bl.className = 'kb-block';
+  for(const [block, cls] of [[KB_MAIN, ''], [KB_NAV, ''], [KB_NUM, 'np']]){
+    const bl = document.createElement('div'); bl.className = 'kb-block ' + cls;
     block.forEach((row, r)=>{
       const rowEl = document.createElement('div'); rowEl.className = 'kb-row' + (r === 0 ? ' fn' : '');
       row.forEach(k=>{
@@ -2195,7 +2304,7 @@ function renderDeskPane(){
 function toSetup(){
   round = null;
   clearInterval(timerId);
-  document.body.classList.remove('playing', 'fkeys');
+  document.body.classList.remove('playing', 'fkeys', 'numpad');
   kbEl.classList.remove('clickable');
   latch.clear(); renderLatch();
   statsEl.innerHTML = '';
@@ -2248,6 +2357,7 @@ function startRound(mode, mission){
   st = null;
   document.body.classList.add('playing');
   document.body.classList.toggle('fkeys', topic !== 'text');
+  document.body.classList.toggle('numpad', tasks.some(x=>x.card.numpad));
   setupEl.hidden = true;
   playEl.hidden = false;
   startBar.hidden = true;
@@ -2273,7 +2383,7 @@ function loadTask(){
   A.adjust(st, t.task);
   st.flash = null;
   round.snapshot = A.clone(st);
-  kbEl.classList.toggle('clickable', isScreen(t));
+  kbEl.classList.toggle('clickable', isScreen(t) || isBoth(t));
   latch.clear(); renderLatch();
   round.taskStart = performance.now();
   round.taskErrors = 0;
@@ -2292,7 +2402,8 @@ function renderHint(){
   const t = round.tasks[round.i];
   const combo = expectOf(t)[0], scr = isScreen(t);
   // Комбінації, які забирає браузер або Windows, збирають мишкою — нагадуємо про це коротко, в один рядок
-  const note = scr ? `<span class="screen-note">🖱️ Збирай мишкою на екранній клавіатурі: ${t.card.topic === 'win' ? 'Windows' : 'браузер'} не віддає цю комбінацію грі</span>` : '';
+  const note = scr ? `<span class="screen-note">🖱️ Збирай мишкою на екранній клавіатурі: ${t.card.topic === 'win' ? 'Windows' : 'браузер'} не віддає цю комбінацію грі</span>`
+    : isBoth(t) && t.card.bothNote ? `<span class="screen-note">⌨️ Натисни на клавіатурі. ${esc(t.card.bothNote)}</span>` : '';
   if(round.taskHint){
     const keys = t.task.goal ? `<span>💡 ${esc(t.task.hint || '')}</span>` : `<span>${scr ? 'Клацни по черзі:' : 'Натисни:'}</span> ${kbdHTML(comboLabels(combo), scr ? '→' : '+')}` + (scr ? '' : `<span class="tipline">💡 ${esc(t.card.tip)}</span>`);
     hintEl.innerHTML = keys + note;
@@ -2583,16 +2694,33 @@ document.addEventListener('keydown', e=>{
   if(code === 'F12' || code === 'F11') return;
   e.preventDefault();
   if(minimized) setMin(false);   // під час завдання документ має бути видно
-  if(e.repeat || MOD_CODES.has(code)) return;
-  if(isScreen(round.tasks[round.i])){
-    if(!busy) say('Цю комбінацію збирай мишкою на екранній клавіатурі 🖱️', '', 'idle', 2500);
+  if(e.repeat) return;
+  const t = round.tasks[round.i];
+  if(isScreen(t) && !isBoth(t)){
+    if(!busy && !MOD_CODES.has(code)) say('Цю комбінацію збирай мишкою на екранній клавіатурі 🖱️', '', 'idle', 2500);
     return;
   }
+  // Комбінації з самих модифікаторів (Alt + Shift) рахуємо, лише якщо завдання їх чекає: інакше Ctrl + Shift перед N був би помилкою
+  if(MOD_CODES.has(code)){
+    const mc = comboOf(e).replace(/\+(Control|Shift|Alt|Meta)(Left|Right)$/, '');
+    if(mc.includes('+') && expectOf(t).includes(mc)) onCombo(mc);
+    return;
+  }
+  if(code === 'PrintScreen') prtDownAt = Date.now();
   onCombo(comboOf(e));
 }, true);
+// PrtSc Windows забирає собі: сторінка бачить лише відпускання клавіші
+let prtDownAt = 0;
 document.addEventListener('keyup', e=>{
-  pressKey(codeOf(e), false);
+  const code = codeOf(e);
+  pressKey(code, false);
   if(round && (e.key === 'Alt' || e.key === 'Meta')) e.preventDefault();
+  if(code === 'PrintScreen' && round && !modalOpen() && Date.now() - prtDownAt > 800){
+    e.preventDefault();
+    const t = round.tasks[round.i];
+    if(isScreen(t) && !isBoth(t)) return;
+    onCombo(e.altKey ? 'Alt+PrintScreen' : 'PrintScreen');
+  }
 }, true);
 // Поки вікно не у фокусі, натискання не доходять — показуємо підказку і ставимо час на паузу
 let blurAt = 0;
