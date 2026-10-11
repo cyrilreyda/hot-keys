@@ -384,10 +384,10 @@
   .ren .hl{background:var(--w-sel);}
   .fx-empty{padding:14px 10px; opacity:.55; font-weight:600;}
   .fx-status{display:flex; gap:12px; padding:3px 12px; font-size:12px; opacity:.75; border-top:1px solid rgba(127,127,127,.2); background:var(--w-bar); flex:none;}
-  .pop{position:absolute; inset:0; z-index:3; display:flex; align-items:center; justify-content:center; background:rgba(27,27,58,.4);}
-  .pop .pc{background:var(--w-bg); color:var(--w-ink); border-radius:12px; padding:12px 20px; text-align:center; font-size:14px; font-weight:700; box-shadow:0 10px 30px rgba(0,0,0,.3);}
-  .pop .big{font-size:52px; line-height:1.1;}
-  .pop small{display:block; opacity:.6; font-weight:600;}
+  .fx-pop{position:absolute; inset:0; z-index:3; display:flex; align-items:center; justify-content:center; background:rgba(27,27,58,.4);}
+  .fx-pop .pc{background:var(--w-bg); color:var(--w-ink); border-radius:12px; padding:12px 20px; text-align:center; font-size:14px; font-weight:700; box-shadow:0 10px 30px rgba(0,0,0,.3);}
+  .fx-pop .big{font-size:52px; line-height:1.1;}
+  .fx-pop small{display:block; opacity:.6; font-weight:600;}
   .spin{display:inline-block; animation:spin .7s linear;}
   @keyframes spin{to{transform:rotate(360deg);}}
 
@@ -441,7 +441,7 @@
   .os-lock .clk{font-size:64px; font-weight:800; line-height:1;}
   .os-lock .msg{font-size:15px; opacity:.9; margin-top:8px;}
   .os-snip{position:absolute; inset:0 0 42px 0; z-index:2; background:rgba(27,27,58,.5); display:flex; justify-content:center;}
-  .os-snip .bar{margin-top:10px; height:max-content; background:#fff; color:var(--ink); border-radius:10px; padding:5px 14px; font-weight:800; font-size:13px; box-shadow:0 6px 18px rgba(0,0,0,.25);}
+  .os-snip .sbar{margin-top:10px; height:max-content; background:#fff; color:var(--ink); border-radius:10px; padding:5px 14px; font-weight:800; font-size:13px; box-shadow:0 6px 18px rgba(0,0,0,.25);}
   .os-snip .sel{position:absolute; left:30%; top:30%; width:26%; height:30%; border:2px dashed #fff; background:rgba(255,255,255,.15);}
   .os-panel{position:absolute; right:22%; bottom:48px; z-index:2; width:min(240px, 46%); background:rgba(255,255,255,.97); color:var(--ink); border-radius:12px; padding:10px 12px; font-size:12.5px; font-weight:700; box-shadow:0 10px 30px rgba(0,0,0,.25);}
   .os-panel h5{margin:0 0 6px; font-family:'Baloo 2',sans-serif; font-size:14px;}
@@ -639,8 +639,9 @@ function keyLabel(code, ukr){
   return UK[code] ? UK[code].toUpperCase() : code;
 }
 // Комбінація записується як "Ctrl+Shift+KeyZ": модифікатори в сталому порядку + фізична клавіша
-const MOD_ORDER = ['Ctrl','Alt','Shift','Win'];
-const comboOf = e => [e.ctrlKey && 'Ctrl', e.altKey && 'Alt', e.shiftKey && 'Shift', e.metaKey && 'Win', codeOf(e)].filter(Boolean).join('+');
+// Порядок, у якому комбінації пишуть у Windows: Ctrl + Shift + Esc, Win + Shift + S
+const MOD_ORDER = ['Ctrl','Win','Alt','Shift'];
+const comboOf = e => { const on = { Ctrl:e.ctrlKey, Win:e.metaKey, Alt:e.altKey, Shift:e.shiftKey }; return [...MOD_ORDER.filter(m=>on[m]), codeOf(e)].join('+'); };
 // Деякі віддалені робочі столи й екранні клавіатури не передають event.code — тоді відновлюємо клавішу з event.key
 const UK_CODE = Object.fromEntries(Object.entries(UK).map(([c, l])=>[l, c]));
 const KEY_CODE = { ' ':'Space', Enter:'Enter', Backspace:'Backspace', Delete:'Delete', Escape:'Escape', Tab:'Tab', CapsLock:'CapsLock',
@@ -872,7 +873,7 @@ CARDS.push(
   { id:'f-nav', topic:'files', stage:1, keys:['↑','↓'], or:true, name:'Вибрати файл', what:'Стрілки переходять до сусіднього файлу чи папки.', tip:'Стрілка вниз — наступний елемент, вгору — попередній.', expect:['ArrowDown'],
     tasks:[ { say:'Вибери файл, що нижче', path:'Документи/Уроки', focus:'вірш.txt', expect:['ArrowDown'] },
             { say:'Вибери папку, що вище', path:'Документи', focus:'Уроки', expect:['ArrowUp'] },
-            { say:'Вибери «гімн.mp3»', path:'Музика', focus:'пісня.mp3', expect:['ArrowUp'] } ] },
+            { say:'Вибери «дзвінок.mp3»', path:'Музика', focus:'пісня.mp3', expect:['ArrowUp'] } ] },
   { id:'f-open', topic:'files', stage:1, keys:['Enter'], name:'Відкрити', what:'Відкриває вибрану папку або файл.', tip:'Те саме, що подвійний клік мишею.', expect:['Enter'],
     tasks:[ { say:'Відкрий папку «Уроки»', path:'Документи', focus:'Уроки' },
             { say:'Відкрий папку «Музика»', path:'', focus:'Музика' },
@@ -882,7 +883,7 @@ CARDS.push(
             { say:'Вийди з папки «Канікули»', path:'Документи/Канікули', focus:'гори.jpg' } ] },
   { id:'f-del', topic:'files', stage:1, keys:['Delete'], name:'Видалити', what:'Переносить вибраний файл у кошик.', tip:'Файл не зникає назавжди: його можна повернути.', expect:['Delete'],
     tasks:[ { say:'Видали «план.txt»', path:'Документи', focus:'план.txt' },
-            { say:'Видали пісню «гімн.mp3»', path:'Музика', focus:'гімн.mp3' } ] },
+            { say:'Видали «дзвінок.mp3»', path:'Музика', focus:'дзвінок.mp3' } ] },
   { id:'f-undo', topic:'files', stage:1, keys:['Ctrl','Z'], name:'Повернути видалене', what:'Скасовує останню дію з файлами.', tip:'Той самий Ctrl + Z, що й у тексті.', expect:['Ctrl+KeyZ'],
     tasks:[ { say:'Ой! Файл видалився. Поверни його', path:'Документи', focus:'план.txt', pre:['Delete'] },
             { say:'Поверни видалену пісню', path:'Музика', focus:'пісня.mp3', pre:['Delete'] } ] },
@@ -904,7 +905,7 @@ CARDS.push(
             { say:'Встав фото сюди', path:'Зображення', focus:'кіт.png', clip:{ mode:'copy', from:'Документи/Канікули', names:['море.jpg'] } } ] },
   { id:'f-cut', topic:'files', stage:2, keys:['Ctrl','X'], name:'Вирізати файл', what:'Готує файл до перенесення: після вставки він зникне зі старого місця.', tip:'X — ножиці.', expect:['Ctrl+KeyX'],
     tasks:[ { say:'Виріж файл, щоб перенести його', path:'Документи', focus:'план.txt' },
-            { say:'Виріж пісню', path:'Музика', focus:'гімн.mp3' } ] },
+            { say:'Виріж звук дзвінка', path:'Музика', focus:'дзвінок.mp3' } ] },
   { id:'f-multi', topic:'files', stage:2, keys:['Shift','↑','↓'], name:'Виділити кілька', what:'Shift зі стрілкою додає до виділення сусідній файл.', tip:'Тримай Shift і натискай стрілку.', expect:['Shift+ArrowDown'],
     tasks:[ { say:'Виділи ще й наступний файл', path:'Документи/Уроки', focus:'вірш.txt', expect:['Shift+ArrowDown'] },
             { say:'Додай до виділення файл вище', path:'Документи/Уроки', focus:'малюнок.png', expect:['Shift+ArrowUp'] } ] },
@@ -913,7 +914,7 @@ CARDS.push(
             { say:'Перейди до останнього файлу', path:'Документи/Уроки', focus:'вірш.txt', expect:['End'] } ] },
   { id:'f-refresh', topic:'files', stage:2, keys:['F5'], name:'Оновити', what:'Перечитує вміст папки.', tip:'F5 оновлює і папку, і сторінку в браузері.', expect:['F5'],
     tasks:[ { say:'Онови вміст папки', path:'Документи', focus:'Уроки' },
-            { say:'Онови папку з музикою', path:'Музика', focus:'гімн.mp3' } ] },
+            { say:'Онови папку з музикою', path:'Музика', focus:'дзвінок.mp3' } ] },
   { id:'f-newdir', topic:'files', stage:2, keys:['Ctrl','Shift','N'], name:'Нова папка', what:'Створює нову папку й одразу пропонує її назвати.', tip:'N — New, нова. У браузері ця комбінація зайнята, тож збирай її мишкою.', expect:['Ctrl+Shift+KeyN'], screen:true,
     tasks:[ { say:'Створи нову папку', path:'Документи', focus:'план.txt' },
             { say:'Створи папку для фото', path:'Зображення', focus:'кіт.png' } ] }
@@ -1558,7 +1559,7 @@ const escRe = x => x.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 /* ================= Провідник ================= */
 // Папка — об'єкт, файл — 0. Шлях — масив назв від «Цей ПК»
 const FS = { 'Документи':{ 'Канікули':{ 'гори.jpg':0, 'море.jpg':0 }, 'Уроки':{ 'вірш.txt':0, 'задача.docx':0, 'малюнок.png':0 }, 'план.txt':0 },
-  'Зображення':{ 'кіт.png':0, 'школа.jpg':0 }, 'Музика':{ 'гімн.mp3':0, 'пісня.mp3':0 }, 'Відео':{ 'мультик.mp4':0 } };
+  'Зображення':{ 'кіт.png':0, 'школа.jpg':0 }, 'Музика':{ 'дзвінок.mp3':0, 'пісня.mp3':0 }, 'Відео':{ 'мультик.mp4':0 } };
 const FX_TYPES = { txt:['📄','Текст'], docx:['📝','Документ'], png:['🖼️','Зображення'], jpg:['🖼️','Зображення'], mp3:['🎵','Музика'], mp4:['🎬','Відео'] };
 const isDir = n => !!n && typeof n === 'object';
 const splitPath = p => p ? p.split('/') : [];
@@ -1708,8 +1709,8 @@ function fxRender(s){
   el.innerHTML = `<div class="fx-addr">🖥️ <span>Цей ПК</span>${s.path.map(p=>` › ${esc(p)}`).join('')}${refreshing ? ' <span class="spin">⟳</span>' : ''}</div>
     <div class="fx-list">${rows || '<div class="fx-empty">Папка порожня</div>'}</div>
     <div class="fx-status"><span>Елементів: ${it.length}</span>${s.sel.length ? `<span>Виділено: ${s.sel.length}</span>` : ''}${clip ? `<span>${clip}</span>` : ''}</div>
-    ${s.preview ? `<div class="pop"><div class="pc"><div class="big">${fxType(s, s.preview)[0]}</div>${esc(s.preview)}<small>Перегляд · Esc — закрити</small></div></div>` : ''}
-    ${s.props ? `<div class="pop"><div class="pc" style="text-align:left">⚙️ Властивості<br>${esc(s.props)}<small>Тип: ${fxType(s, s.props)[1]}</small><small>Розташування: Цей ПК${s.path.map(p=>' › ' + esc(p)).join('')}</small><small>Esc — закрити</small></div></div>` : ''}`;
+    ${s.preview ? `<div class="fx-pop"><div class="pc"><div class="big">${fxType(s, s.preview)[0]}</div>${esc(s.preview)}<small>Перегляд · Esc — закрити</small></div></div>` : ''}
+    ${s.props ? `<div class="fx-pop"><div class="pc" style="text-align:left">⚙️ Властивості<br>${esc(s.props)}<small>Тип: ${fxType(s, s.props)[1]}</small><small>Розташування: Цей ПК${s.path.map(p=>' › ' + esc(p)).join('')}</small><small>Esc — закрити</small></div></div>` : ''}`;
   keepVisible(el.querySelector('.fx-list'), el.querySelector('.fx-row.focus'));
   document.getElementById('docTitle').textContent = 'Провідник — ' + (s.path[s.path.length - 1] || 'Цей ПК');
 }
@@ -1889,7 +1890,7 @@ function osRender(s){
   const START = [['📄','Документ'],['📁','Провідник'],['🌐','Браузер'],['🎨','Малюнок'],['🧮','Калькулятор'],['⚙️','Параметри'],['🎵','Музика'],['📷','Камера']];
   el.innerHTML = `<div class="os-area">${wins}</div>
     ${s.start ? `<div class="os-start">${START.map(([i, t])=>`<div><span>${i}</span>${t}</div>`).join('')}<div class="foot"><span>👤 ${esc(player || 'Учень')}</span><span>⏻</span></div></div>` : ''}
-    ${s.snip ? '<div class="os-snip"><div class="bar">✂️ Виділи область для знімка</div><div class="sel"></div></div>' : ''}
+    ${s.snip ? '<div class="os-snip"><div class="sbar">✂️ Виділи область для знімка</div><div class="sel"></div></div>' : ''}
     ${s.panel === 'clip' ? '<div class="os-panel"><h5>📋 Буфер обміну</h5><div class="it">🖼️ Знімок екрана</div><div class="it">Синій кит — найбільша тварина</div><div class="it">school5.ua</div></div>' : ''}
     ${s.panel === 'emoji' ? `<div class="os-panel"><h5>😀 Емодзі</h5><div class="emo">${'😀 😂 😍 🤔 👍 🎉 ❤️ ⭐ 🐱 🐶 🍎 🚀'.split(' ').map(e=>`<span>${e}</span>`).join('')}</div></div>` : ''}
     ${switching ? `<div class="os-switch">${s.order.filter(id=>s.wins[id]).reverse().map(id=>`<div class="${id === s.active ? 'on' : ''}"><span>${OS_APPS[id].ico}</span>${OS_APPS[id].title}</div>`).join('')}</div>` : ''}
