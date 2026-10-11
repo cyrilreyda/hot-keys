@@ -421,14 +421,14 @@
 
   .os{position:absolute; inset:0; pointer-events:none;}
   .os-area{position:absolute; left:0; right:0; top:0; bottom:42px;}
-  .oswin{position:absolute; display:flex; flex-direction:column; background:var(--w-bg); color:var(--w-ink); border-radius:10px; overflow:hidden; opacity:.96;
+  .oswin{position:absolute; display:flex; flex-direction:column; background:var(--w-bg); color:var(--w-ink); border-radius:10px; overflow:hidden;
     box-shadow:0 8px 22px rgba(27,27,58,.25); transition:left .25s ease, top .25s ease, width .25s ease, height .25s ease, opacity .2s ease, transform .2s ease;}
   .oswin .ttl{flex:none; height:28px; display:flex; align-items:center; gap:6px; padding:0 10px; font-family:'Baloo 2',sans-serif; font-weight:700; font-size:13px; background:var(--w-bar);}
   .oswin .ttl .t{flex:1;}
-  .oswin.act{opacity:1; box-shadow:0 14px 34px rgba(27,27,58,.35), 0 0 0 2px var(--w-caret);}
+  .oswin.act{box-shadow:0 14px 34px rgba(27,27,58,.35), 0 0 0 2px var(--w-caret);}
   .oswin.act .ttl{background:var(--w-head); color:var(--w-head-ink);}
   .oswin .bd{flex:1; padding:8px 12px; font-size:13px; font-weight:700; overflow:hidden;}
-  .oswin .ln{height:7px; border-radius:4px; background:rgba(127,127,127,.25); margin:7px 0;}
+  .oswin .bd .sub{font-weight:600; opacity:.65;}
   .oswin .row{display:flex; justify-content:space-between; gap:8px; padding:2px 0; border-bottom:1px solid rgba(127,127,127,.18);}
   .oswin.hang .bd{filter:grayscale(1) opacity(.6);}
   .oswin .hangnote{flex:none; padding:2px 10px; font-size:12px; font-weight:800; background:#FFE9E2; color:#C2410C;}
@@ -1877,9 +1877,9 @@ function osRender(s){
     : w.snap === 'right' ? 'left:50%; top:0; width:50%; height:100%'
     : (([l, t, ww, h])=>`left:${l}%; top:${t}%; width:${ww}%; height:${h}%`)(OS_POS[id]);
   const body = id => ({
-    doc:'<div class="ln" style="width:70%"></div><div class="ln"></div><div class="ln" style="width:85%"></div><div class="ln" style="width:55%"></div>',
+    doc:'Моє літо<br><span class="sub">Влітку я їздив до моря. Там були чайки.</span>',
     files:'📁 Документи<br>📁 Зображення<br>📁 Музика<br>📁 Відео',
-    web:'🏫 school5.ua<div class="ln" style="width:45%; height:11px"></div><div class="ln"></div><div class="ln" style="width:75%"></div>',
+    web:'<span class="sub">🔗 school5.ua</span><br>Школа №5 · Новини<br><span class="sub">Розклад, гуртки, оголошення</span>',
     task:`<div class="row"><span>🌐 Браузер</span><span>перезапущено</span></div><div class="row"><span>📄 Документ</span><span>1%</span></div><div class="row"><span>📁 Провідник</span><span>0%</span></div>`
   }[id]);
   const wins = s.order.filter(id=>s.wins[id] && !s.wins[id].min).map((id, z)=>`<div class="oswin${id === s.active ? ' act' : ''}${s.hang === id ? ' hang' : ''}" style="${pos(id, s.wins[id])}; z-index:${z + 1}">
@@ -1946,9 +1946,9 @@ const bubbleEl = document.getElementById('bubble');
 function applyLook(){
   deskEl.style.backgroundImage = svgURL(wallSVG(settings.wall));
   const th = (WTHEMES.find(t=>t.id===settings.theme) || WTHEMES[0]).v;
-  const st = document.getElementById('appwin').style;
-  st.setProperty('--w-head', th.head); st.setProperty('--w-head-ink', th.headInk); st.setProperty('--w-bg', th.bg); st.setProperty('--w-ink', th.ink);
-  st.setProperty('--w-bar', th.bar); st.setProperty('--w-sel', th.sel); st.setProperty('--w-caret', th.caret);
+  const ws = deskEl.style;   // змінні на всьому столі: їх беруть і вікно програми, і вікна теми «Windows»
+  ws.setProperty('--w-head', th.head); ws.setProperty('--w-head-ink', th.headInk); ws.setProperty('--w-bg', th.bg); ws.setProperty('--w-ink', th.ink);
+  ws.setProperty('--w-bar', th.bar); ws.setProperty('--w-sel', th.sel); ws.setProperty('--w-caret', th.caret);
   const cur = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M3 2 L3 19 L8 14.5 L11.5 22 L14.5 20.6 L11 13.3 L18 13.3 Z" fill="${th.caret}" stroke="#fff" stroke-width="1.6" stroke-linejoin="round"/></svg>`;
   deskEl.style.cursor = `url("data:image/svg+xml,${encodeURIComponent(cur)}") 3 2, auto`;
   setRobot('idle');
@@ -2474,9 +2474,17 @@ document.getElementById('winMin').addEventListener('click', ()=>{
   setMin(true);
   say(`Щоб повернути вікно, клацни ${OS_APPS[appId]?.ico || '📄'} на панелі задач.`, '', 'happy', 4000);
 });
+// Значки панелі задач: поточна програма згортається й розгортається; в меню інші значки відкривають свою тему;
+// під час завдання — лише підказка, бо тут усе робиться клавішами
+const TB_TOPIC = { doc:'text', files:'files', web:'browser' };
 document.getElementById('tbApps').addEventListener('click', e=>{
   const b = e.target.closest('[data-tb]');
-  if(b && b.dataset.tb === appId) setMin(!minimized);
+  if(!b) return;
+  const id = b.dataset.tb;
+  if(appId !== 'os' && id === appId){ setMin(!minimized); return; }
+  if(!round && TB_TOPIC[id]){ selectTopic(TB_TOPIC[id]); showTab('paneTrain'); say(`Тема «${topicOf(TB_TOPIC[id]).label.slice(3)}». Обери етап і натисни «Почати».`, '', 'happy', 3500); return; }
+  if(!round) return;
+  say(appId === 'os' ? 'Тут вікна перемикаємо клавішами — наприклад, Alt + Tab 🙂' : 'Під час завдання працюємо клавіатурою 🙂 Інші теми — в меню.', '', 'idle', 3000);
 });
 // Назва гри вгорі — завжди шлях до меню: з гри, з вікна результату або зі сторінки за посиланням
 document.getElementById('homeLink').addEventListener('click', e=>{
