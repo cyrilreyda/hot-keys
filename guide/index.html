@@ -4,9 +4,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Для вчителя · Гарячі клавіші</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Nunito+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../fonts/fonts.css">
+<link rel="manifest" href="../manifest.webmanifest">
+<link rel="icon" type="image/png" href="../icons/icon-192.png">
 <style>
   :root{
     --bg:#F6F5FB; --ink:#1B1B3A; --ink-soft:#514F72; --surface:#FFFFFF; --line:#E4E1F5;
@@ -307,6 +307,13 @@
       <li>Кілька учнів за одним комп'ютером — не проблема: кожен обирає себе зі списку гравців.</li>
       <li>Очищення історії браузера або режим інкогніто стирає прогрес. Якщо на шкільних комп'ютерах браузер чиститься після кожного сеансу, покладайтеся на посилання з результатами.</li>
     </ul>
+    <h3>Без інтернету</h3>
+    <ul>
+      <li>Сайт: відкрийте гру на кожному комп'ютері один раз з інтернетом. Браузер збереже її, і далі та сама адреса відкриється без мережі. У Chrome і Edge гру можна встановити як застосунок: значок «Встановити» в рядку адреси, після чого на робочому столі з'явиться значок робота.</li>
+      <li>Файл: на сторінці <a href="https://github.com/cyrilreyda/hot-keys">github.com/cyrilreyda/hot-keys</a> натисніть Code → Download ZIP, розпакуйте папку на комп'ютер або флешку й відкрийте <code>index.html</code>. Інтернет і сервер не потрібні. Цей варіант надійніший, якщо браузер у класі очищує дані після сеансу: тоді разом із прогресом зникає і збережена копія сайту.</li>
+      <li>Без інтернету не відкривається Лабораторія. Посилання на результат учень може скопіювати, але відкрити його вчитель зможе лише з інтернетом.</li>
+      <li>Прогрес на сайті й у файлі окремий: це два різні «місця» для браузера.</li>
+    </ul>
     <h3>Клавіатура</h3>
     <ul>
       <li>Розкладка значення не має: гра розпізнає фізичну клавішу, тож Ctrl+C працює і з українською розкладкою.</li>
@@ -353,5 +360,9 @@
   <footer>Гарячі клавіші · Для вчителя · Лабораторія</footer>
 </main>
 
+<script>
+  // Офлайн-режим: той самий службовий скрипт, що й у грі
+  if('serviceWorker' in navigator && /^https?:$/.test(location.protocol)) navigator.serviceWorker.register('../sw.js', { scope:'../' }).catch(()=>{});
+</script>
 </body>
 </html>

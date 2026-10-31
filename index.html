@@ -4,9 +4,10 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Гарячі клавіші · Лабораторія</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Nunito+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="fonts/fonts.css">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/png" href="icons/icon-192.png">
+<meta name="theme-color" content="#16A3A0">
 <style>
   :root{
     --bg:#F6F5FB; --ink:#1B1B3A; --ink-soft:#514F72; --surface:#FFFFFF; --line:#E4E1F5;
@@ -2909,7 +2910,9 @@ function b64urlDecode(s){
   while(s.length % 4) s += '=';
   return new TextDecoder().decode(Uint8Array.from(atob(s), c=>c.charCodeAt(0)));
 }
-const baseURL = () => location.href.split('#')[0];
+// Запущено з файлу (file://) — таке посилання нікому не відкриється, тож ведемо на опубліковану гру
+const PUBLIC_URL = 'https://cyrilreyda.github.io/hot-keys/';
+const baseURL = () => /^https?:$/.test(location.protocol) ? location.href.split('#')[0] : PUBLIC_URL;
 const num = (x, max) => Math.max(0, Math.min(max, Math.round(+x) || 0));
 const cleanName = n => String(n || 'Гравець').slice(0, 24);
 const RANK_MEDAL = ['', 'bronze', 'silver', 'gold'];
@@ -3065,6 +3068,8 @@ function route(){
   else startGame();
 }
 route();
+// Офлайн-режим: службовий скрипт зберігає гру в браузері (працює лише з адреси http/https, не з файлу)
+if('serviceWorker' in navigator && /^https?:$/.test(location.protocol)) navigator.serviceWorker.register('sw.js').catch(()=>{});
 window.addEventListener('hashchange', ()=>{ if(readResultLink() || readProfileLink()) route(); });
 </script>
 </body>
