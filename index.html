@@ -304,6 +304,7 @@
   .mbox.fail{border-color:var(--coral);}
   .mbox.final{position:relative; padding-right:58px; border-color:var(--yellow); background:#FFFBEF; text-align:left;}
   .win-actions{display:flex; gap:10px; justify-content:center; flex-wrap:wrap; margin-top:6px;}
+  #overlay .win-actions{margin:0 0 14px;}   /* кнопки результату — під зірками, над показниками */
   .confetti{position:fixed; top:-20px; width:10px; height:16px; border-radius:3px; z-index:30; pointer-events:none; animation:fall linear forwards;}
   @keyframes fall{to{transform:translateY(110vh) rotate(720deg);}}
 
@@ -576,14 +577,14 @@
     <h2 id="winTitle"></h2>
     <p class="sub" id="wSub"></p>
     <div class="stars" id="wStars"></div>
-    <div class="result" id="wResult"></div>
-    <div id="wGain"></div>
-    <div id="wMission"></div>
-    <div id="wUnlock"></div>
     <div class="win-actions">
       <button class="btn btn-primary" id="againBtn" type="button">🔁 Ще раз</button>
       <button class="btn btn-ghost" id="toSetupBtn" type="button">До меню</button>
     </div>
+    <div class="result" id="wResult"></div>
+    <div id="wGain"></div>
+    <div id="wMission"></div>
+    <div id="wUnlock"></div>
   </div>
 </div>
 
