@@ -131,6 +131,11 @@
   .robot.bow-fly .acc{transform-origin:78px 22px; animation:bowspin 2s linear;}
   @keyframes bowspin{to{transform:rotate(1440deg);}}
   .robot.antenna{animation:salute .6s ease 2;}
+  .robot.cool{animation:cool 2.4s ease;}
+  @keyframes cool{20%,80%{transform:rotate(-6deg) translateY(-3px);}}
+  .robot.vroom{animation:vroom 2.8s ease;}
+  @keyframes vroom{5%,15%,25%,35%,45%{transform:translateX(-2px) rotate(-1deg);} 10%,20%,30%,40%,50%{transform:translateX(2px) rotate(1deg);}
+    65%,80%{transform:translateX(-40px) rotate(-8deg);}}
   .robot.shake{animation:shake .5s ease 2;}
   @keyframes shake{20%,60%{transform:translateX(-6px);} 40%,80%{transform:translateX(6px);}}
   .robot.drain{animation:drain 2.6s ease;}
@@ -1317,7 +1322,9 @@ const ACCS = [
   { id:'none',    name:'Без нічого', at:0 },
   { id:'cap',     name:'Кепка',      at:25 },
   { id:'headset', name:'Навушники',  at:90 },
+  { id:'shades',  name:'Окуляри',    at:130 },
   { id:'bow',     name:'Бантик',     at:180 },
+  { id:'helmet',  name:'Шолом',      at:320 },
   { id:'crown',   name:'Корона',     at:500 }
 ];
 const WTHEMES = [
@@ -1485,10 +1492,15 @@ function robotSVG(color, acc='none', mood='idle'){
     cap:`<path d="M24 32 Q26 12 60 12 Q94 12 96 32 Z" fill="#FF6B4A"/><path d="M60 30 L104 30 Q104 37 90 37 L60 37 Z" fill="#E8453C"/><circle cx="60" cy="13" r="3.5" fill="#FFC93C"/>`,
     headset:`<path d="M18 50 Q18 14 60 14 Q102 14 102 50" fill="none" stroke="#1B1B3A" stroke-width="5"/><rect x="10" y="40" width="12" height="22" rx="5" fill="#1B1B3A"/><rect x="98" y="40" width="12" height="22" rx="5" fill="#1B1B3A"/>
       <path d="M16 62 Q20 76 38 74" fill="none" stroke="#1B1B3A" stroke-width="3"/><circle cx="40" cy="74" r="3.5" fill="#FF5D9E"/>`,
+    shades:`<path d="M24 46 H36 M84 46 H96" stroke="#E8E8F0" stroke-width="3" stroke-linecap="round"/><path d="M56 46 Q60 42 64 46" fill="none" stroke="#E8E8F0" stroke-width="3"/>
+      <path d="M35 42 H57 V50 Q57 58 46 58 Q35 58 35 50 Z M63 42 H85 V50 Q85 58 74 58 Q63 58 63 50 Z" fill="#05050C" stroke="#E8E8F0" stroke-width="2.5" stroke-linejoin="round"/>
+      <path d="M39 46 L45 46 M67 46 L73 46" stroke="#fff" stroke-width="2.2" stroke-linecap="round" opacity=".7"/>`,
     bow:`<path d="M78 22 L92 14 L92 30 Z M78 22 L64 14 L64 30 Z" fill="#FF5D9E" stroke="#fff" stroke-width="2" stroke-linejoin="round"/><circle cx="78" cy="22" r="4" fill="#E0457F"/>`,
+    helmet:`<path d="M16 46 Q16 6 60 6 Q104 6 104 46 Z" fill="#E8453C"/><path d="M54 7 Q60 6.5 66 7 V46 H54 Z" fill="#fff"/>
+      <path d="M26 40 Q60 30 94 40 L92 50 Q60 42 28 50 Z" fill="#7CC7F5" opacity=".5" stroke="#fff" stroke-width="1.5"/><circle cx="22" cy="44" r="4" fill="#1B1B3A"/><circle cx="98" cy="44" r="4" fill="#1B1B3A"/>`,
     crown:`<path d="M34 26 L32 6 L46 16 L60 2 L74 16 L88 6 L86 26 Z" fill="#FFC93C" stroke="#fff" stroke-width="2.5" stroke-linejoin="round"/><circle cx="60" cy="18" r="3" fill="#FF5D9E"/><circle cx="45" cy="21" r="2.2" fill="#16A3A0"/><circle cx="75" cy="21" r="2.2" fill="#6C5CE7"/>`
   };
-  const antenna = acc === 'crown' || acc === 'cap' ? '' : `<line x1="60" y1="26" x2="60" y2="12" stroke="${dk}" stroke-width="4" stroke-linecap="round"/><circle cx="60" cy="10" r="5.5" fill="#FFC93C"/>`;
+  const antenna = acc === 'crown' || acc === 'cap' || acc === 'helmet' ? '' : `<line x1="60" y1="26" x2="60" y2="12" stroke="${dk}" stroke-width="4" stroke-linecap="round"/><circle cx="60" cy="10" r="5.5" fill="#FFC93C"/>`;
   return `<svg viewBox="0 0 120 132" aria-hidden="true">
     ${antenna}
     <rect x="14" y="40" width="10" height="22" rx="5" fill="${dk}"/><rect x="96" y="40" width="10" height="22" rx="5" fill="${dk}"/>
@@ -1549,7 +1561,7 @@ function wallSVG(id){
     let f = '';
     [[40,370,'#FF5D9E'],[120,385,'#FFC93C'],[210,372,'#fff'],[300,388,'#FF5D9E'],[500,386,'#FFC93C'],[590,372,'#fff'],[680,384,'#FF5D9E'],[760,370,'#FFC93C']]
       .forEach(([x,y,c])=>f += `<circle cx="${x}" cy="${y}" r="5" fill="${c}"/><circle cx="${x}" cy="${y}" r="2" fill="#E8A33D"/>`);
-    return W(`<rect width="800" height="400" fill="url(#g)"/>${arcs}${cloud(90,340,1.1)}${cloud(710,340,1.1)}${cloud(400,70,.7)}
+    return W(`<rect width="800" height="400" fill="url(#g)"/>${arcs}<g opacity=".6">${cloud(90,70,.9)}${cloud(720,60,.8)}${cloud(400,250,.6)}</g>
       <path d="M0 350 Q200 320 400 350 T800 345 V400 H0 Z" fill="#7FCB8F"/>${f}`, grad('g', '#8ED3F7', '#E6F7FF'));
   }
   return W(`<rect width="800" height="400" fill="url(#g)"/><circle cx="705" cy="195" r="56" fill="#FFE27A" opacity=".95"/>
@@ -2237,12 +2249,18 @@ const TICKLES = [
 let tickles = 0, tickleAt = 0;
 const ROBOT_JOKES = {
   headset:{ text:'Охорона, відміна!', mood:'oops', cls:'salute', ms:2600, sound:()=>{ tone(660, .1, 'square', .04); tone(440, .22, 'square', .04, .14); } },
-  crown:  { text:'Коня! Коня! Півцарства за коня!', mood:'oops', cls:'horse', ms:3200,
+  crown:  { text:'Коня! Коня! Півкоролівства за коня!', mood:'oops', cls:'horse', ms:3200,
             sound:()=>[0,.12,.24, .6,.72,.84, 1.2,1.32,1.44].forEach(d=>tone(240, .05, 'square', .04, d)) },
   cap:    { text:'Йо! Кепку задом наперед — тепер я репер! 🎤', mood:'happy', cls:'cap-flip', ms:3000,
             sound:()=>[130,130,196,0,130,196].forEach((f,i)=>f && tone(f, .12, 'square', .05, i*.18)) },
   bow:    { text:'Бантик-пропелер, старт! Я лечу-у-у! 🚁', mood:'happy', cls:'bow-fly', ms:2800,
             sound:()=>[300,400,500,600,700,800,900,1000,1100,1200].forEach((f,i)=>tone(f, .08, 'sine', .04, i*.06)) },
+  shades: { text:'Робот. Тіммі Робот.', mood:'happy', cls:'cool', ms:2800,
+            sound:()=>[330,370,392,370,330,0,494].forEach((f,i)=>f && tone(f, i === 6 ? .5 : .16, 'triangle', .06, i*.17)) },
+  helmet: { text:'Тільки вперед!', mood:'happy', cls:'vroom', ms:3000,
+            sound:()=>{ [0,.12,.24,.36].forEach(d=>tone(70, .07, 'square', .06, d));   // стартер
+              for(let i = 0; i < 16; i++) tone(80 + i * 14, .1, 'sawtooth', .05, .55 + i * .05);   // мотор набирає оберти
+              for(let i = 0; i < 10; i++) tone(i % 2 ? 105 : 95, .07, 'sawtooth', .045, 1.4 + i * .07); } },
   none:   { text:'9 чи 10? Не чує робот', mood:'oops', cls:'antenna', ms:2800, sound:()=>tone(1000, .3, 'sine', .04) }
 };
 const JOKE_CLS = Object.values(ROBOT_JOKES).concat(TICKLES).map(j=>j.cls).concat('hop');
