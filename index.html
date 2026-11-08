@@ -300,6 +300,28 @@
   .unlock b{font-family:'Baloo 2',sans-serif; font-size:17px;}
   .next-unlock{font-size:13px; color:var(--ink-soft); margin:2px 0 12px;}
   .next-unlock .bar{margin-top:4px;}
+
+  /* ---------- Наліпки ---------- */
+  .stickers-box{margin-top:20px; padding-top:16px; border-top:1.5px dashed var(--line);}
+  .st-head{display:flex; align-items:center; gap:6px 12px; flex-wrap:wrap;}
+  .st-head h3{font-size:17px;}
+  .st-head span{font-size:13.5px; font-weight:600; color:var(--ink-soft);}
+  .stickers{display:grid; grid-template-columns:repeat(auto-fill, minmax(86px, 1fr)); gap:8px; margin-top:10px;}
+  .sticker{display:flex; flex-direction:column; align-items:center; gap:3px; text-align:center; cursor:pointer; font-family:'Baloo 2',sans-serif; font-weight:700; font-size:12.5px; line-height:1.15;}
+  .sticker .st-ico{position:relative; overflow:hidden; width:52px; height:52px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:27px;
+    background:radial-gradient(circle at 35% 30%, #FFFFFF, #FFF1C2); border:3px solid #FFC93C; box-shadow:0 3px 0 #E0A800;}
+  .sticker.no{color:var(--ink-soft); font-weight:600;}
+  .sticker.no .st-ico{background:var(--bg); border:2px dashed var(--line); box-shadow:none;}
+  .sticker.no .st-ico span{filter:grayscale(1); opacity:.3;}
+  .sticker.new .st-ico{animation:beat .6s ease 2;}
+  @keyframes beat{50%{transform:scale(1.4);}}
+  /* Ще не отримана наліпка знизу вгору заповнюється кольором на стільки, скільки вже зібрано */
+  .st-part{position:absolute; left:0; right:0; bottom:0; height:var(--fill); overflow:hidden; background:#FFE08A; border-top:2px solid #E0A800;}
+  .st-part span{position:absolute; left:0; right:0; bottom:0; height:48px; display:flex; align-items:center; justify-content:center;}
+  .sticker.no .st-ico .st-part, .sticker.no .st-ico .st-part span{filter:none; opacity:1;}
+  .sticker small{font-size:11.5px; font-weight:700; color:#8A6200;}
+  .unlock-list{display:flex; flex-wrap:wrap; justify-content:center; gap:10px 18px; margin-top:8px;}
+  .unlock-list .sticker{width:96px;}
   .mbox{border:2px dashed var(--teal); border-radius:var(--radius-m); padding:10px 12px; margin:4px 0 14px; font-size:14px;}
   .mbox.fail{border-color:var(--coral);}
   .mbox.final{position:relative; padding-right:58px; border-color:var(--yellow); background:#FFFBEF; text-align:left;}
@@ -556,6 +578,10 @@
       <div class="opt"><h3>Шпалери</h3><div class="cards" id="wallCards"></div></div>
       <div class="opt"><h3>Робот-помічник</h3><div class="cards" id="accCards"></div><div class="swatches" id="swatches"></div></div>
       <div class="opt"><h3>Тема вікон</h3><div class="cards" id="themeCards"></div></div>
+    </div>
+    <div class="stickers-box">
+      <div class="st-head"><h3>Наліпки</h3><span id="stickerCount"></span></div>
+      <div class="stickers" id="stickers"></div>
     </div>
   </section>
 
@@ -1311,6 +1337,46 @@ const NEURON = `<svg class="nico" viewBox="0 0 24 24" fill="none" aria-hidden="t
   <line x1="14.1" y1="8.4" x2="16.6" y2="4" stroke="#FFC93C" stroke-width="1.6" stroke-linecap="round"/><circle cx="16.6" cy="4" r="1.2" fill="#FFC93C"/>
   <circle cx="12" cy="12" r="4.4" fill="#FFC93C"/><circle cx="12" cy="12" r="1.6" fill="#E0A800" opacity="0.6"/></svg>`;
 
+/* ================= Наліпки ================= */
+// Наліпки за досягнення. Усі збираються поступово: count(p) — скільки вже є в профілі гравця, need — скільки треба.
+// best — рахується найкраща серія, а не накопичене. Лічильники в p.ach (див. newAch).
+const cardsAt = (p, lvl, topic) => CARDS.filter(c=>(!topic || c.topic === topic) && cardLevel(p.cards[c.id]) >= lvl).length;
+const STICKERS = [
+  { id:'first',   ico:'🐣', name:'Початок',          how:'Пройти до кінця перше знайомство, тренування чи місію',             count:p=>p.ach.done, need:1 },
+  { id:'streak',  ico:'🔥', name:'Вогняна серія',    how:'Виконати 30 завдань поспіль без помилок і підказок',                count:p=>p.ach.bestStreak, need:30, best:true },
+  { id:'speed',   ico:'⚡', name:'Блискавка',        how:'50 разів виконати завдання швидше ніж за 2,5 секунди, без помилок і підказки', count:p=>p.ach.fast, need:50 },
+  { id:'mouse',   ico:'🖱️', name:'Влучна мишка',     how:'Зібрати мишкою на екранній клавіатурі 30 комбінацій',               count:p=>p.ach.screen, need:30 },
+  { id:'days',    ico:'📅', name:'Щодня потроху',    how:'Грати в 5 різні дні',                                               count:p=>p.ach.days, need:5 },
+  { id:'bronze',  ico:'🃏', name:'Колекціонер',      how:'Отримати бронзу на 30 картках',                                     count:p=>cardsAt(p, 1), need:30 },
+  { id:'gold',    ico:'🥇', name:'Золотий фонд',     how:'Довести 5 карток до золота',                                        count:p=>cardsAt(p, 3), need:5 },
+  { id:'text',    ico:'📝', name:'Знавець тексту',   how:'Отримати срібло на 10 картках теми «Текст»',                        count:p=>cardsAt(p, 2, 'text'), need:10 },
+  { id:'files',   ico:'📁', name:'Знавець файлів',   how:'Отримати срібло на 7 картках теми «Файли»',                         count:p=>cardsAt(p, 2, 'files'), need:7 },
+  { id:'browser', ico:'🌐', name:'Знавець браузера', how:'Отримати срібло на 7 картках теми «Браузер»',                       count:p=>cardsAt(p, 2, 'browser'), need:7 },
+  { id:'win',     ico:'🖥️', name:'Знавець Windows',  how:'Отримати срібло на 8 картках теми «Windows»',                       count:p=>cardsAt(p, 2, 'win'), need:8 },
+  { id:'missions',ico:'🏆', name:'Агент місій',      how:'Пройти 10 різних місій',                                            count:p=>MISSIONS.filter(m=>p.missions[m.id]).length, need:10 },
+  { id:'mgold',   ico:'👑', name:'Золоті місії',     how:'Отримати золото в 5 місіях',                                        count:p=>MISSIONS.filter(m=>p.missions[m.id]?.medal === 'gold').length, need:5 },
+  { id:'neurons', ico:'🧠', name:'Розумник',         how:'Зібрати 1000 нейрончиків',                                          count:p=>p.neurons, need:1000 },
+];
+// Скільки вже зібрано з need (лише для ще не отриманих)
+const stickerProgress = st => profile.stickers[st.id] ? 0 : Math.min(st.count(profile) || 0, st.need);
+const progressText = (st, n) => `${st.best ? 'рекорд' : n ? 'уже' : 'поки'} ${n} з ${st.need}`;
+// Наліпка: отримана — кольорова, ще ні — сіра, частково заповнена кольором, а під назвою — скільки вже зібрано, навіть 0.
+// n = null — прогрес невідомий (сторінка досягнень за посиланням)
+function stickerHTML(st, got = !!profile.stickers[st.id], n = stickerProgress(st)){
+  const show = !got && n !== null;
+  const part = show && n ? `<span class="st-part" style="--fill:${Math.round(n / st.need * 100)}%"><span>${st.ico}</span></span>` : '';
+  return `<span class="sticker${got ? '' : ' no'}" data-st="${st.id}" title="${st.how}${show ? ` — ${progressText(st, n)}` : ''}">` +
+    `<span class="st-ico"><span>${st.ico}</span>${part}</span>${st.name}${show ? `<small>${n} з ${st.need}</small>` : ''}</span>`;
+}
+// Видає наліпки, умову яких уже виконано; повертає нові
+function awardStickers(){
+  const got = STICKERS.filter(st=>!profile.stickers[st.id] && (st.count(profile) || 0) >= st.need);
+  got.forEach(st=>profile.stickers[st.id] = today());
+  if(got.length) saveStore();
+  return got;
+}
+const stickersWord = n => n > 1 ? 'Нові наліпки' : 'Нова наліпка';
+
 /* ================= Бейджики місій ================= */
 // Малюються у квадраті 40×40 з білою «вирубкою» навколо — як у «Клавіатурних перегонах»
 const OUT = 'stroke="#fff" stroke-width="3.5" stroke-linejoin="round" paint-order="stroke"';
@@ -1440,7 +1506,10 @@ const esc = s => String(s).replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'
 
 const STORE_KEY = 'hot-keys-v1';
 const DEFAULT_SETTINGS = { topic:'text', stage:1, mode:'train', wall:'sky', acc:'none', color:COLORS[0], theme:'classic', badge:'' };
-const newProfile = () => ({ neurons:0, tasks:0, rounds:0, cards:{}, missions:{}, since:today(), settings:{ ...DEFAULT_SETTINGS } });
+// Лічильники для наліпок: done — раундів пройдено до кінця; streak і bestStreak — поточна й найкраща серія без помилок
+// і підказок через усі тренування й місії; fast — швидких відповідей; screen — комбінацій мишкою; days і day — днів гри й останній
+const newAch = () => ({ done:0, streak:0, bestStreak:0, fast:0, screen:0, days:0, day:0 });
+const newProfile = () => ({ neurons:0, tasks:0, rounds:0, cards:{}, missions:{}, ach:newAch(), stickers:{}, since:today(), settings:{ ...DEFAULT_SETTINGS } });
 let store = { current:null, players:{} };
 try{ const s = JSON.parse(localStorage.getItem(STORE_KEY)); if(s && s.players) store = s; }catch(e){}
 function saveStore(){ if(player) try{ localStorage.setItem(STORE_KEY, JSON.stringify(store)); }catch(e){} }
@@ -1454,7 +1523,8 @@ function loadPlayer(name){
   player = name;
   store.current = name;
   profile = store.players[name];
-  profile.cards ||= {}; profile.missions ||= {};
+  profile.cards ||= {}; profile.missions ||= {}; profile.stickers ||= {};
+  profile.ach = { ...newAch(), ...profile.ach };
   profile.settings = settings = { ...DEFAULT_SETTINGS, ...profile.settings };
   saveStore();
   renderPlayerBtn();
@@ -2239,7 +2309,15 @@ function renderSetup(){
   document.getElementById('missionCount').textContent = `${done}/${MISSIONS.length}`;
   const got = CARDS.filter(c=>cardLevel(profile.cards[c.id]) > 0).length;
   document.getElementById('cardCount').textContent = `${got}/${CARDS.length}`;
+  document.getElementById('stickerCount').textContent = `${STICKERS.filter(st=>profile.stickers[st.id]).length} з ${STICKERS.length}`;
+  document.getElementById('stickers').innerHTML = STICKERS.map(st=>stickerHTML(st)).join('');
 }
+// Клацання по наліпці підказує, за що її дають (на планшеті підказки при наведенні немає)
+document.getElementById('stickers').addEventListener('click', e=>{
+  const st = STICKERS.find(st=>st.id === e.target.closest('[data-st]')?.dataset.st);
+  if(!st) return;
+  showToast(`${st.ico} ${st.how}${profile.stickers[st.id] ? ' ✓' : ` — ${progressText(st, stickerProgress(st))}`}`);
+});
 
 function renderMissions(){
   const list = document.getElementById('missionList');
@@ -2321,8 +2399,11 @@ function toSetup(){
   setApp(topicOf(settings.topic).app);
   st = APPS[appId].idle();
   renderApp();
+  // Наліпки, заслужені поза підсумком раунду: вихід посеред раунду або прогрес, зібраний до появи наліпок
+  const got = player ? awardStickers() : [];
   showTab(activeTab());
-  say(player ? 'Я твій помічник. Підкажу, якщо що!' : 'Привіт! Як тебе звати?');
+  if(got.length) say(`${stickersWord(got.length)}: ${got.map(st=>`${st.ico} ${st.name}`).join(', ')}! Глянь унизу.`, 'ok', 'happy');
+  else say(player ? 'Я твій помічник. Підкажу, якщо що!' : 'Привіт! Як тебе звати?');
 }
 
 /* ================= Раунд ================= */
@@ -2483,6 +2564,15 @@ function success(t){
   if(clean){ round.streak++; round.bestStreak = Math.max(round.bestStreak, round.streak); } else round.streak = 0;
   let extra = '';
   if(round.streak && round.streak % 5 === 0){ gain += 3; extra = ` Серія ${round.streak}! 🔥`; }
+  // Для наліпок. Знайомство (там підказка завжди є) рахується лише як день гри
+  const a = profile.ach;
+  if(a.day !== today()){ a.day = today(); a.days++; }
+  if(round.mode !== 'learn'){
+    a.streak = clean ? a.streak + 1 : 0;
+    a.bestStreak = Math.max(a.bestStreak, a.streak);
+    if(clean && ms < 2500) a.fast++;
+    if(isScreen(t)) a.screen++;
+  }
   // Картка росте тільки за відповідь без помилок і без підказки (у Знайомстві підказка завжди є)
   if(clean && round.mode !== 'learn'){
     const st = profile.cards[t.card.id] ||= { n:0, days:[], best:0 };
@@ -2515,6 +2605,7 @@ function wrong(t, combo, action){
   round.errors++;
   round.taskErrors++;
   round.streak = 0;
+  if(round.mode !== 'learn') profile.ach.streak = 0;
   buzz();
   const win = document.getElementById(appId === 'os' ? 'osLayer' : 'appwin');
   win.classList.remove('shake'); void win.offsetWidth; win.classList.add('shake');
@@ -2574,7 +2665,9 @@ function finishRound(completed, why){
   if(r.mode === 'mission' && failed){
     missionHTML = `<div class="mbox fail">${why === 'time' ? `⏱ Час вийшов: пройдено ${done} з ${r.tasks.length} кроків.` : `Точність ${acc}% — для цієї місії треба від ${r.mission.minAcc}%.`} Спробуй ще раз!</div>`;
   }
+  if(!failed) profile.ach.done++;
   saveStore();
+  const earned = awardStickers();
   renderHUD(true);
 
   document.getElementById('wBig').textContent = failed ? '🔧' : medal ? MEDALS[medal][0] : '🎉';
@@ -2591,10 +2684,13 @@ function finishRound(completed, why){
   const newly = UNLOCKS.filter(u=>u.at > r.before && u.at <= profile.neurons);
   const next = UNLOCKS.find(u=>u.at > profile.neurons);
   document.getElementById('wUnlock').innerHTML =
+    (earned.length ? `<div class="unlock"><b>🎉 ${stickersWord(earned.length)}!</b><div class="unlock-list">${earned.map(st=>stickerHTML(st)).join('')}</div></div>` : '') +
     (newly.length ? `<div class="unlock"><b>🎁 Відкрито!</b><br>${newly.map(u=>u.label).join('<br>')}</div>` : '') +
     (next ? `<div class="next-unlock">Далі: ${next.label} — ще ${next.at - profile.neurons} ${NEURON}<div class="bar"><i style="width:${Math.round(profile.neurons / next.at * 100)}%"></i></div></div>` : '');
+  document.querySelectorAll('#wUnlock .sticker').forEach(s=>s.classList.add('new'));
   overlay.classList.add('show');
-  if(!failed){ fanfare(); if(medal || stars === 3) confetti(); }
+  if(!failed){ fanfare(); if(medal || stars === 3 || earned.length) confetti(); }
+  else if(earned.length) confetti();
   else tone(260, .3, 'triangle', .06);
   againBtn.onclick = ()=>startRound(r.mode, r.mission);
   say(failed ? 'Нічого страшного, ще раз!' : 'Ура! Ти молодець!', failed ? '' : 'ok', failed ? 'idle' : 'happy');
@@ -2822,13 +2918,14 @@ function renderProfile(){
   const lv = [0,0,0,0]; CARDS.forEach(c=>lv[cardLevel(profile.cards[c.id])]++);
   document.getElementById('profStats').innerHTML =
     `<span>${NEURON} <b>${profile.neurons}</b></span><span>завдань <b>${profile.tasks}</b></span>` +
-    `<span>картки 🥇<b>${lv[3]}</b> 🥈<b>${lv[2]}</b> 🥉<b>${lv[1]}</b></span><span>місій <b>${MISSIONS.filter(m=>profile.missions[m.id]).length}/${MISSIONS.length}</b></span>`;
+    `<span>картки 🥇<b>${lv[3]}</b> 🥈<b>${lv[2]}</b> 🥉<b>${lv[1]}</b></span><span>місій <b>${MISSIONS.filter(m=>profile.missions[m.id]).length}/${MISSIONS.length}</b></span>` +
+    `<span>наліпок <b>${STICKERS.filter(st=>profile.stickers[st.id]).length}/${STICKERS.length}</b></span>`;
   const list = document.getElementById('playerList');
   const names = Object.keys(store.players).sort((a, b)=>a===player ? -1 : b===player ? 1 : a.localeCompare(b, 'uk'));
   list.innerHTML = names.map(n=>{
     const p = store.players[n], me = n === player;
     return `<div class="pl-row${me ? ' me' : ''}">${miniBot(p.settings)}
-      <span class="pl-name">${esc(n)}<small>${NEURON} ${p.neurons || 0}</small></span>
+      <span class="pl-name">${esc(n)}<small>${NEURON} ${p.neurons || 0} · наліпок ${STICKERS.filter(st=>p.stickers?.[st.id]).length} з ${STICKERS.length}</small></span>
       ${me ? '<span class="pl-you">це ти</span>' : `<button type="button" class="btn btn-primary btn-small" data-play="${esc(n)}">Грати</button>`}
       <button type="button" class="pl-del" data-del="${esc(n)}" title="Видалити гравця">✕</button>
     </div>`;
@@ -2923,7 +3020,8 @@ function makeShareLink(){
   for(const m of MISSIONS){ const r = profile.missions[m.id]; if(r) ms[m.id] = [MEDAL_RANK[r.medal], r.day, r.time]; }
   const cd = {};
   for(const c of CARDS){ const l = cardLevel(profile.cards[c.id]); if(l) cd[c.id] = l; }
-  const data = { v:1, n:player, x:profile.neurons, t:profile.tasks, c:settings.color, a:settings.acc, bd:settings.badge, ms, cd, f:profile.since, d:today() };
+  const s = STICKERS.filter(st=>profile.stickers[st.id]).map(st=>st.id);
+  const data = { v:1, n:player, x:profile.neurons, t:profile.tasks, c:settings.color, a:settings.acc, bd:settings.badge, ms, cd, s, f:profile.since, d:today() };
   return baseURL() + '#r=' + b64urlEncode(JSON.stringify(data));
 }
 function makeResultLink(m, r){
@@ -2943,7 +3041,8 @@ function readProfileLink(){
   for(const m of MISSIONS){ const x = d.ms?.[m.id]; if(Array.isArray(x) && RANK_MEDAL[num(x[0], 3)]) ms[m.id] = { medal:RANK_MEDAL[num(x[0], 3)], day:num(x[1], 1e6), time:num(x[2], 36e5) }; }
   const cd = {};
   for(const c of CARDS){ const l = num(d.cd?.[c.id], 3); if(l) cd[c.id] = l; }
-  return { n:cleanName(d.n), x:num(d.x, 1e7), t:num(d.t, 1e7), ...lookOf(d), ms, cd, d:num(d.d, 1e6) };
+  const s = Array.isArray(d.s) ? STICKERS.filter(st=>d.s.includes(st.id)).map(st=>st.id) : null;   // у посиланнях до появи наліпок їх немає
+  return { n:cleanName(d.n), x:num(d.x, 1e7), t:num(d.t, 1e7), ...lookOf(d), ms, cd, s, d:num(d.d, 1e6) };
 }
 function readResultLink(){
   const d = readHash('c');
@@ -3025,6 +3124,9 @@ function showProfile(d){
         return `<div class="medal-item${x ? ' got' : ''}" title="${x ? `${MEDALS[x.medal][1]} · ${fmtDay(x.day)} · ${fmtTime(x.time)}` : 'Ще не пройдено'}">
           ${badgeHTML(m.badge)}${x ? `<span class="m">${MEDALS[x.medal][0]}</span>` : ''}<small>${m.name}</small></div>`; }).join('')}
     </div></div>
+    ${d.s ? `<div class="share-sec"><h3>Наліпки · ${d.s.length}/${STICKERS.length}</h3><div class="stickers">
+      ${STICKERS.map(st=>stickerHTML(st, d.s.includes(st.id), null)).join('')}
+    </div></div>` : ''}
     ${TOPICS.flatMap(t=>t.stages.filter(s=>!s.soon).map(s=>[t, s])).map(([t, s])=>`<div class="share-sec"><h3>Картки · ${t.label} · етап ${s.n}</h3><div class="hk-cards">
       ${cardsOf(t.id, s.n).map(c=>{ const l = d.cd[c.id] || 0;
         return `<div class="hk l${l}"><span class="lvl${l ? '' : ' none'}">${LEVEL_ICON[l]}</span><div class="keys">${kbdHTML(c.keys, c.or ? '/' : '+')}</div><h4>${c.name}</h4></div>`; }).join('')}
