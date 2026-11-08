@@ -324,6 +324,8 @@
   .unlock-list .sticker{width:96px;}
   .mbox{border:2px dashed var(--teal); border-radius:var(--radius-m); padding:10px 12px; margin:4px 0 14px; font-size:14px;}
   .mbox.fail{border-color:var(--coral);}
+  .mbox.all{border-style:solid; border-color:var(--yellow); background:#FFFBEF; font-family:'Baloo 2',sans-serif; font-weight:700; font-size:15.5px;}
+  .comps > .mbox.all{grid-column:1 / -1; margin:0;}
   .mbox.final{position:relative; padding-right:58px; border-color:var(--yellow); background:#FFFBEF; text-align:left;}
   .win-actions{display:flex; gap:10px; justify-content:center; flex-wrap:wrap; margin-top:6px;}
   #overlay .win-actions{margin:0 0 14px;}   /* кнопки результату — під зірками, над показниками */
@@ -1341,11 +1343,16 @@ const NEURON = `<svg class="nico" viewBox="0 0 24 24" fill="none" aria-hidden="t
 // Наліпки за досягнення. Усі збираються поступово: count(p) — скільки вже є в профілі гравця, need — скільки треба.
 // best — рахується найкраща серія, а не накопичене. Лічильники в p.ach (див. newAch).
 const cardsAt = (p, lvl, topic) => CARDS.filter(c=>(!topic || c.topic === topic) && cardLevel(p.cards[c.id]) >= lvl).length;
+const missionsOf = topic => MISSIONS.filter(m=>m.topic === topic);
+const topicName = topic => topicOf(topic).label.split(' ').pop();   // «Текст» без значка
+const missionsDone = (p, topic) => missionsOf(topic).filter(m=>p.missions[m.id]).length;
+// Наліпка за всі місії теми
+const topicMissionsSticker = (topic, ico, name) =>
+  ({ id:'m-' + topic, ico, name, how:`Пройти всі ${missionsOf(topic).length} місій теми «${topicName(topic)}»`, count:p=>missionsDone(p, topic), need:missionsOf(topic).length });
 const STICKERS = [
   { id:'first',   ico:'🐣', name:'Початок',          how:'Пройти до кінця перше знайомство, тренування чи місію',             count:p=>p.ach.done, need:1 },
-  { id:'streak',  ico:'🔥', name:'Вогняна серія',    how:'Виконати 30 завдань поспіль без помилок і підказок',                count:p=>p.ach.bestStreak, need:30, best:true },
+  { id:'streak',  ico:'🌡️', name:'Гаряча сесія',     how:'Виконати 30 завдань поспіль без помилок і підказок',                count:p=>p.ach.bestStreak, need:30, best:true },
   { id:'speed',   ico:'⚡', name:'Блискавка',        how:'50 разів виконати завдання швидше ніж за 2,5 секунди, без помилок і підказки', count:p=>p.ach.fast, need:50 },
-  { id:'mouse',   ico:'🖱️', name:'Влучна мишка',     how:'Зібрати мишкою на екранній клавіатурі 30 комбінацій',               count:p=>p.ach.screen, need:30 },
   { id:'days',    ico:'📅', name:'Щодня потроху',    how:'Грати в 5 різні дні',                                               count:p=>p.ach.days, need:5 },
   { id:'bronze',  ico:'🃏', name:'Колекціонер',      how:'Отримати бронзу на 30 картках',                                     count:p=>cardsAt(p, 1), need:30 },
   { id:'gold',    ico:'🥇', name:'Золотий фонд',     how:'Довести 5 карток до золота',                                        count:p=>cardsAt(p, 3), need:5 },
@@ -1354,6 +1361,10 @@ const STICKERS = [
   { id:'browser', ico:'🌐', name:'Знавець браузера', how:'Отримати срібло на 7 картках теми «Браузер»',                       count:p=>cardsAt(p, 2, 'browser'), need:7 },
   { id:'win',     ico:'🖥️', name:'Знавець Windows',  how:'Отримати срібло на 8 картках теми «Windows»',                       count:p=>cardsAt(p, 2, 'win'), need:8 },
   { id:'missions',ico:'🏆', name:'Агент місій',      how:'Пройти 10 різних місій',                                            count:p=>MISSIONS.filter(m=>p.missions[m.id]).length, need:10 },
+  topicMissionsSticker('text', '📜', 'Герой тексту'),
+  topicMissionsSticker('files', '🗂️', 'Герой файлів'),
+  topicMissionsSticker('browser', '🧭', 'Герой браузера'),
+  topicMissionsSticker('win', '⚙️', 'Герой Windows'),
   { id:'mgold',   ico:'👑', name:'Золоті місії',     how:'Отримати золото в 5 місіях',                                        count:p=>MISSIONS.filter(m=>p.missions[m.id]?.medal === 'gold').length, need:5 },
   { id:'neurons', ico:'🧠', name:'Розумник',         how:'Зібрати 1000 нейрончиків',                                          count:p=>p.neurons, need:1000 },
 ];
@@ -1507,8 +1518,8 @@ const esc = s => String(s).replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'
 const STORE_KEY = 'hot-keys-v1';
 const DEFAULT_SETTINGS = { topic:'text', stage:1, mode:'train', wall:'sky', acc:'none', color:COLORS[0], theme:'classic', badge:'' };
 // Лічильники для наліпок: done — раундів пройдено до кінця; streak і bestStreak — поточна й найкраща серія без помилок
-// і підказок через усі тренування й місії; fast — швидких відповідей; screen — комбінацій мишкою; days і day — днів гри й останній
-const newAch = () => ({ done:0, streak:0, bestStreak:0, fast:0, screen:0, days:0, day:0 });
+// і підказок через усі тренування й місії; fast — швидких відповідей; days і day — днів гри й останній
+const newAch = () => ({ done:0, streak:0, bestStreak:0, fast:0, days:0, day:0 });
 const newProfile = () => ({ neurons:0, tasks:0, rounds:0, cards:{}, missions:{}, ach:newAch(), stickers:{}, since:today(), settings:{ ...DEFAULT_SETTINGS } });
 let store = { current:null, players:{} };
 try{ const s = JSON.parse(localStorage.getItem(STORE_KEY)); if(s && s.players) store = s; }catch(e){}
@@ -2321,7 +2332,8 @@ document.getElementById('stickers').addEventListener('click', e=>{
 
 function renderMissions(){
   const list = document.getElementById('missionList');
-  list.innerHTML = MISSIONS.map((m, i)=>{
+  const all = missionsDone(profile, settings.topic) === missionsOf(settings.topic).length;
+  list.innerHTML = (all ? `<div class="mbox all">🎉 Усі місії теми «${topicName(settings.topic)}» пройдено! Спробуй отримати в кожній золото.</div>` : '') + MISSIONS.map((m, i)=>{
     if(m.topic !== settings.topic) return '';
     const r = profile.missions[m.id];
     const open = isOpenAt(m.at) || linkOpen.has(m.id);
@@ -2571,7 +2583,6 @@ function success(t){
     a.streak = clean ? a.streak + 1 : 0;
     a.bestStreak = Math.max(a.bestStreak, a.streak);
     if(clean && ms < 2500) a.fast++;
-    if(isScreen(t)) a.screen++;
   }
   // Картка росте тільки за відповідь без помилок і без підказки (у Знайомстві підказка завжди є)
   if(clean && round.mode !== 'learn'){
@@ -2642,7 +2653,7 @@ function finishRound(completed, why){
   const done = r.i, acc = done + r.errors ? Math.round(done / (done + r.errors) * 100) : 100;
   const avgMs = r.times.length ? r.times.reduce((s, x)=>s + x, 0) / r.times.length : 0;
   profile.rounds++;
-  let medal = null, missionHTML = '', failed = !completed;
+  let medal = null, missionHTML = '', failed = !completed, allTopic = '';
   if(r.mode === 'mission' && completed){
     if(acc < r.mission.minAcc){ failed = true; why = 'acc'; }
     else{
@@ -2660,6 +2671,11 @@ function finishRound(completed, why){
       missionHTML = `<div class="mbox final"><b>${MEDALS[medal][0]} ${MEDALS[medal][1]}</b> за місію «${r.mission.name}»${better ? ` · бонус +${bonus}` : ''}<br>
         <span class="note-small">${medal === 'gold' ? 'Ідеально!' : medal === 'silver' ? `Для золота: без помилок, без підказок і швидше за ${fmtTime(r.mission.par * 1000)}.` : 'Для срібла: точність від 90% і не більше однієї підказки.'}</span>
         <button type="button" class="share-ico" data-url="${esc(link)}" title="Скопіювати посилання на результат для вчителя">${LINK_ICON}</button></div>`;
+      // Ця місія була останньою непройденою в темі
+      if(!prev && missionsDone(profile, r.topic) === missionsOf(r.topic).length){
+        allTopic = topicName(r.topic);
+        missionHTML += `<div class="mbox all">🎉 Усі місії теми «${allTopic}» пройдено!</div>`;
+      }
     }
   }
   if(r.mode === 'mission' && failed){
@@ -2693,7 +2709,7 @@ function finishRound(completed, why){
   else if(earned.length) confetti();
   else tone(260, .3, 'triangle', .06);
   againBtn.onclick = ()=>startRound(r.mode, r.mission);
-  say(failed ? 'Нічого страшного, ще раз!' : 'Ура! Ти молодець!', failed ? '' : 'ok', failed ? 'idle' : 'happy');
+  say(failed ? 'Нічого страшного, ще раз!' : allTopic ? `Усі місії теми «${allTopic}» пройдено! Молодець!` : 'Ура! Ти молодець!', failed ? '' : 'ok', failed ? 'idle' : 'happy');
 }
 
 function confetti(){
