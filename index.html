@@ -131,6 +131,12 @@
   .robot.bow-fly .acc{transform-origin:78px 22px; animation:bowspin 2s linear;}
   @keyframes bowspin{to{transform:rotate(1440deg);}}
   .robot.antenna{animation:salute .6s ease 2;}
+  .robot.shake{animation:shake .5s ease 2;}
+  @keyframes shake{20%,60%{transform:translateX(-6px);} 40%,80%{transform:translateX(6px);}}
+  .robot.drain{animation:drain 2.6s ease;}
+  @keyframes drain{40%,85%{transform:translateY(8px) scaleY(.9) rotate(-4deg); filter:grayscale(.8) brightness(.7);}}
+  .robot.panic{animation:panic .4s ease 6;}
+  @keyframes panic{25%{transform:translateY(-14px) rotate(-8deg);} 75%{transform:translateY(-14px) rotate(8deg);}}
   .bubble{position:absolute; right:calc(2.5% + 18px); bottom:calc(46px + clamp(84px, 13vw, 128px) * 1.05); z-index:5; max-width:min(260px, 30%);
     background:#fff; color:var(--ink); border-radius:16px; padding:8px 12px; font-family:'Baloo 2',sans-serif; font-weight:600; font-size:14.5px; line-height:1.3;
     box-shadow:0 6px 18px rgba(27,27,58,.18);}
@@ -2192,8 +2198,19 @@ function say(text, kind='', mood='idle', ms=0){
 }
 // Клік по роботу: тулуб — лоскотно, голова — жарт за аксесуаром
 const giggleSound = ()=>[1200,1000,1260,1040,1320,1080,1380].forEach((f,i)=>tone(f, .07, 'triangle', .06, i*.12));
+// Лоскочуть знову й знову — робот сердиться дедалі більше; після паузи все спочатку
+const TICKLES = [
+  { text:'Хі-хі-хі! Лоскотно! 🤭', mood:'happy', cls:'giggle', ms:2600, sound:giggleSound },
+  { text:'Хі-хі… Годі вже!', mood:'happy', cls:'giggle', ms:2400,
+    sound:()=>{ [900,760,940,780].forEach((f,i)=>tone(f, .07, 'triangle', .06, i*.12)); tone(300, .25, 'triangle', .06, .55); } },
+  { text:'Припини!', mood:'oops', cls:'shake', ms:2200, sound:()=>{ tone(330, .15, 'sawtooth', .04); tone(262, .3, 'sawtooth', .04, .18); } },
+  { text:'Я зараз розряджусь! 😵', mood:'oops', cls:'drain', ms:2800,
+    sound:()=>[880,740,620,520,440,370,310,260,220].forEach((f,i)=>tone(f, .12, 'sine', .05, i*.13)) },
+  { text:'Вчителю, рятуйте! 🚨', mood:'oops', cls:'panic', ms:3000,
+    sound:()=>[960,720,960,720,960,720,960,720].forEach((f,i)=>tone(f, .22, 'square', .035, i*.24)) }
+];
+let tickles = 0, tickleAt = 0;
 const ROBOT_JOKES = {
-  body:   { text:'Хі-хі-хі! Лоскотно! 🤭', mood:'happy', cls:'giggle', ms:2600, sound:giggleSound },
   headset:{ text:'Охорона, відміна!', mood:'oops', cls:'salute', ms:2600, sound:()=>{ tone(660, .1, 'square', .04); tone(440, .22, 'square', .04, .14); } },
   crown:  { text:'Коня! Коня! Півцарства за коня!', mood:'oops', cls:'horse', ms:3200,
             sound:()=>[0,.12,.24, .6,.72,.84, 1.2,1.32,1.44].forEach(d=>tone(240, .05, 'square', .04, d)) },
@@ -2203,12 +2220,18 @@ const ROBOT_JOKES = {
             sound:()=>[300,400,500,600,700,800,900,1000,1100,1200].forEach((f,i)=>tone(f, .08, 'sine', .04, i*.06)) },
   none:   { text:'9 чи 10? Не чує робот', mood:'oops', cls:'antenna', ms:2800, sound:()=>tone(1000, .3, 'sine', .04) }
 };
-const JOKE_CLS = Object.values(ROBOT_JOKES).map(j=>j.cls).concat('hop');
+const JOKE_CLS = Object.values(ROBOT_JOKES).concat(TICKLES).map(j=>j.cls).concat('hop');
 let jokeTimer = null;
 robotEl.addEventListener('click', e=>{
   const r = robotEl.getBoundingClientRect();
   const y = (e.clientY - r.top) / r.height * 132;   // у координатах малюнка: голова вище 84, нижче — тулуб
-  const j = ROBOT_JOKES[y < 84 ? (settings.acc || 'none') : 'body'] || ROBOT_JOKES.none;
+  let j;
+  if(y < 84) j = ROBOT_JOKES[settings.acc || 'none'] || ROBOT_JOKES.none;
+  else {
+    if(Date.now() - tickleAt > 6000) tickles = 0;
+    j = TICKLES[Math.min(tickles++, TICKLES.length - 1)];
+    tickleAt = Date.now();
+  }
   clearTimeout(sayTimer); clearTimeout(jokeTimer);
   bubbleEl.textContent = j.text;
   bubbleEl.className = 'bubble';
