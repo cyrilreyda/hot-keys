@@ -115,6 +115,22 @@
   .robot svg{display:block; width:100%; height:auto; overflow:visible;}
   .robot.hop{animation:hop .5s ease;}
   @keyframes hop{40%{transform:translateY(-12px);}}
+  /* Жарти робота: клік по тулубу чи голові */
+  .robot{cursor:pointer;}
+  .robot.giggle{animation:giggle 1.4s ease;}
+  @keyframes giggle{10%,30%,50%,70%{transform:rotate(-6deg) translateY(-3px);} 20%,40%,60%,80%{transform:rotate(6deg);}}
+  .robot.salute{animation:salute .9s ease;}
+  @keyframes salute{20%{transform:translateY(-6px) scale(1.06);} 45%{transform:translateY(0) scale(1);}}
+  .robot.horse{animation:horse 1.8s ease;}
+  @keyframes horse{15%,45%,75%{transform:translateY(-10px) rotate(-4deg);} 30%,60%,90%{transform:translateY(0) rotate(3deg);}}
+  .robot .acc{transform-box:view-box;}
+  .robot.cap-flip .acc{transform-origin:60px 0; animation:capflip 3s ease;}
+  @keyframes capflip{12%,88%{transform:scaleX(-1);}}
+  .robot.bow-fly{animation:bowfly 2s ease;}
+  @keyframes bowfly{30%,70%{transform:translateY(-34px);}}
+  .robot.bow-fly .acc{transform-origin:78px 22px; animation:bowspin 2s linear;}
+  @keyframes bowspin{to{transform:rotate(1440deg);}}
+  .robot.antenna{animation:salute .6s ease 2;}
   .bubble{position:absolute; right:calc(2.5% + 18px); bottom:calc(46px + clamp(84px, 13vw, 128px) * 1.05); z-index:3; max-width:min(260px, 30%);
     background:#fff; color:var(--ink); border-radius:16px; padding:8px 12px; font-family:'Baloo 2',sans-serif; font-weight:600; font-size:14.5px; line-height:1.3;
     box-shadow:0 6px 18px rgba(27,27,58,.18);}
@@ -1090,8 +1106,8 @@ MISSIONS.push(
     steps:[
       { card:'b-zoomin', say:'Текст задрібний — збільш масштаб', tabs:['wiki'], zoom:70 },
       { card:'b-zoomin', say:'Ще трохи більше' },
-      { card:'b-find', say:'Знайди на сторінці слово «кит»: відкрий пошук' },
-      { card:'b-find', say:'Надрукуй «кит»', hint:'Надрукуй літери К, И, Т', goal:s=>s.find && s.find.q.toLowerCase() === 'кит' },
+      { card:'b-find', say:'Знайди на сторінці слово «серце»: відкрий пошук' },
+      { card:'b-find', say:'Надрукуй «серце»', hint:'Надрукуй літери С, Е, Р, Ц, Е', goal:s=>s.find && s.find.q.toLowerCase() === 'серце' },
       { card:'b-esc', say:'Закрий пошук' },
       { card:'b-scroll', say:'Прокрути сторінку вниз', expect:['PageDown','Space'] },
       { card:'b-zoom0', say:'Поверни звичайний масштаб' }
@@ -1472,7 +1488,7 @@ function robotSVG(color, acc='none', mood='idle'){
     ${armR}
     <rect x="34" y="84" width="52" height="38" rx="12" fill="${color}"/>
     <circle cx="60" cy="101" r="7" fill="#FFC93C"/><circle cx="60" cy="101" r="3" fill="#fff" opacity=".7"/>
-    ${ACC[acc] || ''}
+    <g class="acc">${ACC[acc] || ''}</g>
   </svg>`;
 }
 
@@ -1918,9 +1934,11 @@ const PAGES = {
         'У п\'ятницю — екскурсія до планетарію для 4 класів.', 'Шкільна їдальня оновила меню: тепер щодня є фрукти.', 'Розклад перших уроків:'],
     table:[['День','Перший урок'],['Понеділок','Математика'],['Вівторок','Українська мова'],['Середа','Інформатика'],['Четвер','Природознавство'],['П\'ятниця','Фізкультура']],
     after:['Гуртки: робототехніка — у середу, шахи — у четвер.'] },
-  wiki:{ title:'Енциклопедія: Кит', url:'wiki.ua/kyt', h:'Синій кит',
-    ps:['Синій кит — найбільша тварина на Землі. Він завдовжки як три автобуси.', 'Хоч кит живе в морі, це не риба, а ссавець: кит дихає повітрям і випливає, щоб вдихнути.',
-        'Їсть кит дрібних рачків — криль. За день він з\'їдає кілька тонн їжі.', 'Кити спілкуються піснями, які чути за сотні кілометрів.', 'Синій кит живе до 90 років.'] },
+  wiki:{ title:'Енциклопедія: Восьминіг', url:'wiki.ua/vosmynih', h:'Восьминіг',
+    ps:['Восьминіг — морська тварина з вісьмома щупальцями і без жодної кістки. Тому він пролазить у щілину, куди пройде хіба монетка.',
+        'У восьминога три серця: два маленьких качають кров до зябер, а велике серце — по всьому тілу. Коли восьминіг пливе, велике серце зупиняється й відпочиває.',
+        'Кров у нього блакитна: у ній є мідь, а не залізо, як у нас.', 'За мить восьминіг змінює колір і навіть візерунок шкіри, щоб сховатися. А якщо його помітили — пускає хмару чорнила й тікає.',
+        'Він дуже кмітливий: відкручує кришки банок і знаходить вихід із лабіринту.', 'Більшість восьминогів живе лише рік-два.'] },
   weather:{ title:'Погода', url:'pogoda.ua', h:'Погода в Києві', ps:['Сьогодні: +18°, сонячно ☀️', 'Завтра: +15°, невеликий дощ 🌧️', 'Післязавтра: +20°, хмарно ⛅'] },
   video:{ title:'Відео: Космос', url:'video.ua/kosmos', h:'▶ Подорож до Сатурна', ps:['🪐 Відео про кільця Сатурна, 12 хвилин.', 'Наступне: «Як живуть космонавти на МКС».'] }
 };
@@ -2093,7 +2111,7 @@ function osRender(s){
   el.innerHTML = `<div class="os-area">${wins}</div>
     ${s.start ? `<div class="os-start">${START.map(([i, t])=>`<div><span>${i}</span>${t}</div>`).join('')}<div class="foot"><span>👤 ${esc(player || 'Учень')}</span><span>⏻</span></div></div>` : ''}
     ${s.snip ? '<div class="os-snip"><div class="sbar">✂️ Виділи область для знімка</div><div class="sel"></div></div>' : ''}
-    ${s.panel === 'clip' ? `<div class="os-panel"><h5>📋 Буфер обміну</h5>${(s.shots.length ? [...s.shots].reverse() : ['Знімок екрана']).map(x=>`<div class="it">🖼️ ${esc(x)}</div>`).join('')}<div class="it">Синій кит — найбільша тварина</div></div>` : ''}
+    ${s.panel === 'clip' ? `<div class="os-panel"><h5>📋 Буфер обміну</h5>${(s.shots.length ? [...s.shots].reverse() : ['Знімок екрана']).map(x=>`<div class="it">🖼️ ${esc(x)}</div>`).join('')}<div class="it">У восьминога три серця</div></div>` : ''}
     ${shooting && !s.shotWin ? '<div class="os-flash"></div>' : ''}${shooting ? `<div class="os-shotlabel">📸 ${esc(s.shots[s.shots.length - 1])} — у буфері обміну</div>` : ''}
     ${s.panel === 'emoji' ? `<div class="os-panel"><h5>😀 Емодзі</h5><div class="emo">${'😀 😂 😍 🤔 👍 🎉 ❤️ ⭐ 🐱 🐶 🍎 🚀'.split(' ').map(e=>`<span>${e}</span>`).join('')}</div></div>` : ''}
     ${switching ? `<div class="os-switch">${s.order.filter(id=>s.wins[id]).reverse().map(id=>`<div class="${id === s.active ? 'on' : ''}"><span>${OS_APPS[id].ico}</span>${OS_APPS[id].title}</div>`).join('')}</div>` : ''}
@@ -2162,7 +2180,9 @@ function applyLook(){
 }
 function setRobot(mood){ robotEl.innerHTML = robotSVG(settings.color, settings.acc, mood); }
 let sayTimer = null;
+let said = { text:'', kind:'', until:0 };   // що робот казав до жарту — після жарту повертаємо
 function say(text, kind='', mood='idle', ms=0){
+  said = { text, kind, until:ms ? Date.now() + ms : 0 };
   bubbleEl.textContent = text;
   bubbleEl.className = 'bubble' + (kind ? ' ' + kind : '');
   setRobot(mood);
@@ -2170,6 +2190,38 @@ function say(text, kind='', mood='idle', ms=0){
   clearTimeout(sayTimer);
   if(ms) sayTimer = setTimeout(()=>{ bubbleEl.textContent = ''; setRobot('idle'); }, ms);
 }
+// Клік по роботу: тулуб — лоскотно, голова — жарт за аксесуаром
+const giggleSound = ()=>[1200,1000,1260,1040,1320,1080,1380].forEach((f,i)=>tone(f, .07, 'triangle', .06, i*.12));
+const ROBOT_JOKES = {
+  body:   { text:'Хі-хі-хі! Лоскотно! 🤭', mood:'happy', cls:'giggle', ms:2600, sound:giggleSound },
+  headset:{ text:'Охорона, відміна!', mood:'oops', cls:'salute', ms:2600, sound:()=>{ tone(660, .1, 'square', .04); tone(440, .22, 'square', .04, .14); } },
+  crown:  { text:'Коня! Коня! Півцарства за коня!', mood:'oops', cls:'horse', ms:3200,
+            sound:()=>[0,.12,.24, .6,.72,.84, 1.2,1.32,1.44].forEach(d=>tone(240, .05, 'square', .04, d)) },
+  cap:    { text:'Йо! Кепку задом наперед — тепер я репер! 🎤', mood:'happy', cls:'cap-flip', ms:3000,
+            sound:()=>[130,130,196,0,130,196].forEach((f,i)=>f && tone(f, .12, 'square', .05, i*.18)) },
+  bow:    { text:'Бантик-пропелер, старт! Я лечу-у-у! 🚁', mood:'happy', cls:'bow-fly', ms:2800,
+            sound:()=>[300,400,500,600,700,800,900,1000,1100,1200].forEach((f,i)=>tone(f, .08, 'sine', .04, i*.06)) },
+  none:   { text:'Біп! Не крути антену — я ловлю мультики 📺', mood:'oops', cls:'antenna', ms:2800, sound:()=>tone(1000, .3, 'sine', .04) }
+};
+const JOKE_CLS = Object.values(ROBOT_JOKES).map(j=>j.cls).concat('hop');
+let jokeTimer = null;
+robotEl.addEventListener('click', e=>{
+  const r = robotEl.getBoundingClientRect();
+  const y = (e.clientY - r.top) / r.height * 132;   // у координатах малюнка: голова вище 84, нижче — тулуб
+  const j = ROBOT_JOKES[y < 84 ? (settings.acc || 'none') : 'body'] || ROBOT_JOKES.none;
+  clearTimeout(sayTimer); clearTimeout(jokeTimer);
+  bubbleEl.textContent = j.text;
+  bubbleEl.className = 'bubble';
+  setRobot(j.mood);
+  robotEl.classList.remove(...JOKE_CLS); void robotEl.offsetWidth; robotEl.classList.add(j.cls);
+  j.sound();
+  jokeTimer = setTimeout(()=>{
+    robotEl.classList.remove(j.cls);
+    const left = said.until - Date.now();
+    if(said.until && left <= 0){ bubbleEl.textContent = ''; setRobot('idle'); }
+    else say(said.text, said.kind, 'idle', said.until ? left : 0);
+  }, j.ms);
+});
 const clockText = () => { const d = new Date(); return `${d.getHours()}:${String(d.getMinutes()).padStart(2, '0')}`; };
 function tickClock(){ document.getElementById('clock').textContent = clockText(); }
 tickClock(); setInterval(tickClock, 15000);
