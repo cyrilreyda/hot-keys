@@ -2201,7 +2201,7 @@ const ROBOT_JOKES = {
             sound:()=>[130,130,196,0,130,196].forEach((f,i)=>f && tone(f, .12, 'square', .05, i*.18)) },
   bow:    { text:'Бантик-пропелер, старт! Я лечу-у-у! 🚁', mood:'happy', cls:'bow-fly', ms:2800,
             sound:()=>[300,400,500,600,700,800,900,1000,1100,1200].forEach((f,i)=>tone(f, .08, 'sine', .04, i*.06)) },
-  none:   { text:'Біп! Не крути антену — я ловлю мультики 📺', mood:'oops', cls:'antenna', ms:2800, sound:()=>tone(1000, .3, 'sine', .04) }
+  none:   { text:'9 чи 10? Не чує робот', mood:'oops', cls:'antenna', ms:2800, sound:()=>tone(1000, .3, 'sine', .04) }
 };
 const JOKE_CLS = Object.values(ROBOT_JOKES).map(j=>j.cls).concat('hop');
 let jokeTimer = null;
