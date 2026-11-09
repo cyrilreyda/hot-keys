@@ -374,7 +374,10 @@
 
   /* Профіль */
   .win.prof{position:relative; text-align:left;}
-  .win.prof > #profShare .share-ico{top:16px; right:16px;}
+  /* Хрестик угорі праворуч закриває вікно */
+  .prof-close{position:absolute; top:14px; right:14px; z-index:1; width:34px; height:34px; border-radius:50%; border:1.5px solid var(--line); background:var(--surface); color:var(--ink-soft); font-size:16px; font-weight:700; line-height:1; cursor:pointer;}
+  .prof-close:hover{border-color:var(--coral); color:var(--coral);}
+  .prof-foot .share-ico{position:static;}   /* «поділитися» — унизу праворуч, поруч із «скинути мій прогрес» */
   .win.prof h2{text-align:center; font-size:24px;}
   .prof-avatar{position:relative; width:150px; margin:0 auto 6px; padding:16px 26px 8px; border-radius:var(--radius-l); background:linear-gradient(180deg, #E3F7F6, #F6F5FB);}
   .prof-avatar svg{display:block; width:100%; height:auto; overflow:visible;}
@@ -662,7 +665,7 @@
 <!-- Профіль -->
 <div class="overlay" id="profileOverlay">
   <div class="win prof" role="dialog" aria-labelledby="profTitle">
-    <div id="profShare"></div>
+    <button class="prof-close" id="profClose" type="button" title="Закрити вікно" aria-label="Закрити вікно">✕</button>
     <div class="prof-avatar" id="profAvatar"></div>
     <h2 id="profTitle"></h2>
     <div class="prof-stats" id="profStats"></div>
@@ -675,7 +678,7 @@
     <p class="note-small" id="addErr"></p>
     <div class="prof-foot">
       <button class="link-btn danger" id="resetBtn" type="button">скинути мій прогрес</button>
-      <button class="btn btn-ghost btn-small" id="profClose" type="button">Закрити</button>
+      <div id="profShare"></div>
     </div>
   </div>
 </div>
