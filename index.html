@@ -385,6 +385,7 @@
   .prof-foot .share-ico{position:static;}   /* «поділитися» — унизу праворуч, поруч із «скинути мій прогрес» */
   .win.prof h2{text-align:center; font-size:24px;}
   .prof-avatar{position:relative; width:150px; margin:0 auto 6px; padding:16px 26px 8px; border-radius:var(--radius-l); background:linear-gradient(180deg, #E3F7F6, #F6F5FB);}
+  .prof-games{margin:-2px 0 8px; text-align:center;}   /* «🏅 Мої ігри» під аватаром — лише з акаунтом сайту */
   .prof-avatar svg{display:block; width:100%; height:auto; overflow:visible;}
   .prof-avatar .badge-ico{position:absolute; top:-8px; right:-10px; width:52px; height:52px;}
   .prof-stats{display:flex; justify-content:center; flex-wrap:wrap; gap:6px 16px; margin:4px 0 6px; font-size:14px; color:var(--ink-soft);}
@@ -672,6 +673,7 @@
   <div class="win prof" role="dialog" aria-labelledby="profTitle">
     <button class="prof-close" id="profClose" type="button" title="Закрити вікно" aria-label="Закрити вікно">✕</button>
     <div class="prof-avatar" id="profAvatar"></div>
+    <div class="prof-games" id="profGames" hidden><button class="link-btn" id="profGamesBtn" type="button">🏅 Мої ігри</button></div>
     <h2 id="profTitle"></h2>
     <div class="prof-stats" id="profStats"></div>
     <h3 id="playersTitle">Гравці на цьому пристрої</h3>
@@ -2816,6 +2818,7 @@ function finishRound(completed, why){
     missionHTML = `<div class="mbox fail">${why === 'time' ? `⏱ Час вийшов: пройдено ${done} з ${r.tasks.length} кроків.` : `Точність ${acc}% — для цієї місії треба від ${r.mission.minAcc}%.`} Спробуй ще раз!</div>`;
   }
   if(!failed) profile.ach.done++;
+  if(!failed) ACC?.played();   // «Мої ігри» на сайті: ця гра зіграна (повтори account.js пропускає сам)
   saveStore();
   const earned = awardStickers();
   renderHUD(true);
@@ -3100,6 +3103,10 @@ function renderProfile(){
     `<button type="button" class="share-ico" data-url="${esc(makeShareLink())}" title="Поділитися досягненнями">${LINK_ICON}</button>`;
   bindLinkButtons(document.getElementById('profShare'));
   document.getElementById('profAvatar').innerHTML = robotSVG(settings.color, settings.acc, 'happy') + badgeHTML(settings.badge);
+  // «Мої ігри» (усі ігри сайту й наліпки за них) відкриває клік на аватар або кнопку під ним — лише з акаунтом сайту
+  const games = !!ACC?.user, av = document.getElementById('profAvatar');
+  av.style.cursor = games ? 'pointer' : ''; av.title = games ? 'Мої ігри' : '';
+  document.getElementById('profGames').hidden = !games;
   document.getElementById('profTitle').textContent = player;
   const lv = [0,0,0,0]; CARDS.forEach(c=>lv[cardLevel(profile.cards[c.id])]++);
   document.getElementById('profStats').innerHTML =
@@ -3160,6 +3167,9 @@ document.getElementById('addForm').addEventListener('submit', e=>{
 });
 document.getElementById('playerBtn').addEventListener('click', openProfile);
 document.getElementById('profClose').addEventListener('click', ()=>profileOverlay.classList.remove('show'));
+const openGames = ()=>{ if(ACC?.user) ACC.showGames(); };
+document.getElementById('profAvatar').addEventListener('click', openGames);
+document.getElementById('profGamesBtn').addEventListener('click', openGames);
 profileOverlay.addEventListener('click', e=>{ if(e.target === profileOverlay) profileOverlay.classList.remove('show'); });
 document.addEventListener('keydown', e=>{
   if(e.key !== 'Escape') return;
