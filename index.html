@@ -1629,8 +1629,19 @@ function renderHUD(pop){
 }
 
 /* ================= Звук ================= */
+// Звук — один перемикач для всіх ігор сайту на цьому пристрої: 'off' — без звуку, інакше звук є.
+// Учням його не показуємо: вимикає вчитель адресою ?zvuk=tykho (вмикає ?zvuk=klas) або Ctrl+Alt+Z
+const SOUND_KEY = 'site-sound';
+let soundOn = true;
+try{ soundOn = localStorage.getItem(SOUND_KEY) !== 'off'; }catch(e){}
+function setSound(on){
+  soundOn = on;
+  try{ localStorage.setItem(SOUND_KEY, on ? 'on' : 'off'); }catch(e){}
+  showToast(on ? '🔊 Звук увімкнено' : '🔇 Без звуку');
+}
 let actx = null;
 function tone(freq, dur=0.12, type='sine', vol=0.07, delay=0){
+  if(!soundOn) return;
   try{
     actx = actx || new (window.AudioContext || window.webkitAudioContext)();
     const t = actx.currentTime + delay;
@@ -3376,6 +3387,22 @@ function route(){
   else if(prof) showProfile(prof);
   else startGame();
 }
+// Прихований перемикач звуку (спільний для всіх ігор сайту): ?zvuk=klas або ?zvuk=tykho (параметр одразу зникає з адреси) чи Ctrl+Alt+Z
+{
+  const q = new URLSearchParams(location.search), z = q.get('zvuk');
+  if(z === 'klas' || z === 'tykho'){
+    q.delete('zvuk');
+    history.replaceState(null, '', location.pathname + (q.toString() ? '?' + q : '') + location.hash);
+    setSound(z === 'klas');
+  }
+}
+// Ctrl+Alt+Z ловимо на window у фазі перехоплення — раніше за перехоплення клавіш гри на document — і далі не пускаємо:
+// у завданні вона не зарахується як помилка й не сплутається з Ctrl+Z
+window.addEventListener('keydown', e=>{
+  if(!(e.ctrlKey && e.altKey && !e.shiftKey && !e.metaKey && e.code === 'KeyZ')) return;
+  e.preventDefault(); e.stopPropagation();
+  if(!e.repeat) setSound(!soundOn);
+}, true);
 route();
 // Офлайн-режим: службовий скрипт зберігає гру в браузері (працює лише з адреси http/https, не з файлу)
 if('serviceWorker' in navigator && /^https?:$/.test(location.protocol)) navigator.serviceWorker.register('sw.js').catch(()=>{});
