@@ -2800,6 +2800,7 @@ function finishRound(completed, why){
   const done = r.i, acc = done + r.errors ? Math.round(done / (done + r.errors) * 100) : 100;
   const avgMs = r.times.length ? r.times.reduce((s, x)=>s + x, 0) / r.times.length : 0;
   profile.rounds++;
+  ACC?.played();   // «Мої ігри» на сайті: ця гра зіграна, навіть якщо місія не вдалася (повтори account.js пропускає сам)
   let medal = null, missionHTML = '', failed = !completed, allTopic = '';
   if(r.mode === 'mission' && completed){
     if(acc < r.mission.minAcc){ failed = true; why = 'acc'; }
@@ -2829,7 +2830,6 @@ function finishRound(completed, why){
     missionHTML = `<div class="mbox fail">${why === 'time' ? `⏱ Час вийшов: пройдено ${done} з ${r.tasks.length} кроків.` : `Точність ${acc}% — для цієї місії треба від ${r.mission.minAcc}%.`} Спробуй ще раз!</div>`;
   }
   if(!failed) profile.ach.done++;
-  if(!failed) ACC?.played();   // «Мої ігри» на сайті: ця гра зіграна (повтори account.js пропускає сам)
   saveStore();
   const earned = awardStickers();
   renderHUD(true);
