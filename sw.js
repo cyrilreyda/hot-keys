@@ -1,12 +1,14 @@
 // Офлайн-режим: після першого відкриття з інтернетом гра й інструкція працюють без мережі.
 // Сторінки — спершу з мережі (щоб з інтернетом завжди була свіжа версія), без мережі — з кешу.
 // Шрифти й значки змінюються рідко, тому спершу з кешу.
-const CACHE = 'hot-keys-v1';
+const CACHE = 'hot-keys-v2';
 const FILES = [
   './', './index.html', './guide/', './guide/index.html', './manifest.webmanifest',
   './fonts/fonts.css', './fonts/baloo2-latin.woff2', './fonts/nunitosans-cyrillic.woff2', './fonts/nunitosans-latin.woff2',
   './icons/icon-192.png', './icons/icon-512.png'
 ];
+// Спільні файли сайту, які гра підключає з кореня: замок уроку, акаунт, «Разом», «Клас»
+FILES.push('/lock.js', '/account.js', '/duel.js', '/classrace.js');
 
 self.addEventListener('install', e=>{
   e.waitUntil(caches.open(CACHE).then(c=>c.addAll(FILES)).then(()=>self.skipWaiting()));
@@ -33,3 +35,10 @@ self.addEventListener('fetch', e=>{
 });
 
 function put(req, res){ caches.open(CACHE).then(c=>c.put(req, res)); }
+
+// Каталог, відкритий з інтернетом, просить кожну гру оновити збережену копію: тоді для роботи без мережі
+// досить відкрити каталог, а не кожну гру. no-cache — умовний запит: файл, що не змінився, не завантажується вдруге
+self.addEventListener('message', e=>{
+  if(e.data !== 'refresh') return;
+  e.waitUntil(caches.open(CACHE).then(c=>c.addAll(FILES.map(f=>new Request(f, { cache:'no-cache' })))).catch(()=>{}));
+});
