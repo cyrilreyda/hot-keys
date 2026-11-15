@@ -9,6 +9,7 @@
 <link rel="icon" type="image/png" href="icons/icon-192.png">
 <meta name="theme-color" content="#16A3A0">
 <script src="/lock.js"></script>   <!-- замок «лише на уроці» з каталогу; у грі з архіву його немає, і вона відкривається як завжди -->
+<script src="/account.js"></script>   <!-- спільний акаунт учня з каталогу; без нього гра питає ім'я, як раніше -->
 <style>
   :root{
     --bg:#F6F5FB; --ink:#1B1B3A; --ink-soft:#514F72; --surface:#FFFFFF; --line:#E4E1F5;
@@ -673,7 +674,7 @@
     <div class="prof-avatar" id="profAvatar"></div>
     <h2 id="profTitle"></h2>
     <div class="prof-stats" id="profStats"></div>
-    <h3>Гравці на цьому пристрої</h3>
+    <h3 id="playersTitle">Гравці на цьому пристрої</h3>
     <div class="players" id="playerList"></div>
     <form class="field" id="addForm">
       <input id="addInput" maxlength="24" placeholder="Ім'я нового гравця" autocomplete="off">
@@ -1589,7 +1590,15 @@ const newAch = () => ({ done:0, streak:0, bestStreak:0, fast:0, days:0, day:0 })
 const newProfile = () => ({ neurons:0, tasks:0, rounds:0, cards:{}, missions:{}, ach:newAch(), stickers:{}, since:today(), settings:{ ...DEFAULT_SETTINGS } });
 let store = { current:null, players:{} };
 try{ const s = JSON.parse(localStorage.getItem(STORE_KEY)); if(s && s.players) store = s; }catch(e){}
-function saveStore(){ if(player) try{ localStorage.setItem(STORE_KEY, JSON.stringify(store)); }catch(e){} }
+// Спільний акаунт (/account.js каталогу): учень входить один раз для всіх ігор, прогрес іде за ним на інші пристрої.
+// Тоді в store лише він сам, а гравці, що грали тут до акаунта (legacy), можуть забрати свій прогрес при першому вході
+const ACC = window.Account;
+const legacy = store;
+function saveStore(){
+  if(!player) return;
+  if(ACC){ ACC.save(STORE_KEY, profile); return; }
+  try{ localStorage.setItem(STORE_KEY, JSON.stringify(store)); }catch(e){}
+}
 
 let player = null;
 let profile = newProfile();
@@ -2563,7 +2572,7 @@ function pickTraining(topic, stage){
 }
 
 function startRound(mode, mission){
-  if(!player){ openNameModal(true); return; }
+  if(!player){ if(!ACC) openNameModal(true); return; }
   document.activeElement?.blur();
   if(!startMenu.hidden) toggleStartMenu(false);
   const topic = mission ? mission.topic : settings.topic;
@@ -3035,6 +3044,42 @@ document.getElementById('nameForm').addEventListener('submit', e=>{
   enterGame(n);
 });
 document.getElementById('nameCancel').addEventListener('click', ()=>nameOverlay.classList.remove('show'));
+
+// Акаунт: учень увійшов. Якщо в цій грі в нього ще нічого немає, а на пристрої є гравці з часів до акаунта,
+// пропонуємо забрати свій прогрес (забраний гравець зникає зі списку, щоб його не забрав ще хтось)
+function enterAccount(){
+  const me = ACC.user.label, saved = ACC.get(STORE_KEY);
+  // Збережене може бути неповним (напр. лише нейрончики й наліпки): бракуючі поля беремо з нового профілю
+  const begin = p=>{ store = { current:me, players:{ [me]:{ ...newProfile(), ...p } } }; enterGame(me); };
+  const names = Object.keys(legacy.players);
+  if(saved || ACC.user.guest || !names.length){ begin(saved); return; }
+  nameRequired = true;
+  document.getElementById('nameTitle').textContent = 'Ти вже грав на цьому пристрої?';
+  nameOverlay.querySelector('.sub').textContent = 'Обери своє ім\'я, щоб забрати свої нейрончики, картки, медалі й робота.';
+  document.getElementById('nameForm').hidden = true;
+  document.getElementById('nameCancel').hidden = true;
+  const known = document.getElementById('knownPlayers');
+  known.innerHTML = names.map(n=>`<button type="button" class="chip-btn" data-n="${esc(n)}">👤 ${esc(n)}</button>`).join('') +
+    `<button type="button" class="btn btn-ghost btn-small" data-new style="width:100%">Ні, почати спочатку</button>`;
+  known.querySelectorAll('[data-n]').forEach(b=>b.addEventListener('click', ()=>{
+    const p = legacy.players[b.dataset.n];
+    delete legacy.players[b.dataset.n];
+    if(legacy.current === b.dataset.n) legacy.current = null;
+    try{ localStorage.setItem(STORE_KEY, JSON.stringify(legacy)); }catch(e){}
+    begin(p);
+  }));
+  known.querySelector('[data-new]').addEventListener('click', ()=>begin(null));
+  nameOverlay.classList.add('show');
+}
+// Дані змінилися з іншого пристрою (account.js уже звів їх із цими): підхоплюємо, не перериваючи гру
+ACC?.on('update', key=>{
+  if(!player || key !== STORE_KEY) return;
+  Object.assign(profile, ACC.get(STORE_KEY));
+  profile.settings = settings = { ...DEFAULT_SETTINGS, ...profile.settings };
+  renderHUD();
+  renderPlayerBtn();
+});
+
 function enterGame(name){
   loadPlayer(name);
   nameOverlay.classList.remove('show');
@@ -3062,6 +3107,15 @@ function renderProfile(){
     `<span>картки 🥇<b>${lv[3]}</b> 🥈<b>${lv[2]}</b> 🥉<b>${lv[1]}</b></span><span>місій <b>${MISSIONS.filter(m=>profile.missions[m.id]).length}/${MISSIONS.length}</b></span>` +
     `<span>наліпок <b>${STICKERS.filter(st=>profile.stickers[st.id]).length}/${STICKERS.length}</b></span>`;
   const list = document.getElementById('playerList');
+  if(ACC){
+    const u = ACC.user;
+    document.getElementById('playersTitle').textContent = 'Вхід';
+    document.getElementById('addForm').hidden = true;
+    list.innerHTML = `<div class="pl-row me">${miniBot(settings)}<span class="pl-name">${esc(u.full)}<small>${u.guest ? 'граєш без входу: прогрес лише на цьому пристрої' : 'прогрес зберігається для всіх ігор і пристроїв'}</small></span>
+      <button type="button" class="btn btn-primary btn-small" id="logoutBtn">${u.guest ? 'Увійти' : 'Вийти'}</button></div>`;
+    document.getElementById('logoutBtn').addEventListener('click', ()=>ACC.logout());
+    return;
+  }
   const names = Object.keys(store.players).sort((a, b)=>a===player ? -1 : b===player ? 1 : a.localeCompare(b, 'uk'));
   list.innerHTML = names.map(n=>{
     const p = store.players[n], me = n === player;
@@ -3077,7 +3131,7 @@ function renderProfile(){
   document.getElementById('addErr').textContent = '';
 }
 function openProfile(){
-  if(!player){ openNameModal(true); return; }
+  if(!player){ if(!ACC) openNameModal(true); return; }
   if(round) toSetup();
   renderProfile();
   profileOverlay.classList.add('show');
@@ -3280,6 +3334,7 @@ function leaveShared(){
   startGame();
 }
 function startGame(){
+  if(ACC){ loadDefaults(); toSetup(); ACC.ready(enterAccount); return; }
   if(store.current && store.players[store.current]) enterGame(store.current);
   else { loadDefaults(); toSetup(); openNameModal(true); }
 }
