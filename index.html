@@ -3188,8 +3188,10 @@ document.addEventListener('keydown', e=>{
   guideOverlay.classList.remove('show');
   if(!nameRequired) nameOverlay.classList.remove('show');
 });
-document.getElementById('resetBtn').addEventListener('click', ()=>{
+// З акаунтом скидання підтверджують картинки: на класному комп'ютері вхід міг лишитися відкритим, і чужий прогрес скинув би будь-хто
+document.getElementById('resetBtn').addEventListener('click', async ()=>{
   if(!confirm(`Скинути весь прогрес гравця «${player}»? Нейрончики, картки й медалі почнуться спочатку.`)) return;
+  if(ACC && !await ACC.confirmReset(STORE_KEY, newProfile())) return;
   store.players[player] = newProfile();
   enterGame(player);
 });
